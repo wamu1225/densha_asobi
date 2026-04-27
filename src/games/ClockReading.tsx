@@ -1,129 +1,160 @@
 import { useState } from 'react'
 import { GameLayout } from '../components/GameLayout'
 
-type Phase = 'play' | 'over'
+type Difficulty = 'easy' | 'normal' | 'hard'
+type Phase = 'select' | 'play' | 'over'
 
-interface ClockTime { h: number; m: number }
+const BEST_KEY = 'densha_clock_best'
+function getBest(): Record<string, number> {
+  try { return JSON.parse(localStorage.getItem(BEST_KEY) || '{}') } catch { return {} }
+}
+function saveBest(key: string, val: number) {
+  const b = getBest(); if (!b[key] || val > b[key]) { b[key] = val; localStorage.setItem(BEST_KEY, JSON.stringify(b)) }
+}
 
-function randomTime(): ClockTime {
-  return {
-    h: Math.floor(Math.random() * 12) + 1,
-    m: Math.floor(Math.random() * 12) * 5,
+const DIFF_LABEL: Record<Difficulty, string> = { easy: 'ちょうど（〜じ）', normal: '15分きざみ', hard: '5分きざみ' }
+const DIFF_MINUTES: Record<Difficulty, number[]> = {
+  easy: [0],
+  normal: [0, 15, 30, 45],
+  hard: [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55],
+}
+const TOTAL = 12
+
+function randomTime(diff: Difficulty) {
+  const mins = DIFF_MINUTES[diff]
+  return { h: Math.floor(Math.random() * 12) + 1, m: mins[Math.floor(Math.random() * mins.length)] }
+}
+
+function fmt(h: number, m: number) {
+  return m === 0 ? `${h}じ` : `${h}じ ${m}ふん`
+}
+
+function makeChoices(h: number, m: number, diff: Difficulty) {
+  const correct = fmt(h, m)
+  const used = new Set([correct])
+  const result = [{ h, m }]
+  const allMins = DIFF_MINUTES[diff]
+  while (result.length < 4) {
+    const nh = Math.floor(Math.random() * 12) + 1
+    const nm = allMins[Math.floor(Math.random() * allMins.length)]
+    const s = fmt(nh, nm)
+    if (!used.has(s)) { used.add(s); result.push({ h: nh, m: nm }) }
   }
+  return result.sort(() => Math.random() - 0.5)
 }
 
-function fmt(t: ClockTime) {
-  return t.m === 0 ? `${t.h}じ` : `${t.h}じ ${t.m}ふん`
-}
-
-function makeChoices(correct: ClockTime): ClockTime[] {
-  const used = new Set([fmt(correct)])
-  const choices: ClockTime[] = [correct]
-  while (choices.length < 4) {
-    const c = randomTime()
-    if (!used.has(fmt(c))) { used.add(fmt(c)); choices.push(c) }
-  }
-  return choices.sort(() => Math.random() - 0.5)
-}
-
-function ClockSvg({ h, m }: ClockTime) {
+function ClockSvg({ h, m }: { h: number; m: number }) {
   const cx = 120, cy = 120, r = 100
-  const mAngle = (m / 60) * 360 - 90
-  const hAngle = ((h % 12) / 12) * 360 + (m / 60) * 30 - 90
-  const toXY = (angle: number, len: number) => ({
-    x: cx + len * Math.cos((angle * Math.PI) / 180),
-    y: cy + len * Math.sin((angle * Math.PI) / 180),
-  })
-  const mP = toXY(mAngle, 80)
-  const hP = toXY(hAngle, 55)
-
+  const mAng = (m / 60) * 360 - 90
+  const hAng = ((h % 12) / 12) * 360 + (m / 60) * 30 - 90
+  const toXY = (a: number, l: number) => ({ x: cx + l * Math.cos((a * Math.PI) / 180), y: cy + l * Math.sin((a * Math.PI) / 180) })
+  const mP = toXY(mAng, 78); const hP = toXY(hAng, 55)
   return (
-    <svg viewBox="0 0 240 240" className="w-48 h-48">
+    <svg viewBox="0 0 240 240" className="w-52 h-52 drop-shadow-lg">
+      <circle cx={cx} cy={cy} r={r + 8} fill="#e0e7ff" />
       <circle cx={cx} cy={cy} r={r} fill="white" stroke="#6366f1" strokeWidth="4" />
-      {[...Array(12)].map((_, i) => {
-        const a = (i / 12) * 360 - 90
-        const p1 = toXY(a, 85); const p2 = toXY(a, 95)
-        return <line key={i} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#6366f1" strokeWidth={i % 3 === 0 ? 3 : 1.5} />
+      {[...Array(60)].map((_, i) => {
+        const a = (i / 60) * 360 - 90; const isHour = i % 5 === 0
+        const p1 = toXY(a, isHour ? 82 : 90); const p2 = toXY(a, 97)
+        return <line key={i} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={isHour ? '#6366f1' : '#c7d2fe'} strokeWidth={isHour ? 3 : 1} />
       })}
-      {[12, 3, 6, 9].map((n, i) => {
-        const a = (i / 4) * 360 - 90
-        const p = toXY(a, 72)
-        return <text key={n} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" fontSize="16" fontWeight="bold" fill="#4f46e5">{n}</text>
+      {[1,2,3,4,5,6,7,8,9,10,11,12].map(n => {
+        const a = ((n / 12) * 360 - 90) * Math.PI / 180
+        const p = { x: cx + 70 * Math.cos(a), y: cy + 70 * Math.sin(a) }
+        return <text key={n} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" fontSize="15" fontWeight="bold" fill="#4338ca">{n}</text>
       })}
-      <line x1={cx} y1={cy} x2={mP.x} y2={mP.y} stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
-      <line x1={cx} y1={cy} x2={hP.x} y2={hP.y} stroke="#1e293b" strokeWidth="5" strokeLinecap="round" />
-      <circle cx={cx} cy={cy} r="5" fill="#e11d48" />
+      <line x1={cx} y1={cy} x2={mP.x} y2={mP.y} stroke="#1e293b" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1={cx} y1={cy} x2={hP.x} y2={hP.y} stroke="#1e293b" strokeWidth="6" strokeLinecap="round" />
+      {m !== 0 && <line x1={cx} y1={cy} x2={toXY(mAng, 85).x} y2={toXY(mAng, 85).y} stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round" />}
+      <circle cx={cx} cy={cy} r="6" fill="#e11d48" />
     </svg>
   )
 }
 
 export function ClockReading() {
-  const [phase, setPhase] = useState<Phase>('play')
-  const [time, setTime] = useState(randomTime())
-  const [choices, setChoices] = useState(() => makeChoices(randomTime()))
+  const [phase, setPhase] = useState<Phase>('select')
+  const [diff, setDiff] = useState<Difficulty>('easy')
+  const [time, setTime] = useState({ h: 3, m: 0 })
+  const [choices, setChoices] = useState<{ h: number; m: number }[]>([])
   const [score, setScore] = useState(0)
   const [qNum, setQNum] = useState(1)
   const [flash, setFlash] = useState<'ok' | 'ng' | null>(null)
-  const total = 10
+  const [wrongAns, setWrongAns] = useState('')
+  const best = getBest()
 
-  function next() {
-    const t = randomTime()
-    setTime(t)
-    setChoices(makeChoices(t))
+  function loadQ(d: Difficulty) {
+    const t = randomTime(d); setTime(t); setChoices(makeChoices(t.h, t.m, d))
   }
 
-  useState(() => { next() })
+  function start(d: Difficulty) { setDiff(d); setScore(0); setQNum(1); loadQ(d); setPhase('play') }
 
-  function tap(c: ClockTime) {
-    if (fmt(c) === fmt(time)) {
-      setFlash('ok')
-      setScore(s => s + 1)
+  function tap(c: { h: number; m: number }) {
+    if (fmt(c.h, c.m) === fmt(time.h, time.m)) {
+      setFlash('ok'); setScore(s => s + 1); setWrongAns('')
     } else {
-      setFlash('ng')
+      setFlash('ng'); setWrongAns(`こたえ：${fmt(time.h, time.m)}`)
     }
     setTimeout(() => {
-      setFlash(null)
-      if (qNum >= total) { setPhase('over') } else { setQNum(n => n + 1); next() }
-    }, 400)
+      setFlash(null); setWrongAns('')
+      if (qNum >= TOTAL) { setPhase('over') } else { setQNum(n => n + 1); loadQ(diff) }
+    }, 800)
   }
 
-  function reset() {
-    setPhase('play'); setScore(0); setQNum(1); next()
-  }
-
-  if (phase === 'over') return (
+  if (phase === 'select') return (
     <GameLayout title="とけいをよもう" color="bg-purple-400">
-      <div className="flex flex-col items-center gap-6 pt-10 bounce-in">
-        <p className="text-4xl">🎉</p>
-        <p className="text-3xl font-bold text-gray-700">おわり！</p>
-        <div className="bg-purple-100 rounded-3xl p-6 text-center">
-          <p className="text-lg text-gray-600">せいかい</p>
-          <p className="text-6xl font-bold text-purple-500 mt-2">{score}<span className="text-2xl"> / {total}</span></p>
-        </div>
-        <button onClick={reset} className="px-8 py-4 text-xl font-bold bg-purple-400 text-white rounded-2xl shadow active:scale-95">
-          もういちど
-        </button>
+      <div className="flex flex-col gap-4 pt-4">
+        <p className="text-center text-xl font-bold text-gray-700">むずかしさをえらんでね</p>
+        {(['easy', 'normal', 'hard'] as Difficulty[]).map(d => (
+          <button key={d} onClick={() => start(d)} className="bg-white border-2 border-purple-200 rounded-2xl p-4 text-left shadow active:scale-95">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="font-bold text-gray-700">{d === 'easy' ? '🌟 かんたん' : d === 'normal' ? '⭐ ふつう' : '🔥 むずかしい'}</p>
+                <p className="text-sm text-gray-500 mt-1">{DIFF_LABEL[d]}</p>
+              </div>
+              {best[d] != null && <p className="text-sm text-gray-400">🏆 {best[d]}/{TOTAL}</p>}
+            </div>
+          </button>
+        ))}
       </div>
     </GameLayout>
   )
 
+  if (phase === 'over') {
+    saveBest(diff, score)
+    const b = getBest()[diff]
+    return (
+      <GameLayout title="とけいをよもう" color="bg-purple-400">
+        <div className="flex flex-col items-center gap-5 pt-8 bounce-in">
+          <p className="text-4xl">{score >= 10 ? '🎉' : '😊'}</p>
+          <p className="text-3xl font-bold text-gray-700">おわり！</p>
+          <div className="bg-purple-50 border-2 border-purple-200 rounded-3xl p-6 text-center w-full">
+            <p className="text-lg text-gray-500">せいかい</p>
+            <p className="text-6xl font-bold text-purple-500 mt-1">{score}<span className="text-2xl"> / {TOTAL}</span></p>
+            {b != null && <p className="text-sm text-gray-400 mt-2">🏆 ベスト {b}/{TOTAL}</p>}
+          </div>
+          <div className="flex gap-3 w-full">
+            <button onClick={() => start(diff)} className="flex-1 py-4 text-lg font-bold bg-purple-400 text-white rounded-2xl shadow active:scale-95">もういちど</button>
+            <button onClick={() => setPhase('select')} className="flex-1 py-4 text-lg font-bold bg-gray-200 text-gray-700 rounded-2xl active:scale-95">もどる</button>
+          </div>
+        </div>
+      </GameLayout>
+    )
+  }
+
   return (
     <GameLayout title="とけいをよもう" color="bg-purple-400">
-      <div className={`flex flex-col items-center gap-4 transition-colors rounded-2xl p-2 ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
+      <div className={`flex flex-col items-center gap-3 rounded-2xl p-2 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
         <div className="flex justify-between w-full">
           <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
-          <span className="text-xl font-bold text-gray-700">{qNum} / {total}</span>
+          <span className="text-xl font-bold text-gray-700">{qNum} / {TOTAL}</span>
         </div>
         <p className="text-lg text-gray-600">なんじ なんぷん？</p>
         <ClockSvg h={time.h} m={time.m} />
-        <div className="grid grid-cols-2 gap-3 w-full mt-2">
+        {wrongAns && <p className="text-red-500 font-bold text-lg bounce-in">{wrongAns}</p>}
+        <div className="grid grid-cols-2 gap-3 w-full">
           {choices.map((c, i) => (
-            <button
-              key={i}
-              onClick={() => tap(c)}
-              className="py-5 text-xl font-bold bg-white rounded-2xl border-2 border-purple-300 shadow active:scale-95"
-            >
-              {fmt(c)}
+            <button key={i} onClick={() => tap(c)} className="py-5 text-xl font-bold bg-white rounded-2xl border-2 border-purple-300 shadow active:scale-95">
+              {fmt(c.h, c.m)}
             </button>
           ))}
         </div>
