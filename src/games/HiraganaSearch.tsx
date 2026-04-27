@@ -3,48 +3,138 @@ import { GameLayout } from '../components/GameLayout'
 
 const GRAD = 'linear-gradient(135deg, #67e8f9, #06b6d4)'
 
-interface Puzzle { title: string; grid: string[][]; words: { word: string; cells: [number, number][] }[] }
+interface WordDef { word: string; cells: [number, number][] }
+interface Puzzle { title: string; grid: string[][]; words: WordDef[] }
 
 const PUZZLES: Puzzle[] = [
   {
     title: 'どうぶつ①',
-    grid: [['ね','こ','て','れ','い','ぬ'],['い','と','り','あ','し','か'],['な','ろ','く','ね','ま','ん'],['く','は','な','こ','た','ち'],['め','ぐ','さ','か','な','き'],['か','ゆ','ぷ','て','も','ろ']],
-    words: [{ word: 'ねこ', cells: [[0,0],[0,1]] },{ word: 'とり', cells: [[1,1],[1,2]] },{ word: 'いぬ', cells: [[0,4],[0,5]] },{ word: 'さかな', cells: [[4,2],[4,3],[4,4]] }],
+    grid: [
+      ['ね','こ','て','れ','い','ぬ'],
+      ['い','と','り','あ','し','か'],
+      ['な','ろ','く','ほ','ま','ん'],
+      ['く','は','な','こ','た','ち'],
+      ['め','ぐ','さ','か','な','き'],
+      ['か','ゆ','ぷ','て','も','ろ'],
+    ],
+    words: [
+      { word: 'ねこ',   cells: [[0,0],[0,1]] },
+      { word: 'とり',   cells: [[1,1],[1,2]] },
+      { word: 'いぬ',   cells: [[0,4],[0,5]] },
+      { word: 'さかな', cells: [[4,2],[4,3],[4,4]] },
+    ],
   },
   {
     title: 'どうぶつ②',
-    grid: [['う','さ','ぎ','て','ぞ','う'],['ま','ら','く','れ','い','わ'],['く','め','ほ','ぬ','し','か'],['ら','と','か','も','の','め'],['い','つ','か','め','て','く'],['の','き','ん','ぎ','ょ','い']],
-    words: [{ word: 'うさぎ', cells: [[0,0],[0,1],[0,2]] },{ word: 'ぞう', cells: [[0,4],[0,5]] },{ word: 'かめ', cells: [[4,2],[4,3]] },{ word: 'きんぎょ', cells: [[5,1],[5,2],[5,3],[5,4]] }],
+    grid: [
+      ['う','さ','ぎ','て','ぞ','う'],
+      ['ま','ら','く','れ','い','わ'],
+      ['く','め','ほ','ぬ','し','か'],
+      ['ら','と','か','も','の','め'],
+      ['い','つ','か','め','て','く'],
+      ['の','き','ん','ぎ','ょ','い'],
+    ],
+    words: [
+      { word: 'うさぎ',   cells: [[0,0],[0,1],[0,2]] },
+      { word: 'ぞう',     cells: [[0,4],[0,5]] },
+      { word: 'かめ',     cells: [[4,2],[4,3]] },
+      { word: 'きんぎょ', cells: [[5,1],[5,2],[5,3],[5,4]] },
+    ],
   },
   {
     title: 'くだもの①',
-    grid: [['り','ん','ご','も','か','て'],['わ','れ','く','も','す','ね'],['な','し','た','か','り','ぬ'],['き','め','ほ','ぐ','ら','ん'],['い','ち','ご','は','ぷ','む'],['か','れ','わ','し','て','き']],
-    words: [{ word: 'りんご', cells: [[0,0],[0,1],[0,2]] },{ word: 'もも', cells: [[0,3],[1,3]] },{ word: 'なし', cells: [[2,0],[2,1]] },{ word: 'いちご', cells: [[4,0],[4,1],[4,2]] }],
+    grid: [
+      ['り','ん','ご','も','か','て'],
+      ['わ','れ','く','も','す','ね'],
+      ['な','し','た','か','り','ぬ'],
+      ['き','め','ほ','ぐ','ら','ん'],
+      ['い','ち','ご','は','ぷ','む'],
+      ['か','れ','わ','し','て','き'],
+    ],
+    words: [
+      { word: 'りんご', cells: [[0,0],[0,1],[0,2]] },
+      { word: 'もも',   cells: [[0,3],[1,3]] },
+      { word: 'なし',   cells: [[2,0],[2,1]] },
+      { word: 'いちご', cells: [[4,0],[4,1],[4,2]] },
+    ],
   },
   {
     title: 'くだもの②',
-    grid: [['バ','ナ','ナ','か','め','ろ'],['ぶ','ど','う','わ','み','ん'],['れ','ん','ほ','た','か','く'],['い','ろ','て','ぬ','ん','ぎ'],['す','い','か','く','め','て'],['か','ゆ','つ','ら','し','も']],
-    words: [{ word: 'バナナ', cells: [[0,0],[0,1],[0,2]] },{ word: 'ぶどう', cells: [[1,0],[1,1],[1,2]] },{ word: 'みかん', cells: [[1,4],[2,4],[3,4]] },{ word: 'すいか', cells: [[4,0],[4,1],[4,2]] }],
+    grid: [
+      ['バ','ナ','ナ','か','め','ろ'],
+      ['ぶ','ど','う','わ','み','ん'],
+      ['れ','ん','ほ','た','か','く'],
+      ['い','ろ','て','ぬ','ん','ぎ'],
+      ['す','い','か','く','め','て'],
+      ['か','ゆ','つ','ら','し','も'],
+    ],
+    words: [
+      { word: 'バナナ', cells: [[0,0],[0,1],[0,2]] },
+      { word: 'ぶどう', cells: [[1,0],[1,1],[1,2]] },
+      { word: 'みかん', cells: [[1,4],[2,4],[3,4]] },
+      { word: 'すいか', cells: [[4,0],[4,1],[4,2]] },
+    ],
   },
   {
     title: 'のりもの①',
-    grid: [['ひ','こ','う','き','か','く'],['な','め','ら','ぬ','し','る'],['き','ほ','て','れ','ん','ま'],['で','ん','し','ゃ','ぷ','ふ'],['わ','き','め','ら','て','ね'],['か','ゆ','ぬ','さ','け','ぶ']],
-    words: [{ word: 'ひこうき', cells: [[0,0],[0,1],[0,2],[0,3]] },{ word: 'でんしゃ', cells: [[3,0],[3,1],[3,2],[3,3]] },{ word: 'くるま', cells: [[0,5],[1,5],[2,5]] },{ word: 'ふね', cells: [[3,5],[4,5]] }],
+    grid: [
+      ['ひ','こ','う','き','か','く'],
+      ['な','め','ら','ぬ','し','る'],
+      ['き','ほ','て','れ','ん','ま'],
+      ['で','ん','し','ゃ','ぷ','ふ'],
+      ['わ','き','め','ら','て','ね'],
+      ['か','ゆ','ぬ','さ','け','ぶ'],
+    ],
+    words: [
+      { word: 'ひこうき', cells: [[0,0],[0,1],[0,2],[0,3]] },
+      { word: 'でんしゃ', cells: [[3,0],[3,1],[3,2],[3,3]] },
+      { word: 'くるま',   cells: [[0,5],[1,5],[2,5]] },
+      { word: 'ふね',     cells: [[3,5],[4,5]] },
+    ],
   },
   {
     title: 'のりもの②',
-    grid: [['バ','イ','ク','か','ろ','め'],['ゆ','い','れ','な','ぷ','し'],['バ','ス','ほ','て','わ','ん'],['め','ん','く','ら','た','か'],['タ','ク','シ','ー','ぬ','き'],['き','ゆ','ぬ','さ','け','ぶ']],
-    words: [{ word: 'バイク', cells: [[0,0],[0,1],[0,2]] },{ word: 'バス', cells: [[2,0],[2,1]] },{ word: 'タクシー', cells: [[4,0],[4,1],[4,2],[4,3]] },{ word: 'いか', cells: [[0,1],[1,1]] }],
+    // 'いか' を削除し 'くるま' を縦 col4 row1-3 に配置
+    grid: [
+      ['バ','イ','ク','か','ろ','め'],
+      ['ゆ','い','れ','な','く','し'],
+      ['バ','ス','ほ','て','る','ん'],
+      ['め','ん','く','ら','ま','か'],
+      ['タ','ク','シ','ー','ぬ','き'],
+      ['き','ゆ','ぬ','さ','け','ぶ'],
+    ],
+    words: [
+      { word: 'バイク',   cells: [[0,0],[0,1],[0,2]] },
+      { word: 'バス',     cells: [[2,0],[2,1]] },
+      { word: 'くるま',   cells: [[1,4],[2,4],[3,4]] },
+      { word: 'タクシー', cells: [[4,0],[4,1],[4,2],[4,3]] },
+    ],
   },
 ]
 
 type CellKey = string
 function key(r: number, c: number): CellKey { return `${r},${c}` }
+
 function cellsBetween(a: [number, number], b: [number, number]): [number, number][] {
   const [r1, c1] = a, [r2, c2] = b
-  if (r1 === r2) { const [lo, hi] = [Math.min(c1, c2), Math.max(c1, c2)]; return Array.from({ length: hi - lo + 1 }, (_, i) => [r1, lo + i]) }
-  if (c1 === c2) { const [lo, hi] = [Math.min(r1, r2), Math.max(r1, r2)]; return Array.from({ length: hi - lo + 1 }, (_, i) => [lo + i, c1]) }
+  if (r1 === r2) {
+    const [lo, hi] = [Math.min(c1, c2), Math.max(c1, c2)]
+    return Array.from({ length: hi - lo + 1 }, (_, i) => [r1, lo + i])
+  }
+  if (c1 === c2) {
+    const [lo, hi] = [Math.min(r1, r2), Math.max(r1, r2)]
+    return Array.from({ length: hi - lo + 1 }, (_, i) => [lo + i, c1])
+  }
   return [a]
+}
+
+// セルの位置が一致するか（前向き or 後ろ向き）— 文字列一致ではなく位置一致で判定
+function cellsMatch(selected: [number, number][], defined: [number, number][]): boolean {
+  if (selected.length !== defined.length) return false
+  const fwd = defined.every(([r, c], i) => selected[i][0] === r && selected[i][1] === c)
+  if (fwd) return true
+  const rev = [...defined].reverse().every(([r, c], i) => selected[i][0] === r && selected[i][1] === c)
+  return rev
 }
 
 export function HiraganaSearch() {
@@ -55,21 +145,29 @@ export function HiraganaSearch() {
   const [justFound, setJustFound] = useState<string | null>(null)
   const puzzle = PUZZLES[pIdx]
 
-  function getFoundCells() {
+  function getFoundCells(): Set<CellKey> {
     const s = new Set<CellKey>()
-    puzzle.words.forEach(w => { if (found.has(w.word)) w.cells.forEach(([r, c]) => s.add(key(r, c))) })
+    puzzle.words.forEach(w => {
+      if (found.has(w.word)) w.cells.forEach(([r, c]) => s.add(key(r, c)))
+    })
     return s
   }
 
   function tap(r: number, c: number) {
     if (!startCell) { setStartCell([r, c]); return }
-    const cells = cellsBetween(startCell, [r, c])
-    const word = cells.map(([row, col]) => puzzle.grid[row][col]).join('')
-    const rev = [...word].reverse().join('')
-    const match = puzzle.words.find(w => (w.word === word || w.word === rev) && !found.has(w.word))
+
+    const selected = cellsBetween(startCell, [r, c])
+    // セル位置で判定（同じ文字列が別の場所にあっても誤判定しない）
+    const match = puzzle.words.find(
+      w => !found.has(w.word) && cellsMatch(selected, w.cells),
+    )
+
     if (match) {
-      const next = new Set(found); next.add(match.word); setFound(next)
-      setJustFound(match.word); setTimeout(() => setJustFound(null), 1200)
+      const next = new Set(found)
+      next.add(match.word)
+      setFound(next)
+      setJustFound(match.word)
+      setTimeout(() => setJustFound(null), 1200)
       if (next.size === puzzle.words.length) setDone(true)
     }
     setStartCell(null)
@@ -114,25 +212,35 @@ export function HiraganaSearch() {
                 const isFound = foundCells.has(k)
                 const isSel = startKey === k
                 return (
-                  <button key={k} onClick={() => tap(r, c)}
+                  <button
+                    key={k}
+                    onClick={() => tap(r, c)}
                     className={`aspect-square rounded-lg text-base font-black flex items-center justify-center transition-all active:scale-90 ${
-                      isFound ? 'text-white shadow' :
-                      isSel ? 'bg-cyan-100 text-cyan-800 scale-95 border-2 border-cyan-400' :
-                      'bg-gray-50 text-gray-700 border border-gray-200'
+                      isFound
+                        ? 'text-white shadow'
+                        : isSel
+                        ? 'bg-cyan-100 text-cyan-800 scale-95 border-2 border-cyan-400'
+                        : 'bg-gray-50 text-gray-700 border border-gray-200'
                     }`}
-                    style={isFound ? { background: GRAD } : {}}>
+                    style={isFound ? { background: GRAD } : {}}
+                  >
                     {cell}
                   </button>
                 )
-              })
+              }),
             )}
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2 w-full">
           {puzzle.words.map(w => (
-            <span key={w.word} className={`px-3 py-2 rounded-xl text-base font-bold border-2 transition-all ${found.has(w.word) ? 'text-white border-transparent' : 'bg-white text-gray-700 border-cyan-200'}`}
-              style={found.has(w.word) ? { background: GRAD } : {}}>
+            <span
+              key={w.word}
+              className={`px-3 py-2 rounded-xl text-base font-bold border-2 transition-all ${
+                found.has(w.word) ? 'text-white border-transparent' : 'bg-white text-gray-700 border-cyan-200'
+              }`}
+              style={found.has(w.word) ? { background: GRAD } : {}}
+            >
               {found.has(w.word) ? '✓ ' : ''}{w.word}
             </span>
           ))}

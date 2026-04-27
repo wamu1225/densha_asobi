@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { AdBanner } from '../components/AdBanner'
 
 const GAMES = [
   { path: '/math',     emoji: '🔢', title: 'けいさん\nスプリント', grad: 'linear-gradient(145deg,#ff9a5c,#f97316)' },
@@ -104,7 +105,10 @@ export function TopPage() {
           ))}
         </div>
 
-        <p className="text-center text-gray-400 text-xs mt-8 font-bold">
+        {/* 広告ユニット（ゲームグリッド下） */}
+        <AdBanner slot="8756234109" format="rectangle" className="mt-6 rounded-xl overflow-hidden" />
+
+        <p className="text-center text-gray-400 text-xs mt-6 font-bold">
           🚃 でんしゃのたびを たのしもう！
         </p>
       </main>

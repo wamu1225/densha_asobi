@@ -84,7 +84,9 @@ export function WhichBigger() {
 
   return (
     <GameLayout title="どっちがおおきい？" gradient={GRAD}>
-      <div className={`flex flex-col items-center gap-4 rounded-3xl p-3 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
+      <div className="flex flex-col items-center gap-4">
+        {flash === 'ok' && <div className="w-full bg-green-100 border-2 border-green-400 rounded-2xl py-2 text-center bounce-in"><span className="text-xl font-black text-green-600">⭕ せいかい！</span></div>}
+        {flash === 'ng' && <div className="w-full bg-red-100 border-2 border-red-400 rounded-2xl py-2 text-center bounce-in"><span className="text-xl font-black text-red-600">❌ ちがう！</span></div>}
         <div className="flex justify-between w-full items-center">
           <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
           {timeMode ? <span className={`text-xl font-bold ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>⏱ {timeLeft}s</span>

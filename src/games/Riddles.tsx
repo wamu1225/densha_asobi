@@ -6,40 +6,47 @@ type Level = 'easy' | 'normal' | 'hard'
 interface Riddle { q: string; a: string; hint: string; level: Level }
 
 const RIDDLES: Riddle[] = [
-  { q: 'なきごえが「ワンワン」の どうぶつは？', a: 'いぬ', hint: 'ペット', level: 'easy' },
-  { q: 'きいろくて ながくて あまい たべものは？', a: 'バナナ', hint: 'くだもの', level: 'easy' },
-  { q: 'あかくて まるくて あまい たべものは？', a: 'りんご', hint: 'くだもの', level: 'easy' },
-  { q: 'くびが ながい どうぶつは？', a: 'きりん', hint: 'どうぶつえん', level: 'easy' },
-  { q: 'はなが ながくて おおきな どうぶつは？', a: 'ぞう', hint: 'どうぶつえん', level: 'easy' },
-  { q: 'みずのなかで およぐ いきものは？', a: 'さかな', hint: 'うみや かわ', level: 'easy' },
-  { q: 'まるくて かたくて ころがるものは？', a: 'ボール', hint: 'あそびどうぐ', level: 'easy' },
-  { q: 'あめのひに もってでる ながいどうぐは？', a: 'かさ', hint: 'あめよけ', level: 'easy' },
-  { q: 'しろいからだに くろいもようの どうぶつは？', a: 'しまうま', hint: 'どうぶつえん', level: 'easy' },
-  { q: 'そらをとんで「チュンチュン」なく いきものは？', a: 'とり（すずめ）', hint: 'はばたくよ', level: 'easy' },
-  { q: 'たべると なくなるのに、たべないと ふえるのは？', a: 'おなか（すき）', hint: 'おなかが…', level: 'normal' },
-  { q: 'うえに のると、のった ひとが ちいさく なるのは？', a: 'やま', hint: 'しぜんのもの', level: 'normal' },
-  { q: 'てがないのに まいにち はりをうごかしているのは？', a: 'とけい', hint: 'じかんをしらせる', level: 'normal' },
-  { q: 'あながあっても なにも はいらない たべものは？', a: 'ドーナツ', hint: 'まるい おかし', level: 'normal' },
-  { q: 'なきむしなのに みんなにすかれるのは？', a: 'あめ（雨）', hint: 'そらから ふってくる', level: 'normal' },
-  { q: 'はやくはしるほど ながくなるものは？', a: 'いき（息）', hint: 'からだから でる', level: 'normal' },
-  { q: 'かわをむかずに たべられる くだものは？', a: 'いちご（ぶどう）', hint: 'あかい くだもの', level: 'normal' },
-  { q: 'ながければながいほど みじかくなるものは？', a: 'えんぴつ', hint: 'かくどうぐ', level: 'normal' },
-  { q: 'おうちにあるのに そとのことをよくしっているのは？', a: 'まど（窓）', hint: 'へやのかべ', level: 'normal' },
-  { q: 'たくさんあるほど かるくなるものは？', a: 'あな（穴）', hint: 'なにもないもの', level: 'normal' },
-  { q: 'みずのなかにいるのに ぬれないものは？', a: 'かげ（影）', hint: 'ひかりでできる', level: 'normal' },
-  { q: 'まいにちふんでいるのに きずがつかないものは？', a: 'じめん（地面）', hint: 'そとにある', level: 'normal' },
-  { q: 'おこるほど おおきくなるのは？', a: 'こえ（声）', hint: 'のどから でる', level: 'normal' },
-  { q: 'あるけばあるくほど ながくなるのは？', a: 'あしあと', hint: 'すなはまでみえる', level: 'normal' },
-  { q: '1から10まで たすといくつ？', a: '55（1+2+3…+10）', hint: 'ぜんぶたしてみて', level: 'hard' },
-  { q: 'たまごからうまれるが ほにゅうるいの どうぶつは？', a: 'カモノハシ', hint: 'オーストラリアにいる', level: 'hard' },
-  { q: '「はながさく」と「はなをほる」、2つの「はな」のちがいは？', a: 'さく→flower、ほる→nose（鼻）', hint: 'からだの「はな」とは？', level: 'hard' },
-  { q: 'せかいでいちばん ながいかわは？', a: 'ナイル川（エジプト）', hint: 'アフリカにある', level: 'hard' },
-  { q: 'おやゆびだけ なまえのルールが ちがうのはなぜ？', a: 'ほかは「〜ゆび」（人差し指・中指・薬指・小指）', hint: 'てをみてみよう', level: 'hard' },
-  { q: 'かみ1まいで せかいをまっぷたつに できるのはなぜ？', a: 'まんなかで おりたたむと2つに なる', hint: 'かみをおってみよう', level: 'hard' },
+  // ── やさしい（ダジャレ・なぞなぞ）──
+  { q: 'あかい かさを もっているのに、ぬれている たべものは なに？', a: 'トマト', hint: 'やさい', level: 'easy' },
+  { q: 'は（歯）を もっているのに、なにも たべられないのは なに？', a: 'くし', hint: 'かみをとくどうぐ', level: 'easy' },
+  { q: 'くろいのに、かくと しろくなるのは なに？', a: 'こくばん（黒板）', hint: 'がっこうにある', level: 'easy' },
+  { q: 'あしが 4ほん あるのに、あるけないのは なに？', a: 'いす・つくえ', hint: 'すわるもの', level: 'easy' },
+  { q: 'さわると きえてしまうのは なに？', a: 'あわ（泡）', hint: 'おふろにある', level: 'easy' },
+  { q: 'おふろに はいるほど、ちいさくなるのは なに？', a: 'せっけん', hint: 'からだをあらうもの', level: 'easy' },
+  { q: 'ひるは ねていて、よるは ひかるのは なに？', a: 'ほし（星）', hint: 'そらにある', level: 'easy' },
+  { q: 'まえからよんでも うしろからよんでも おなじ ことばは なに？（3もじ）', a: 'しんぶんし（新聞紙）', hint: 'さかさまによんでみよう', level: 'easy' },
+  { q: 'うえからみると まる、よこからみると しかくなのは なに？', a: 'コップ', hint: 'のみものをいれる', level: 'easy' },
+  { q: 'くちが あるのに しゃべれない、あしが あるのに あるけないのは なに？', a: 'くつ（靴）', hint: 'はくもの', level: 'easy' },
+  // ── ふつう ──
+  { q: 'ごはんを たべるほど へるのに、たべないと ふえるのは なに？', a: 'おなか（すき）', hint: 'おなかが…', level: 'normal' },
+  { q: 'うえに のると、のったひとが ちいさくなるのは なに？', a: 'やま', hint: 'しぜんのもの', level: 'normal' },
+  { q: 'てがないのに、まいにち はりをうごかしているのは なに？', a: 'とけい', hint: 'じかんをしらせる', level: 'normal' },
+  { q: 'なきむしなのに、みんなにすかれるのは なに？', a: 'あめ（雨）', hint: 'そらからふってくる', level: 'normal' },
+  { q: 'はしればはしるほど、みじかくなるのは なに？', a: 'いき（息）', hint: 'からだからでる', level: 'normal' },
+  { q: 'たくさんあるほど、かるくなるものは なに？', a: 'あな（穴）', hint: 'なにもないもの', level: 'normal' },
+  { q: 'みずのなかにいるのに、ぬれないものは なに？', a: 'かげ（影）', hint: 'ひかりでできる', level: 'normal' },
+  { q: 'おこるほど おおきくなるのは なに？', a: 'こえ（声）', hint: 'のどからでる', level: 'normal' },
+  { q: 'ながければながいほど みじかくなるものは なに？', a: 'えんぴつ', hint: 'かくどうぐ', level: 'normal' },
+  { q: 'あるけばあるくほど ながくなるのは なに？', a: 'あしあと', hint: 'すなはまでみえる', level: 'normal' },
+  // ── むずかしい ──
+  { q: 'まいにちやってくるのに、だれも みたことがないのは なに？', a: 'あした（明日）', hint: 'きょうのつぎ', level: 'hard' },
+  { q: 'みんなが もっているのに、だれにも あげられないのは なに？', a: 'なまえ（名前）', hint: 'よばれるもの', level: 'hard' },
+  { q: 'どんなに おいかけても、ぜったいに つかまえられないのは なに？', a: 'じかん（時間）', hint: 'めにみえない', level: 'hard' },
+  { q: 'こどものときは よつあし、おとなは ふたあし、としよりは みつあしの いきものは なに？', a: 'にんげん（人間）', hint: 'わたしたちのこと', level: 'hard' },
+  { q: 'いつも みんなを かこんでいるのに、だれも きづかないのは なに？', a: 'くうき（空気）', hint: 'いきをするもの', level: 'hard' },
+  { q: 'うそを ついているのに、だれも おこらないのは なに？', a: 'えほん（フィクション）', hint: 'おはなしのほん', level: 'hard' },
+  { q: 'ひとりでは できるのに、ふたりでは できないことは なに？', a: 'ひとりごと（独り言）', hint: 'じぶんだけにきこえる', level: 'hard' },
+  { q: 'みずを のまないのに、みずのそばに いつも いるのは なに？', a: 'はし（橋）', hint: 'かわのうえにある', level: 'hard' },
+  { q: 'あながあっても、なにも はいらないのは なに？', a: 'ドーナツ', hint: 'たべもの', level: 'hard' },
+  { q: 'はしを わたらずに、はしのしたを とおるのは なに？', a: 'かわのみず（川の水）', hint: 'かわのながれ', level: 'hard' },
 ]
 
 const LEVEL_LABELS: Record<Level, string> = { easy: '🌟 やさしい', normal: '⭐ ふつう', hard: '🔥 むずかしい' }
-const LEVEL_BG: Record<Level, string> = { easy: 'bg-green-100 text-green-700', normal: 'bg-yellow-100 text-yellow-700', hard: 'bg-red-100 text-red-700' }
+const LEVEL_BG: Record<Level, string> = {
+  easy: 'bg-green-100 text-green-700',
+  normal: 'bg-yellow-100 text-yellow-700',
+  hard: 'bg-red-100 text-red-700',
+}
 
 export function Riddles() {
   const [filter, setFilter] = useState<Level | 'all'>('all')
@@ -48,12 +55,23 @@ export function Riddles() {
   const [showHint, setShowHint] = useState(false)
   const [seenCount, setSeenCount] = useState(0)
 
-  const filtered = useMemo(() => filter === 'all' ? RIDDLES : RIDDLES.filter(r => r.level === filter), [filter])
+  const filtered = useMemo(
+    () => (filter === 'all' ? RIDDLES : RIDDLES.filter(r => r.level === filter)),
+    [filter],
+  )
   const riddle = filtered[idx % filtered.length]
 
-  function changeFilter(f: Level | 'all') { setFilter(f); setIdx(0); setRevealed(false); setShowHint(false) }
-  function next() { setIdx(i => (i + 1) % filtered.length); setRevealed(false); setShowHint(false); setSeenCount(c => c + 1) }
-  function prev() { setIdx(i => (i - 1 + filtered.length) % filtered.length); setRevealed(false); setShowHint(false) }
+  function changeFilter(f: Level | 'all') {
+    setFilter(f); setIdx(0); setRevealed(false); setShowHint(false)
+  }
+  function next() {
+    setIdx(i => (i + 1) % filtered.length)
+    setRevealed(false); setShowHint(false); setSeenCount(c => c + 1)
+  }
+  function prev() {
+    setIdx(i => (i - 1 + filtered.length) % filtered.length)
+    setRevealed(false); setShowHint(false)
+  }
 
   return (
     <GameLayout title="なぞなぞ" gradient={GRAD}>
@@ -61,16 +79,23 @@ export function Riddles() {
         {/* フィルタ */}
         <div className="flex gap-2 w-full overflow-x-auto pb-1">
           {(['all', 'easy', 'normal', 'hard'] as (Level | 'all')[]).map(f => (
-            <button key={f} onClick={() => changeFilter(f)}
-              className={`flex-shrink-0 px-3 py-2 rounded-xl text-sm font-bold border-2 transition-all active:scale-95 ${filter === f ? 'text-white border-transparent' : 'bg-white text-gray-600 border-gray-200'}`}
-              style={filter === f ? { background: GRAD } : {}}>
+            <button
+              key={f}
+              onClick={() => changeFilter(f)}
+              className={`flex-shrink-0 px-3 py-2 rounded-xl text-sm font-bold border-2 transition-all active:scale-95 ${
+                filter === f ? 'text-white border-transparent' : 'bg-white text-gray-600 border-gray-200'
+              }`}
+              style={filter === f ? { background: GRAD } : {}}
+            >
               {f === 'all' ? '📚 ぜんぶ' : LEVEL_LABELS[f]}
             </button>
           ))}
         </div>
 
         <div className="flex items-center gap-3">
-          <span className={`rounded-full px-3 py-1 text-xs font-bold ${LEVEL_BG[riddle.level]}`}>{LEVEL_LABELS[riddle.level]}</span>
+          <span className={`rounded-full px-3 py-1 text-xs font-bold ${LEVEL_BG[riddle.level]}`}>
+            {LEVEL_LABELS[riddle.level]}
+          </span>
           <span className="text-sm text-gray-400">{(idx % filtered.length) + 1} / {filtered.length}</span>
         </div>
 
@@ -93,11 +118,18 @@ export function Riddles() {
           </div>
         ) : (
           <div className="flex flex-col gap-2 w-full">
-            <button onClick={() => { setRevealed(true); setSeenCount(c => c + 1) }} className="w-full py-5 text-xl font-black text-white rounded-2xl shadow-lg active:scale-95" style={{ background: GRAD }}>
+            <button
+              onClick={() => { setRevealed(true); setSeenCount(c => c + 1) }}
+              className="w-full py-5 text-xl font-black text-white rounded-2xl shadow-lg active:scale-95"
+              style={{ background: GRAD }}
+            >
               こたえを みる 👀
             </button>
             {!showHint && (
-              <button onClick={() => setShowHint(true)} className="w-full py-3 text-base font-bold bg-orange-100 text-orange-600 rounded-2xl active:scale-95">
+              <button
+                onClick={() => setShowHint(true)}
+                className="w-full py-3 text-base font-bold bg-orange-100 text-orange-600 rounded-2xl active:scale-95"
+              >
                 ヒントをみる 💡
               </button>
             )}

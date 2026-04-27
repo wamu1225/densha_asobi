@@ -64,10 +64,10 @@ export function MathSprint() {
   useEffect(() => { if (mode === 'play') next(level) }, [mode, level, next])
 
   useEffect(() => {
-    if (mode !== 'play') return
+    if (mode !== 'play' || gameMode === 'survival') return
     const t = setInterval(() => setTimeLeft(v => { if (v <= 1) { setMode('over'); return 0 } return v - 1 }), 1000)
     return () => clearInterval(t)
-  }, [mode])
+  }, [mode, gameMode])
 
   function tap(c: number) {
     if (c === q.answer) {
@@ -121,7 +121,7 @@ export function MathSprint() {
 
   return (
     <GameLayout title="けいさんスプリント" gradient={GRAD}>
-      <div className={`flex flex-col items-center gap-4 rounded-3xl p-3 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
+      <div className="flex flex-col items-center gap-4">
         <div className="flex justify-between w-full items-center">
           <div className="flex items-center gap-2">
             <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
@@ -132,6 +132,8 @@ export function MathSprint() {
             : <span className={`text-xl font-bold ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>⏱ {timeLeft}s</span>
           }
         </div>
+        {flash === 'ok' && <div className="w-full bg-green-100 border-2 border-green-400 rounded-2xl py-2 text-center bounce-in"><span className="text-xl font-black text-green-600">⭕ せいかい！</span></div>}
+        {flash === 'ng' && <div className="w-full bg-red-100 border-2 border-red-400 rounded-2xl py-2 text-center bounce-in"><span className="text-xl font-black text-red-600">❌ ちがう！</span></div>}
         {comboFlash && <div className="bg-yellow-100 border-2 border-yellow-300 rounded-2xl px-5 py-2 bounce-in"><span className="text-xl font-bold text-yellow-700">🔥 {combo}れんぞく！ボーナス！</span></div>}
         <div className="text-5xl font-black text-gray-800 py-6 tracking-wide">
           {q.a} {q.op} {q.b} = ?

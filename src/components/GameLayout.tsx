@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import { AdBanner } from './AdBanner'
 
 interface GameLayoutProps {
   title: string
@@ -28,6 +29,7 @@ export function GameLayout({ title, gradient = DEFAULT_GRAD, children }: GameLay
       </header>
       <main className="flex-1 p-4 max-w-lg mx-auto w-full">
         {children}
+        <AdBanner slot="5432198760" format="horizontal" className="mt-6" />
       </main>
     </div>
   )

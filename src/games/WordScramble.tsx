@@ -62,10 +62,9 @@ export function WordScramble() {
 
   useEffect(() => {
     if (!timeMode || phase !== 'play') return
-    if (timeLeft <= 0) { setPhase('over'); return }
     const t = setInterval(() => setTimeLeft(v => { if (v <= 1) { setPhase('over'); return 0 } return v - 1 }), 1000)
     return () => clearInterval(t)
-  }, [timeMode, phase, timeLeft])
+  }, [timeMode, phase])
 
   function startGame(c: Cat, tm: boolean) {
     const shuffled = [...CATEGORIES[c]].sort(() => Math.random() - 0.5)

@@ -78,9 +78,16 @@ export function NumberMaze() {
 
   if (mode === 'over') {
     const bk = `${size}_${variant}`; saveBest(bk, elapsed)
+    const bSecs = getBest()[bk]
     return (
       <GameLayout title="すうじめいろ" gradient={GRAD}>
-        <ResultScreen timeStr={fmt(elapsed)} best={getBest()[bk] != null ? Number(fmt(getBest()[bk]).replace(':', '')) : null} bestLabel={`ベストタイム（${size}×${size} ${variant}）`} onRetry={() => start(size, variant)} accentColor="text-red-500" />
+        <ResultScreen
+          timeStr={fmt(elapsed)}
+          bestStr={bSecs != null ? fmt(bSecs) : undefined}
+          bestLabel={`ベスト（${size}×${size} ${variant === 'hidden' ? 'きえる' : 'みえる'}）`}
+          onRetry={() => start(size, variant)}
+          accentColor="text-red-500"
+        />
       </GameLayout>
     )
   }

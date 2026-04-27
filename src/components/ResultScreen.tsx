@@ -9,6 +9,7 @@ interface ResultScreenProps {
   timeStr?: string
   extra?: Stat[]
   best?: number | null
+  bestStr?: string        // best をフォーマット済み文字列で渡す場合（時間表示など）
   bestLabel?: string
   onRetry: () => void
   accentColor?: string
@@ -50,7 +51,7 @@ function Confetti({ active }: { active: boolean }) {
   )
 }
 
-export function ResultScreen({ score, total, timeStr, extra = [], best, bestLabel = 'ベスト', onRetry, accentColor = 'text-sky-500' }: ResultScreenProps) {
+export function ResultScreen({ score, total, timeStr, extra = [], best, bestStr, bestLabel = 'ベスト', onRetry, accentColor = 'text-sky-500' }: ResultScreenProps) {
   const navigate = useNavigate()
   const [showConfetti, setShowConfetti] = useState(false)
   const pct = total != null && score != null ? score / total : null
@@ -100,9 +101,9 @@ export function ResultScreen({ score, total, timeStr, extra = [], best, bestLabe
             <p className="text-2xl font-bold text-gray-700">{s.value}</p>
           </div>
         ))}
-        {best != null && (
+        {(best != null || bestStr) && (
           <div className="mt-3 pt-3 border-t border-gray-100 text-center">
-            <p className="text-sm text-gray-400">🏆 {bestLabel}：{best}</p>
+            <p className="text-sm text-gray-400">🏆 {bestLabel}：{bestStr ?? best}</p>
           </div>
         )}
       </div>

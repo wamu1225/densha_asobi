@@ -104,11 +104,24 @@ export function WhatsNext() {
 
   return (
     <GameLayout title="つぎはどれ？" gradient={GRAD}>
-      <div className={`flex flex-col items-center gap-5 rounded-3xl p-3 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
+      <div className="flex flex-col items-center gap-4">
         <div className="flex justify-between w-full">
           <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
           <span className="text-xl font-bold text-gray-700">{qNum} / {TOTAL}</span>
         </div>
+
+        {/* 正解・不正解の明示的なフィードバック */}
+        {flash === 'ok' && (
+          <div className="w-full bg-green-100 border-2 border-green-400 rounded-2xl py-3 text-center bounce-in">
+            <p className="text-2xl font-black text-green-600">⭕ せいかい！</p>
+          </div>
+        )}
+        {flash === 'ng' && (
+          <div className="w-full bg-red-100 border-2 border-red-400 rounded-2xl py-3 text-center bounce-in">
+            <p className="text-2xl font-black text-red-600">❌ ちがう！</p>
+          </div>
+        )}
+
         <p className="text-lg font-bold text-gray-600">つぎは なに？</p>
         <div className="bg-indigo-50 rounded-2xl p-4 w-full border border-indigo-100">
           <div className="flex items-center gap-1.5 flex-wrap justify-center">

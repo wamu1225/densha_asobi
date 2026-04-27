@@ -116,14 +116,15 @@ export function ClockReading() {
 
   return (
     <GameLayout title="とけいをよもう" gradient={GRAD}>
-      <div className={`flex flex-col items-center gap-3 rounded-3xl p-3 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
+      <div className="flex flex-col items-center gap-3">
+        {flash === 'ok' && <div className="w-full bg-green-100 border-2 border-green-400 rounded-2xl py-2 text-center bounce-in"><span className="text-xl font-black text-green-600">⭕ せいかい！</span></div>}
+        {flash === 'ng' && wrongAns && <div className="w-full bg-red-100 border-2 border-red-400 rounded-2xl py-2 text-center bounce-in"><span className="text-lg font-black text-red-600">❌ {wrongAns}</span></div>}
         <div className="flex justify-between w-full">
           <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
           <span className="text-xl font-bold text-gray-700">{qNum} / {TOTAL}</span>
         </div>
         <p className="text-lg font-bold text-gray-600">なんじ なんぷん？</p>
         <ClockSvg h={time.h} m={time.m} />
-        {wrongAns && <p className="text-red-500 font-bold text-lg bounce-in">{wrongAns}</p>}
         <div className="grid grid-cols-2 gap-3 w-full">
           {choices.map((c, i) => (
             <button key={i} onClick={() => tap(c)} className="bg-white rounded-2xl border-2 border-purple-200 shadow-md active:scale-95 font-bold text-gray-800" style={{ height: 70, fontSize: 20 }}>
