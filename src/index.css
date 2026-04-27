@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+:root {
+  --font-rounded: 'M PLUS Rounded 1c', 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
+  --color-sky-50:  #f0f9ff;
+  --color-sky-500: #0ea5e9;
+  --color-correct: #22c55e;
+  --color-wrong:   #f43f5e;
+  --radius-card:   20px;
+  --tap-target:    56px;
+}
+
 * {
   box-sizing: border-box;
   -webkit-tap-highlight-color: transparent;
@@ -7,57 +17,87 @@
 
 body {
   margin: 0;
-  font-family: 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Meiryo', sans-serif;
-  background: #f0f9ff;
+  font-family: var(--font-rounded);
+  background: var(--color-sky-50);
 }
 
-#root {
-  min-height: 100svh;
+#root { min-height: 100svh; }
+
+/* ── フォント強制 ── */
+h1, h2, h3, button, p, span, div {
+  font-family: var(--font-rounded);
 }
 
-.flip-card {
-  perspective: 1000px;
-}
-
+/* ── フリップカード ── */
+.flip-card { perspective: 1000px; }
 .flip-card-inner {
   transition: transform 0.4s;
   transform-style: preserve-3d;
   position: relative;
 }
-
-.flip-card-inner.flipped {
-  transform: rotateY(180deg);
-}
-
+.flip-card-inner.flipped { transform: rotateY(180deg); }
 .flip-card-front,
 .flip-card-back {
   backface-visibility: hidden;
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   border-radius: 12px;
 }
+.flip-card-back { transform: rotateY(180deg); }
 
-.flip-card-back {
-  transform: rotateY(180deg);
-}
-
+/* ── アニメーション ── */
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-6px); }
-  75% { transform: translateX(6px); }
+  0%,100% { transform: translateX(0); }
+  25%      { transform: translateX(-8px); }
+  75%      { transform: translateX(8px); }
 }
-
-.shake {
-  animation: shake 0.3s ease;
-}
+.shake { animation: shake 0.3s ease; }
 
 @keyframes bounce-in {
-  0% { transform: scale(0.8); opacity: 0; }
-  60% { transform: scale(1.1); }
-  100% { transform: scale(1); opacity: 1; }
+  0%   { transform: scale(0.75); opacity: 0; }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1);    opacity: 1; }
+}
+.bounce-in { animation: bounce-in 0.4s cubic-bezier(.34,1.56,.64,1); }
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.pop { animation: pop 0.25s ease; }
+
+@keyframes confetti-fall {
+  0%   { transform: translateY(-60px) rotate(0deg)   scaleX(1);   opacity: 1; }
+  50%  { transform: translateY(45vh)  rotate(400deg) scaleX(-1); }
+  100% { transform: translateY(110vh) rotate(720deg) scaleX(1);   opacity: 0; }
+}
+.confetti-piece {
+  position: fixed;
+  top: 0;
+  pointer-events: none;
+  z-index: 9999;
+  border-radius: 3px;
+  animation: confetti-fall linear forwards;
 }
 
-.bounce-in {
-  animation: bounce-in 0.4s ease;
+@keyframes train-ride {
+  0%   { transform: translateX(-160px); }
+  100% { transform: translateX(calc(100vw + 160px)); }
+}
+.train-ride {
+  animation: train-ride 8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes cloud-drift {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(40px); }
+}
+
+/* ── グラスモーフィズム バッジ ── */
+.glass-badge {
+  backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.25);
+  border: 1px solid rgba(255,255,255,0.4);
 }

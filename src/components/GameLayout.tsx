@@ -2,23 +2,29 @@ import { useNavigate } from 'react-router-dom'
 
 interface GameLayoutProps {
   title: string
-  color?: string
+  gradient?: string
   children: React.ReactNode
 }
 
-export function GameLayout({ title, color = 'bg-blue-500', children }: GameLayoutProps) {
+const DEFAULT_GRAD = 'linear-gradient(135deg, #0ea5e9, #0284c7)'
+
+export function GameLayout({ title, gradient = DEFAULT_GRAD, children }: GameLayoutProps) {
   const navigate = useNavigate()
   return (
-    <div className="min-h-svh bg-gray-50 flex flex-col">
-      <header className={`${color} text-white px-4 py-3 flex items-center gap-3 shadow-md`}>
+    <div className="min-h-svh flex flex-col" style={{ background: '#f0f9ff' }}>
+      <header
+        className="text-white px-4 flex items-center gap-3 shrink-0"
+        style={{ background: gradient, height: 'var(--tap-target, 56px)', boxShadow: '0 2px 12px rgba(0,0,0,0.15)' }}
+      >
         <button
           onClick={() => navigate('/')}
-          className="text-2xl font-bold w-10 h-10 flex items-center justify-center rounded-full bg-white/20 active:bg-white/40"
+          className="w-10 h-10 flex items-center justify-center rounded-full text-xl font-bold shrink-0"
+          style={{ background: 'rgba(255,255,255,0.25)', border: '1px solid rgba(255,255,255,0.4)' }}
           aria-label="もどる"
         >
           ←
         </button>
-        <h1 className="text-xl font-bold">{title}</h1>
+        <h1 className="text-xl font-bold tracking-tight truncate">{title}</h1>
       </header>
       <main className="flex-1 p-4 max-w-lg mx-auto w-full">
         {children}

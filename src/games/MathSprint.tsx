@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { GameLayout } from '../components/GameLayout'
+import { ResultScreen } from '../components/ResultScreen'
 
 type Mode = 'select' | 'play' | 'over'
 type Level = 1 | 2 | 3
 type GameMode = 'normal' | 'survival'
 
+const GRAD = 'linear-gradient(135deg, #ff9a5c, #f97316)'
 const BEST_KEY = 'densha_mathsprint_best'
 
 function getBest(): Record<string, number> {
@@ -54,12 +56,9 @@ export function MathSprint() {
   const [timeLeft, setTimeLeft] = useState(30)
   const [flash, setFlash] = useState<'ok' | 'ng' | null>(null)
   const [comboFlash, setComboFlash] = useState(false)
-  const best = getBest()
 
   const next = useCallback((lv: Level) => {
-    const nq = makeQuestion(lv)
-    setQ(nq)
-    setChoices(makeChoices(nq.answer))
+    const nq = makeQuestion(lv); setQ(nq); setChoices(makeChoices(nq.answer))
   }, [])
 
   useEffect(() => { if (mode === 'play') next(level) }, [mode, level, next])
@@ -72,106 +71,74 @@ export function MathSprint() {
 
   function tap(c: number) {
     if (c === q.answer) {
-      const newCombo = combo + 1
-      setCombo(newCombo)
-      const bonus = newCombo >= 5 ? 2 : 1
-      setScore(s => s + bonus)
-      setFlash('ok')
-      if (newCombo > 0 && newCombo % 3 === 0) setComboFlash(true)
+      const nc = combo + 1; setCombo(nc)
+      setScore(s => s + (nc >= 5 ? 2 : 1)); setFlash('ok')
+      if (nc > 0 && nc % 3 === 0) setComboFlash(true)
     } else {
-      setCombo(0)
-      setFlash('ng')
-      if (gameMode === 'survival') {
-        const nl = lives - 1
-        setLives(nl)
-        if (nl <= 0) { setMode('over'); return }
-      }
+      setCombo(0); setFlash('ng')
+      if (gameMode === 'survival') { const nl = lives - 1; setLives(nl); if (nl <= 0) { setMode('over'); return } }
     }
     setTimeout(() => { setFlash(null); setComboFlash(false); next(level) }, 300)
   }
 
   function start(lv: Level, gm: GameMode) {
-    setLevel(lv); setGameMode(gm)
-    setScore(0); setCombo(0); setLives(3)
-    setTimeLeft(gm === 'normal' ? LEVEL_TIME[lv] : 999)
-    setMode('play')
+    setLevel(lv); setGameMode(gm); setScore(0); setCombo(0); setLives(3)
+    setTimeLeft(gm === 'normal' ? LEVEL_TIME[lv] : 999); setMode('play')
   }
 
-  if (mode === 'select') {
-    // removed unused var
-    return (
-      <GameLayout title="けいさんスプリント" color="bg-orange-400">
-        <div className="flex flex-col gap-4 pt-4">
-          <p className="text-center text-xl font-bold text-gray-700">レベルをえらんでね</p>
-          {([1, 2, 3] as Level[]).map(lv => (
-            <div key={lv} className="bg-white rounded-2xl border-2 border-orange-200 p-4 shadow">
-              <p className="font-bold text-gray-700 mb-2">レベル{lv}：{LEVEL_LABELS[lv]}</p>
-              {best[`${lv}_normal`] != null && <p className="text-xs text-gray-400 mb-2">🏆 ベスト {best[`${lv}_normal`]}もん</p>}
-              <div className="flex gap-2">
-                <button onClick={() => start(lv, 'normal')} className="flex-1 py-3 text-base font-bold bg-orange-400 text-white rounded-xl shadow active:scale-95">
-                  ふつう ⏱{LEVEL_TIME[lv]}s
-                </button>
-                <button onClick={() => start(lv, 'survival')} className="flex-1 py-3 text-base font-bold bg-red-500 text-white rounded-xl shadow active:scale-95">
-                  サバイバル ❤️❤️❤️
-                </button>
-              </div>
+  const best = getBest()
+
+  if (mode === 'select') return (
+    <GameLayout title="けいさんスプリント" gradient={GRAD}>
+      <div className="flex flex-col gap-4 pt-4">
+        <p className="text-center text-xl font-bold text-gray-700">レベルをえらんでね</p>
+        {([1, 2, 3] as Level[]).map(lv => (
+          <div key={lv} className="bg-white rounded-2xl border border-orange-100 p-4 shadow-md">
+            <p className="font-bold text-gray-700 mb-2">レベル{lv}：{LEVEL_LABELS[lv]}</p>
+            {best[`${lv}_normal`] != null && <p className="text-xs text-gray-400 mb-2">🏆 ベスト {best[`${lv}_normal`]}もん</p>}
+            <div className="flex gap-2">
+              <button onClick={() => start(lv, 'normal')} className="flex-1 py-3 text-base font-bold text-white rounded-xl shadow active:scale-95" style={{ background: GRAD }}>
+                ふつう ⏱{LEVEL_TIME[lv]}s
+              </button>
+              <button onClick={() => start(lv, 'survival')} className="flex-1 py-3 text-base font-bold bg-red-500 text-white rounded-xl shadow active:scale-95">
+                サバイバル ❤️
+              </button>
             </div>
-          ))}
-        </div>
-      </GameLayout>
-    )
-  }
+          </div>
+        ))}
+      </div>
+    </GameLayout>
+  )
 
   if (mode === 'over') {
-    const key = `${level}_${gameMode}`
-    saveBest(key, score)
-    const b = getBest()[key]
+    const key = `${level}_${gameMode}`; saveBest(key, score)
     return (
-      <GameLayout title="けいさんスプリント" color="bg-orange-400">
-        <div className="flex flex-col items-center gap-5 pt-8 bounce-in">
-          <p className="text-4xl">{score >= 10 ? '🎉' : '😊'}</p>
-          <p className="text-3xl font-bold text-gray-700">おわり！</p>
-          <div className="bg-orange-50 border-2 border-orange-200 rounded-3xl p-6 text-center w-full">
-            <p className="text-lg text-gray-500">せいかい</p>
-            <p className="text-6xl font-bold text-orange-500 mt-1">{score}<span className="text-2xl">もん</span></p>
-            {b != null && <p className="text-sm text-gray-400 mt-2">🏆 ベスト {b}もん</p>}
-          </div>
-          <div className="flex gap-3 w-full">
-            <button onClick={() => start(level, gameMode)} className="flex-1 py-4 text-lg font-bold bg-orange-400 text-white rounded-2xl shadow active:scale-95">もういちど</button>
-            <button onClick={() => setMode('select')} className="flex-1 py-4 text-lg font-bold bg-gray-200 text-gray-700 rounded-2xl active:scale-95">もどる</button>
-          </div>
-        </div>
+      <GameLayout title="けいさんスプリント" gradient={GRAD}>
+        <ResultScreen score={score} best={getBest()[key]} bestLabel={`ベスト（レベル${level}）`} onRetry={() => start(level, gameMode)} accentColor="text-orange-500" />
       </GameLayout>
     )
   }
 
   return (
-    <GameLayout title="けいさんスプリント" color="bg-orange-400">
-      <div className={`flex flex-col items-center gap-4 rounded-2xl p-2 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : 'bg-transparent'}`}>
+    <GameLayout title="けいさんスプリント" gradient={GRAD}>
+      <div className={`flex flex-col items-center gap-4 rounded-3xl p-3 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
         <div className="flex justify-between w-full items-center">
-          <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
+            {combo >= 3 && <span className="text-sm font-bold text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full">🔥 {combo}連続！</span>}
+          </div>
           {gameMode === 'survival'
             ? <span className="text-xl">{[...Array(lives)].map((_, i) => <span key={i}>❤️</span>)}</span>
             : <span className={`text-xl font-bold ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>⏱ {timeLeft}s</span>
           }
         </div>
-
-        {comboFlash && combo >= 3 && (
-          <div className="bg-yellow-100 border-2 border-yellow-400 rounded-xl px-4 py-1 bounce-in">
-            <span className="text-xl font-bold text-yellow-600">🔥 {combo}れんぞく！ボーナス！</span>
-          </div>
-        )}
-        {combo >= 3 && !comboFlash && (
-          <div className="text-sm text-orange-500 font-bold">🔥 {combo}れんぞく</div>
-        )}
-
-        <div className="text-5xl font-bold text-gray-800 py-6 tracking-wide">
+        {comboFlash && <div className="bg-yellow-100 border-2 border-yellow-300 rounded-2xl px-5 py-2 bounce-in"><span className="text-xl font-bold text-yellow-700">🔥 {combo}れんぞく！ボーナス！</span></div>}
+        <div className="text-5xl font-black text-gray-800 py-6 tracking-wide">
           {q.a} {q.op} {q.b} = ?
         </div>
-
-        <div className="grid grid-cols-2 gap-4 w-full">
+        <div className="grid grid-cols-2 gap-3 w-full">
           {choices.map((c, i) => (
-            <button key={i} onClick={() => tap(c)} className="py-6 text-4xl font-bold bg-white rounded-2xl border-2 border-orange-300 shadow active:scale-95">
+            <button key={i} onClick={() => tap(c)} className="bg-white rounded-2xl border-2 border-orange-200 shadow-md active:scale-95 transition-transform" style={{ height: 80, fontSize: 36, fontWeight: 800 }}>
               {c}
             </button>
           ))}

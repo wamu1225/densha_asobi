@@ -1,5 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
 import { GameLayout } from '../components/GameLayout'
+import { ResultScreen } from '../components/ResultScreen'
+
+const GRAD = 'linear-gradient(135deg, #fcd34d, #f59e0b)'
 
 interface WordEntry { word: string; hint: string }
 const CATEGORIES: Record<string, WordEntry[]> = {
@@ -28,22 +31,19 @@ const CATEGORIES: Record<string, WordEntry[]> = {
     { word: 'まくら', hint: '🛏️' },
   ],
 }
-
 type Cat = keyof typeof CATEGORIES
-type Mode = 'select' | 'normal' | 'timeattack' | 'over'
 
 function scramble(word: string): string[] {
-  const chars = word.split('')
-  let result: string[]
-  let tries = 0
+  const chars = word.split(''); let result: string[]; let tries = 0
   do { result = [...chars].sort(() => Math.random() - 0.5); tries++ } while (result.join('') === word && tries < 20)
   return result
 }
 
 export function WordScramble() {
-  const [mode, setMode] = useState<Mode>('select')
+  const [phase, setPhase] = useState<'select' | 'play' | 'over'>('select')
   const [cat, setCat] = useState<Cat>('どうぶつ')
-  const [words, setWords] = useState<WordEntry[]>([...CATEGORIES['どうぶつ']])
+  const [timeMode, setTimeMode] = useState(false)
+  const [words, setWords] = useState<WordEntry[]>([])
   const [idx, setIdx] = useState(0)
   const [tiles, setTiles] = useState<string[]>([])
   const [selected, setSelected] = useState<number[]>([])
@@ -51,31 +51,26 @@ export function WordScramble() {
   const [flash, setFlash] = useState<'ok' | 'ng' | null>(null)
   const [showHint, setShowHint] = useState(false)
   const [timeLeft, setTimeLeft] = useState(90)
-  const [timeMode, setTimeMode] = useState(false)
 
-  const word = words[idx]
+  const word = words[idx] ?? { word: '', hint: '' }
 
   const loadWord = useCallback((i: number, ws: WordEntry[]) => {
-    if (i < ws.length) {
-      setTiles(scramble(ws[i].word))
-      setSelected([]); setShowHint(false); setFlash(null)
-    }
+    if (i < ws.length) { setTiles(scramble(ws[i].word)); setSelected([]); setShowHint(false); setFlash(null) }
   }, [])
 
   useEffect(() => { loadWord(idx, words) }, [idx, words, loadWord])
 
   useEffect(() => {
-    if (!timeMode || mode !== 'normal') return
-    if (timeLeft <= 0) { setMode('over'); return }
-    const t = setInterval(() => setTimeLeft(v => { if (v <= 1) { setMode('over'); return 0 } return v - 1 }), 1000)
+    if (!timeMode || phase !== 'play') return
+    if (timeLeft <= 0) { setPhase('over'); return }
+    const t = setInterval(() => setTimeLeft(v => { if (v <= 1) { setPhase('over'); return 0 } return v - 1 }), 1000)
     return () => clearInterval(t)
-  }, [timeMode, mode, timeLeft])
+  }, [timeMode, phase, timeLeft])
 
   function startGame(c: Cat, tm: boolean) {
     const shuffled = [...CATEGORIES[c]].sort(() => Math.random() - 0.5)
-    setCat(c); setWords(shuffled); setTimeMode(tm)
-    setIdx(0); setScore(0); setTimeLeft(90)
-    loadWord(0, shuffled); setMode('normal')
+    setCat(c); setWords(shuffled); setTimeMode(tm); setIdx(0); setScore(0); setTimeLeft(90)
+    loadWord(0, shuffled); setPhase('play')
   }
 
   function tapTile(i: number) {
@@ -86,26 +81,25 @@ export function WordScramble() {
     if (current.length === word.word.length) {
       if (current === word.word) {
         setFlash('ok'); setScore(s => s + 1)
-        setTimeout(() => {
-          if (idx + 1 >= words.length) { setMode('over') } else { setIdx(i => i + 1) }
-        }, 500)
+        setTimeout(() => { if (idx + 1 >= words.length) { setPhase('over') } else { setIdx(i => i + 1) } }, 500)
       } else {
-        setFlash('ng')
-        setTimeout(() => { setSelected([]); setFlash(null) }, 400)
+        setFlash('ng'); setTimeout(() => { setSelected([]); setFlash(null) }, 400)
       }
     }
   }
 
-  if (mode === 'select') return (
-    <GameLayout title="もじならべ" color="bg-amber-400">
+  if (phase === 'select') return (
+    <GameLayout title="もじならべ" gradient={GRAD}>
       <div className="flex flex-col gap-4 pt-4">
         <p className="text-center text-xl font-bold text-gray-700">カテゴリをえらんでね</p>
         {(Object.keys(CATEGORIES) as Cat[]).map(c => (
-          <div key={c} className="bg-white rounded-2xl border-2 border-amber-200 p-4 shadow">
-            <p className="font-bold text-gray-700 mb-2">{c === 'どうぶつ' ? '🐾' : c === 'たべもの' ? '🍎' : c === 'のりもの' ? '🚃' : '🎓'} {c}（{CATEGORIES[c].length}もん）</p>
+          <div key={c} className="bg-white rounded-2xl border border-amber-100 p-4 shadow-md">
+            <p className="font-bold text-gray-700 mb-2">
+              {c === 'どうぶつ' ? '🐾' : c === 'たべもの' ? '🍎' : c === 'のりもの' ? '🚃' : '🎓'} {c}（{CATEGORIES[c].length}もん）
+            </p>
             <div className="flex gap-2">
-              <button onClick={() => startGame(c, false)} className="flex-1 py-3 text-sm font-bold bg-amber-400 text-white rounded-xl active:scale-95">ふつう</button>
-              <button onClick={() => startGame(c, true)} className="flex-1 py-3 text-sm font-bold bg-orange-500 text-white rounded-xl active:scale-95">⏱ 90びょう</button>
+              <button onClick={() => startGame(c, false)} className="flex-1 py-3 text-sm font-bold text-white rounded-xl shadow active:scale-95" style={{ background: GRAD }}>ふつう</button>
+              <button onClick={() => startGame(c, true)} className="flex-1 py-3 text-sm font-bold bg-orange-500 text-white rounded-xl shadow active:scale-95">⏱90びょう</button>
             </div>
           </div>
         ))}
@@ -113,28 +107,17 @@ export function WordScramble() {
     </GameLayout>
   )
 
-  if (mode === 'over') return (
-    <GameLayout title="もじならべ" color="bg-amber-400">
-      <div className="flex flex-col items-center gap-5 pt-8 bounce-in">
-        <p className="text-4xl">{score >= 8 ? '🎉' : '😊'}</p>
-        <p className="text-3xl font-bold text-gray-700">{timeMode ? 'タイムアップ！' : 'ぜんぶおわり！'}</p>
-        <div className="bg-amber-50 border-2 border-amber-200 rounded-3xl p-6 text-center w-full">
-          <p className="text-lg text-gray-500">せいかい</p>
-          <p className="text-6xl font-bold text-amber-500 mt-1">{score}<span className="text-2xl"> / {words.length}</span></p>
-        </div>
-        <div className="flex gap-3 w-full">
-          <button onClick={() => startGame(cat, timeMode)} className="flex-1 py-4 text-lg font-bold bg-amber-400 text-white rounded-2xl shadow active:scale-95">もういちど</button>
-          <button onClick={() => setMode('select')} className="flex-1 py-4 text-lg font-bold bg-gray-200 text-gray-700 rounded-2xl active:scale-95">もどる</button>
-        </div>
-      </div>
+  if (phase === 'over') return (
+    <GameLayout title="もじならべ" gradient={GRAD}>
+      <ResultScreen score={score} total={words.length} onRetry={() => startGame(cat, timeMode)} accentColor="text-amber-500" />
     </GameLayout>
   )
 
   const current = selected.map(i => tiles[i]).join('')
 
   return (
-    <GameLayout title="もじならべ" color="bg-amber-400">
-      <div className={`flex flex-col items-center gap-4 rounded-2xl p-2 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
+    <GameLayout title="もじならべ" gradient={GRAD}>
+      <div className={`flex flex-col items-center gap-4 rounded-3xl p-3 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
         <div className="flex justify-between w-full">
           <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
           {timeMode
@@ -142,33 +125,30 @@ export function WordScramble() {
             : <span className="text-xl font-bold text-gray-700">{idx + 1} / {words.length}</span>
           }
         </div>
+        <div className="text-7xl mt-1">{word.hint}</div>
+        <p className="text-lg font-bold text-gray-600">{cat}の なまえを つくってね</p>
 
-        <div className="text-6xl mt-1">{word.hint}</div>
-        <p className="text-lg text-gray-600">{cat}の なまえを つくってね</p>
-
-        <div className="flex gap-2 bg-amber-50 rounded-2xl px-5 py-4 min-h-14 items-center justify-center w-full border-2 border-amber-200">
-          {current.split('').map((c, i) => (
-            <span key={i} className="text-3xl font-bold text-amber-700">{c}</span>
-          ))}
-          {current.length === 0 && <span className="text-gray-400 text-base">ひらがなを タップしてね</span>}
+        <div className="flex gap-2 bg-amber-50 rounded-2xl px-5 py-4 min-h-16 items-center justify-center w-full border-2 border-amber-200">
+          {current.length > 0
+            ? current.split('').map((c, i) => <span key={i} className="text-3xl font-black text-amber-700">{c}</span>)
+            : <span className="text-gray-400 text-base">ひらがなをタップしてね</span>
+          }
         </div>
 
         <div className="flex gap-2 flex-wrap justify-center">
           {tiles.map((t, i) => (
             <button key={i} onClick={() => tapTile(i)} disabled={selected.includes(i)}
-              className={`w-14 h-14 text-2xl font-bold rounded-xl border-2 transition-all active:scale-95 ${
-                selected.includes(i) ? 'bg-amber-50 border-amber-100 text-amber-50' : 'bg-white border-amber-400 shadow-md'
-              }`}>
+              className={`w-14 h-14 text-2xl font-black rounded-xl border-2 transition-all active:scale-95 shadow-md ${selected.includes(i) ? 'bg-amber-50 border-amber-100 text-amber-50' : 'bg-white border-amber-300'}`}>
               {selected.includes(i) ? '' : t}
             </button>
           ))}
         </div>
 
         <div className="flex gap-2 w-full">
-          <button onClick={() => setSelected([])} className="flex-1 py-3 text-base font-bold bg-gray-200 text-gray-600 rounded-2xl active:scale-95">やりなおし</button>
+          <button onClick={() => setSelected([])} className="flex-1 py-3 text-base font-bold bg-white text-gray-600 rounded-2xl shadow border border-gray-200 active:scale-95">やりなおし</button>
           {!showHint
             ? <button onClick={() => setShowHint(true)} className="flex-1 py-3 text-base font-bold bg-amber-100 text-amber-700 rounded-2xl active:scale-95">ヒント 💡</button>
-            : <div className="flex-1 py-3 text-base font-bold bg-amber-100 text-amber-700 rounded-2xl text-center">「{word.word[0]}」から！</div>
+            : <div className="flex-1 py-3 text-base font-bold bg-amber-100 text-amber-700 rounded-2xl text-center">「{word.word[0]}」からはじまる！</div>
           }
         </div>
       </div>
