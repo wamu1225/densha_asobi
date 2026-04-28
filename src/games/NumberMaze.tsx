@@ -3,93 +3,183 @@ import { GameLayout } from '../components/GameLayout'
 import { ResultScreen } from '../components/ResultScreen'
 
 const GRAD = 'linear-gradient(135deg, #f87171, #ef4444)'
-type Mode = 'select' | 'play' | 'over'
-type Size = 4 | 5
-type Variant = 'normal' | 'hidden'
-
 const BEST_KEY = 'densha_maze_best'
 function getBest(): Record<string, number> { try { return JSON.parse(localStorage.getItem(BEST_KEY) || '{}') } catch { return {} } }
 function saveBest(key: string, val: number) { const b = getBest(); if (!b[key] || val < b[key]) { b[key] = val; localStorage.setItem(BEST_KEY, JSON.stringify(b)) } }
 
-function makeGrid(size: Size) {
+type Size = 4 | 5
+type Variant = 'speed' | 'memory' | 'reverse'
+type Phase = 'select' | 'preview' | 'play' | 'over'
+
+const VARIANTS: Record<Variant, { emoji: string; label: string; desc: string; color: string }> = {
+  speed:   { emoji: '⚡', label: 'スピード',    desc: '1からじゅんばんにタップ！\nはやさをきそおう',   color: '#ef4444' },
+  memory:  { emoji: '🧠', label: 'きおく',      desc: '3びょうでばしょをおぼえて！\nきえたら こころのめで探せ', color: '#8b5cf6' },
+  reverse: { emoji: '🔄', label: 'ぎゃくじゅん', desc: 'おおきいかずからさがして\nN→1の じゅんでタップ！', color: '#f59e0b' },
+}
+
+function makeGrid(size: Size): number[] {
   return Array.from({ length: size * size }, (_, i) => i + 1).sort(() => Math.random() - 0.5)
 }
 
 export function NumberMaze() {
-  const [mode, setMode] = useState<Mode>('select')
-  const [size, setSize] = useState<Size>(4)
-  const [variant, setVariant] = useState<Variant>('normal')
-  const [grid, setGrid] = useState<number[]>([])
-  const [next, setNext] = useState(1)
-  const [hidden, setHidden] = useState(new Set<number>())
-  const [shake, setShake] = useState<number | null>(null)
-  const [elapsed, setElapsed] = useState(0)
+  const [phase, setPhase]       = useState<Phase>('select')
+  const [size, setSize]         = useState<Size>(4)
+  const [variant, setVariant]   = useState<Variant>('speed')
+  const [grid, setGrid]         = useState<number[]>([])
+  const [next, setNext]         = useState(1)
+  const [tapped, setTapped]     = useState(new Set<number>())  // tapped cell indices
+  const [shake, setShake]       = useState<number | null>(null)
+  const [elapsed, setElapsed]   = useState(0)
+  const [countdown, setCountdown] = useState(3)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const best = getBest()
 
-  // ⑰修正: elapsed=0リセットと timer 起動の競合を避けるため、
-  // mode が 'play' になった直後に elapsed を 0 にセットしてからタイマーを開始する
+  // ── ゲームタイマー ──────────────────────────────────────
   useEffect(() => {
-    if (mode !== 'play') return
+    if (phase !== 'play') return
     setElapsed(0)
     const t = setInterval(() => setElapsed(e => e + 1), 1000)
     timerRef.current = t
     return () => { clearInterval(t); timerRef.current = null }
-  }, [mode])
+  }, [phase])
+
+  // ── きおくモードのプレビューカウントダウン ──────────────
+  useEffect(() => {
+    if (phase !== 'preview') return
+    setCountdown(3)
+    let c = 3
+    const t = setInterval(() => {
+      c--
+      setCountdown(c)
+      if (c <= 0) { clearInterval(t); setPhase('play') }
+    }, 1000)
+    return () => clearInterval(t)
+  }, [phase])
 
   function start(s: Size, v: Variant) {
-    setSize(s); setVariant(v); setGrid(makeGrid(s)); setNext(1); setHidden(new Set()); setMode('play')
-    // elapsed は useEffect 内でリセットするので start() では触らない
+    const g = makeGrid(s)
+    setSize(s); setVariant(v); setGrid(g)
+    setTapped(new Set()); setElapsed(0)
+    setNext(v === 'reverse' ? s * s : 1)
+    setPhase(v === 'memory' ? 'preview' : 'play')
   }
 
   function tap(n: number, i: number) {
+    if (phase !== 'play') return
     if (n === next) {
-      const nv = next + 1
-      if (variant === 'hidden') setHidden(h => new Set([...h, i]))
-      setNext(nv)
-      if (nv > size * size) { if (timerRef.current) clearInterval(timerRef.current); setMode('over') }
-    } else { setShake(i); setTimeout(() => setShake(null), 300) }
+      const nextTapped = new Set(tapped)
+      nextTapped.add(i)
+      setTapped(nextTapped)
+      const done = variant === 'reverse' ? next <= 1 : next >= size * size
+      if (done) {
+        if (timerRef.current) clearInterval(timerRef.current)
+        setPhase('over')
+      } else {
+        setNext(v => variant === 'reverse' ? v - 1 : v + 1)
+      }
+    } else {
+      setShake(i); setTimeout(() => setShake(null), 300)
+    }
   }
 
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-  const progress = (next - 1) / (size * size)
+  const progress = variant === 'reverse'
+    ? (size * size - next) / (size * size)
+    : (next - 1) / (size * size)
+  const bk = `${size}_${variant}`
+  const colCount = size === 4 ? 4 : 5
+  const textSz = size === 4 ? 26 : 20
 
-  if (mode === 'select') return (
+  // ── 選択画面 ──────────────────────────────────────────
+  if (phase === 'select') return (
     <GameLayout title="すうじめいろ" gradient={GRAD}>
-      <div className="flex flex-col gap-4 pt-4">
-        <p className="text-center text-xl font-bold text-gray-700">モードをえらんでね</p>
-        {([4, 5] as Size[]).map(s => (
-          <div key={s} className="bg-white rounded-2xl border border-red-100 p-4 shadow-md">
-            <p className="font-bold text-gray-700 mb-2">{s === 4 ? '🌟' : '🔥'} {s}×{s}グリッド（1〜{s * s}）</p>
-            <div className="flex gap-2">
-              {(['normal', 'hidden'] as Variant[]).map(v => {
-                const bk = `${s}_${v}`
-                return (
-                  <button key={v} onClick={() => start(s, v)} className="flex-1 py-3 text-sm font-bold text-white rounded-xl shadow active:scale-95" style={{ background: GRAD }}>
-                    {v === 'normal' ? '👀 みえる' : '🙈 きえる'}
-                    {best[bk] != null && <span className="block text-xs mt-0.5">🏆 {fmt(best[bk])}</span>}
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        ))}
-        <div className="bg-red-50 rounded-xl p-3 border border-red-100 text-sm text-gray-600">
-          🙈 きえるモード：タップしたかずがきえていくよ！
+      <div className="flex flex-col gap-4 pt-3">
+        <p className="text-center text-lg font-bold" style={{ color: 'var(--ink)' }}>
+          サイズをえらんでね
+        </p>
+        <div className="flex gap-3">
+          {([4, 5] as Size[]).map(s => (
+            <button key={s} onClick={() => setSize(s)}
+              className="flex-1 py-3 rounded-xl font-black border-2 transition-all active:scale-95"
+              style={{
+                background: size === s ? GRAD : 'white',
+                color: size === s ? 'white' : 'var(--ink)',
+                borderColor: size === s ? 'transparent' : '#fca5a5',
+              }}>
+              {s === 4 ? '4×4（1〜16）' : '5×5（1〜25）'}
+            </button>
+          ))}
         </div>
+
+        <p className="text-center text-lg font-bold mt-1" style={{ color: 'var(--ink)' }}>
+          モードをえらんでね
+        </p>
+        {(Object.entries(VARIANTS) as [Variant, typeof VARIANTS[Variant]][]).map(([v, info]) => {
+          const bkKey = `${size}_${v}`
+          return (
+            <button key={v} onClick={() => start(size, v)}
+              className="bg-white rounded-2xl border-2 p-4 text-left shadow-md active:scale-95 transition-all"
+              style={{ borderColor: info.color + '66' }}>
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="font-black text-lg" style={{ color: info.color }}>
+                    {info.emoji} {info.label}
+                  </p>
+                  <p className="text-sm mt-1 whitespace-pre-line" style={{ color: 'var(--ink-sub)' }}>
+                    {info.desc}
+                  </p>
+                </div>
+                {best[bkKey] != null && (
+                  <span className="text-xs font-bold bg-gray-100 rounded-lg px-2 py-1 shrink-0" style={{ color: 'var(--ink-sub)' }}>
+                    🏆 {fmt(best[bkKey])}
+                  </span>
+                )}
+              </div>
+            </button>
+          )
+        })}
       </div>
     </GameLayout>
   )
 
-  if (mode === 'over') {
-    const bk = `${size}_${variant}`; saveBest(bk, elapsed)
-    const bSecs = getBest()[bk]
+  // ── きおくモード: プレビュー画面 ──────────────────────
+  if (phase === 'preview') return (
+    <GameLayout title="すうじめいろ" gradient={GRAD}>
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-full bg-purple-100 border-2 border-purple-400 rounded-2xl py-3 text-center">
+          <p className="text-xl font-black text-purple-700">
+            🧠 {countdown > 0 ? `${countdown}びょうで おぼえて！` : 'きえる！'}
+          </p>
+          <div className="flex justify-center gap-1 mt-1">
+            {[3, 2, 1].map(n => (
+              <div key={n} className="w-6 h-6 rounded-full transition-all"
+                style={{ background: countdown >= n ? '#8b5cf6' : '#e9d5ff' }} />
+            ))}
+          </div>
+        </div>
+        <div className="grid gap-2 w-full" style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}>
+          {grid.map((n, i) => (
+            <div key={i}
+              className="aspect-square rounded-xl font-black flex items-center justify-center bg-white border-2 border-purple-200"
+              style={{ fontSize: textSz, color: '#7c3aed' }}>
+              {n}
+            </div>
+          ))}
+        </div>
+        <p className="text-sm font-bold text-gray-500">ばしょをしっかりおぼえよう！</p>
+      </div>
+    </GameLayout>
+  )
+
+  // ── 結果画面 ──────────────────────────────────────────
+  if (phase === 'over') {
+    saveBest(bk, elapsed)
     return (
       <GameLayout title="すうじめいろ" gradient={GRAD}>
         <ResultScreen
           timeStr={fmt(elapsed)}
-          bestStr={bSecs != null ? fmt(bSecs) : undefined}
-          bestLabel={`ベスト（${size}×${size} ${variant === 'hidden' ? 'きえる' : 'みえる'}）`}
+          bestStr={getBest()[bk] != null ? fmt(getBest()[bk]) : undefined}
+          bestLabel={`ベスト（${size}×${size} ${VARIANTS[variant].label}）`}
           onRetry={() => start(size, variant)}
           accentColor="text-red-500"
         />
@@ -97,36 +187,57 @@ export function NumberMaze() {
     )
   }
 
-  const colClass = size === 4 ? 4 : 5
-  const textSz = size === 4 ? 26 : 20
+  // ── プレイ画面 ────────────────────────────────────────
+  const targetLabel = variant === 'reverse'
+    ? `タップ：${next} → 1`
+    : `タップ：${next}`
 
   return (
     <GameLayout title="すうじめいろ" gradient={GRAD}>
       <div className="flex flex-col items-center gap-3">
         <div className="flex justify-between w-full items-center">
-          <span className="text-xl font-bold text-gray-700">つぎ：<span className="text-red-500 text-2xl font-black">{next}</span></span>
-          <span className="text-xl font-bold text-gray-700">⏱ {fmt(elapsed)}</span>
+          <span className="text-xl font-black" style={{ color: variant === 'reverse' ? '#f59e0b' : variant === 'memory' ? '#8b5cf6' : 'var(--ink)' }}>
+            {VARIANTS[variant].emoji} {targetLabel}
+          </span>
+          <span className="text-xl font-bold" style={{ color: 'var(--ink)' }}>⏱ {fmt(elapsed)}</span>
         </div>
-        <p className="text-sm text-gray-500">{variant === 'hidden' ? '🙈 タップしたらきえるよ！' : '1からじゅんにタップ！'}</p>
-        <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-          <div className="h-3 rounded-full transition-all" style={{ width: `${progress * 100}%`, background: GRAD }} />
+
+        <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
+          <div className="h-2.5 rounded-full transition-all" style={{ width: `${progress * 100}%`, background: GRAD }} />
         </div>
-        <div className="grid gap-2 w-full" style={{ gridTemplateColumns: `repeat(${colClass}, 1fr)` }}>
+
+        <div className="grid gap-2 w-full" style={{ gridTemplateColumns: `repeat(${colCount}, 1fr)` }}>
           {grid.map((n, i) => {
-            const tapped = n < next; const isHid = hidden.has(i)
+            const isDone = tapped.has(i)
+            // きおくモードは未タップセルを非表示（プレイ中は真っ白）
+            const showNum = variant === 'memory' ? (isDone ? '✓' : '') : (isDone ? '✓' : n)
+            const cellBg = isDone
+              ? GRAD
+              : 'white'
+            const cellBorder = isDone ? 'transparent' : '#fca5a5'
+
             return (
-              <button key={i} onClick={() => !tapped && tap(n, i)}
-                className={`aspect-square rounded-xl font-black transition-all border-2 ${shake === i ? 'shake border-red-400 bg-red-100' : ''} ${
-                  isHid ? 'bg-gray-100 border-gray-100' :
-                  tapped ? 'border-transparent text-white shadow-inner' :
-                  'bg-white border-red-100 shadow active:scale-95'
-                }`}
-                style={{ fontSize: textSz, background: tapped && !isHid ? 'linear-gradient(135deg,#f87171,#ef4444)' : undefined }}>
-                {isHid ? '' : tapped ? '✓' : n}
+              <button key={i}
+                onClick={() => !isDone && tap(n, i)}
+                className={`aspect-square rounded-xl font-black transition-all border-2 active:scale-95 ${shake === i ? 'shake' : ''}`}
+                style={{
+                  fontSize: textSz,
+                  background: shake === i ? '#fee2e2' : cellBg,
+                  borderColor: shake === i ? '#ef4444' : cellBorder,
+                  color: isDone ? 'white' : shake === i ? '#ef4444' : 'var(--ink)',
+                  boxShadow: isDone ? 'inset 0 2px 4px rgba(0,0,0,0.1)' : '3px 3px 0 rgba(0,0,0,0.08)',
+                }}>
+                {showNum}
               </button>
             )
           })}
         </div>
+
+        {variant === 'memory' && (
+          <p className="text-sm font-bold text-purple-600">
+            🧠 きおくをたよりに タップ！
+          </p>
+        )}
       </div>
     </GameLayout>
   )
