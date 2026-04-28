@@ -132,7 +132,7 @@ export function MathSprint() {
     const key = `${level}_${gameMode}`; saveBest(key, score)
     return (
       <GameLayout title="けいさんスプリント" gradient={GRAD}>
-        <ResultScreen score={score} best={getBest()[key]} bestLabel={`ベスト（レベル${level} ${gameMode === 'survival' ? 'サバイバル' : 'ふつう'}）`} onRetry={() => start(level, gameMode)} accentColor="text-orange-500" />
+        <ResultScreen score={score} scoreLabel="せいかい" scoreSuffix="もん" best={getBest()[key]} bestLabel={`ベスト（レベル${level} ${gameMode === 'survival' ? 'サバイバル' : 'ふつう'}）`} onRetry={() => start(level, gameMode)} accentColor="text-orange-500" />
       </GameLayout>
     )
   }

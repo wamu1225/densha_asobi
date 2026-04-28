@@ -135,7 +135,8 @@ export function Simon() {
         <ResultScreen
           score={round - 1}
           scoreLabel="クリアしたラウンド"
-          bestStr={best > 0 ? `${best} ラウンド` : undefined}
+          scoreSuffix="ラウンド"
+          bestStr={best > 0 ? `${best}ラウンド` : undefined}
           bestLabel="ベスト"
           onRetry={startGame}
           accentColor="text-purple-600"

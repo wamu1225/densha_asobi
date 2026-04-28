@@ -124,7 +124,13 @@ export function ClockReading() {
     saveBest(diff, score)
     return (
       <GameLayout title="とけいをよもう" gradient={GRAD}>
-        <ResultScreen score={score} total={TOTAL} best={getBest()[diff]} bestLabel={`ベスト（${diff}）`} onRetry={() => start(diff)} accentColor="text-purple-500" />
+        <ResultScreen
+          score={score} total={TOTAL}
+          best={getBest()[diff]}
+          bestLabel={`ベスト（${{ easy: 'かんたん', normal: 'ふつう', hard: 'むずかしい' }[diff]}）`}
+          onRetry={() => start(diff)}
+          accentColor="text-purple-500"
+        />
       </GameLayout>
     )
   }

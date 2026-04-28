@@ -143,6 +143,7 @@ export function WordScramble() {
         <ResultScreen
           score={score} total={timeMode ? undefined : words.length}
           scoreLabel={timeMode ? 'クリアしたもんだい' : undefined}
+          scoreSuffix={timeMode ? 'もん' : undefined}
           bestStr={timeMode && getTaBest(cat) > 0 ? `${getTaBest(cat)}もん` : undefined}
           bestLabel="タイムアタック ベスト"
           onRetry={() => startGame(cat, timeMode)}

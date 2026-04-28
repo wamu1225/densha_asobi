@@ -96,7 +96,16 @@ export function WhichBigger() {
     const key = `${level}_${timeMode ? 't' : 'q'}`; saveBest(key, score)
     return (
       <GameLayout title="どっちがおおきい？" gradient={GRAD}>
-        <ResultScreen score={score} total={timeMode ? undefined : TOTAL} extra={[{ label: 'さいこうれんぞく', value: `${maxStreak}かい 🔥` }]} best={getBest()[key]} onRetry={() => start(level, timeMode)} accentColor="text-blue-500" />
+        <ResultScreen
+          score={score}
+          total={timeMode ? undefined : TOTAL}
+          scoreLabel={timeMode ? 'せいかい' : undefined}
+          scoreSuffix={timeMode ? 'もん' : undefined}
+          extra={[{ label: 'さいこうれんぞく', value: `${maxStreak}かい 🔥` }]}
+          best={getBest()[key]}
+          onRetry={() => start(level, timeMode)}
+          accentColor="text-blue-500"
+        />
       </GameLayout>
     )
   }
