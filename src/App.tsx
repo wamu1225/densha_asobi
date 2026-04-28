@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { TopPage } from './pages/TopPage'
 import { MathSprint } from './games/MathSprint'
 import { WhichBigger } from './games/WhichBigger'
@@ -15,7 +15,7 @@ import { Simon } from './games/Simon'
 
 export default function App() {
   return (
-    <HashRouter>
+    <BrowserRouter basename="/densha_asobi">
       <Routes>
         <Route path="/" element={<TopPage />} />
         <Route path="/math" element={<MathSprint />} />
@@ -31,6 +31,6 @@ export default function App() {
         <Route path="/dots" element={<DotConnect />} />
         <Route path="/simon" element={<Simon />} />
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   )
 }

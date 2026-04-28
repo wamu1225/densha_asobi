@@ -113,13 +113,12 @@ export function NumberMaze() {
         </div>
         <div className="grid gap-2 w-full" style={{ gridTemplateColumns: `repeat(${colClass}, 1fr)` }}>
           {grid.map((n, i) => {
-            const tapped = n < next; const isHid = hidden.has(i); const isNext = n === next
+            const tapped = n < next; const isHid = hidden.has(i)
             return (
               <button key={i} onClick={() => !tapped && tap(n, i)}
                 className={`aspect-square rounded-xl font-black transition-all border-2 ${shake === i ? 'shake border-red-400 bg-red-100' : ''} ${
                   isHid ? 'bg-gray-100 border-gray-100' :
                   tapped ? 'border-transparent text-white shadow-inner' :
-                  isNext ? 'bg-white border-red-400 shadow-lg active:scale-95' :
                   'bg-white border-red-100 shadow active:scale-95'
                 }`}
                 style={{ fontSize: textSz, background: tapped && !isHid ? 'linear-gradient(135deg,#f87171,#ef4444)' : undefined }}>

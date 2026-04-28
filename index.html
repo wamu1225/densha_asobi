@@ -12,6 +12,14 @@
     <meta name="description" content="電車の中でこどもが楽しめる12種類のゲームサイト。足し算・ひきざん、なぞなぞ、でんしゃビンゴ、神経衰弱など。幼稚園から小学3年生向け。" />
     <meta name="keywords" content="電車 子供 ゲーム 暇つぶし 幼児 小学生 足し算 なぞなぞ ビンゴ" />
     <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://wamu1225.github.io/densha_asobi/" />
+    <!-- GitHub Pages SPA: sessionStorage からパスを復元 -->
+    <script>
+      (function(){
+        var r = sessionStorage.getItem('spa_redirect');
+        if (r) { sessionStorage.removeItem('spa_redirect'); history.replaceState(null,null,r); }
+      })();
+    </script>
     <meta property="og:title" content="でんしゃあそび | こどものひまつぶしゲーム12こ" />
     <meta property="og:description" content="電車の中でこどもが楽しめる12種類のゲームサイト。幼稚園から小学3年生向け。" />
     <meta property="og:type" content="website" />
@@ -24,12 +32,20 @@
       "@context": "https://schema.org",
       "@type": "WebSite",
       "name": "でんしゃあそび",
-      "description": "電車の中でこどもが楽しめるゲームサイト",
+      "description": "電車の中でこどもが楽しめる12種類のゲームサイト",
       "url": "https://wamu1225.github.io/densha_asobi/",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://wamu1225.github.io/densha_asobi/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      },
       "audience": {
-        "@type": "Audience",
-        "audienceType": "こども（幼稚園〜小学3年生）"
-      }
+        "@type": "EducationalAudience",
+        "educationalRole": "student",
+        "audienceType": "幼稚園・保育園〜小学3年生（4〜9歳）"
+      },
+      "keywords": "電車 子供 ゲーム 暇つぶし 幼児 小学生 足し算 時計 ビンゴ 記憶",
+      "inLanguage": "ja"
     }
     </script>
   </head>

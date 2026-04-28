@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AdBanner } from './AdBanner'
 
@@ -25,6 +26,13 @@ function darken(hex: string, amount = 30): string {
 
 export function GameLayout({ title, gradient, children }: GameLayoutProps) {
   const navigate = useNavigate()
+  // ゲームページの document.title を動的に更新（検索結果への表示に影響）
+  useEffect(() => {
+    const prev = document.title
+    document.title = `${title} | でんしゃあそび`
+    return () => { document.title = prev }
+  }, [title])
+
   const baseColor = extractColor(gradient)
   const headerBg = darken(baseColor, 40)
 
