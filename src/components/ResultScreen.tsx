@@ -56,14 +56,27 @@ export function ResultScreen({ score, total, scoreLabel, timeStr, extra = [], be
   const navigate = useNavigate()
   const [showConfetti, setShowConfetti] = useState(false)
   const pct = total != null && score != null ? score / total : null
-  const isGreat = pct != null ? pct >= 0.8 : true
+  const isPerfect = pct === 1.0
+  const isGreat   = pct != null ? pct >= 0.8 : true
 
   useEffect(() => {
     if (isGreat) { setShowConfetti(true); setTimeout(() => setShowConfetti(false), 2500) }
   }, [isGreat])
 
-  const emoji = pct == null ? '🎉' : pct >= 0.9 ? '🏆' : pct >= 0.7 ? '🎉' : pct >= 0.5 ? '😊' : '💪'
-  const message = pct == null ? 'クリア！' : pct >= 0.9 ? 'かんぺき！！' : pct >= 0.7 ? 'すごい！' : pct >= 0.5 ? 'よくできました！' : 'もういちど やってみよう！'
+  // 「かんぺき」は 100% のときだけ
+  const emoji =
+    pct == null  ? '🎉' :
+    isPerfect    ? '🏆' :
+    pct >= 0.8   ? '🎉' :
+    pct >= 0.6   ? '😊' :
+    pct >= 0.4   ? '😅' : '💪'
+
+  const message =
+    pct == null  ? 'クリア！' :
+    isPerfect    ? 'かんぺき！！🏆' :
+    pct >= 0.8   ? 'すごい！' :
+    pct >= 0.6   ? 'よくできました！' :
+    pct >= 0.4   ? 'もうすこし！' : 'もういちど やってみよう！'
 
   return (
     <div className="flex flex-col items-center gap-5 pt-8 bounce-in">
