@@ -38,17 +38,29 @@ export function MemoryCards() {
 
   useEffect(() => { if (phase !== 'play') return; const t = setInterval(() => setElapsed(e => e + 1), 1000); return () => clearInterval(t) }, [phase])
 
+  // ⑯修正: sel のみを依存配列にして cards の変更による誤発火を防ぐ
+  // cards は setCards の関数型更新で常に最新値を参照できる
   useEffect(() => {
-    if (sel.length !== 2) return; setLocked(true)
+    if (sel.length !== 2) return
+    setLocked(true)
     const [i, j] = sel
-    if (cards[i].emoji === cards[j].emoji) {
-      setCards(prev => prev.map((c, k) => k === i || k === j ? { ...c, matched: true } : c))
-      setSel([]); setLocked(false)
-    } else {
-      setTimeout(() => { setCards(prev => prev.map((c, k) => k === i || k === j ? { ...c, flipped: false } : c)); setSel([]); setLocked(false) }, 900)
-    }
+    // 最新の cards を参照するために setCards のコールバック内で比較
+    setCards(prev => {
+      if (prev[i].emoji === prev[j].emoji) {
+        // マッチ: matched フラグを立てる
+        setTimeout(() => { setSel([]); setLocked(false) }, 0)
+        return prev.map((c, k) => k === i || k === j ? { ...c, matched: true } : c)
+      } else {
+        // 不一致: 900ms後にフリップを戻す
+        setTimeout(() => {
+          setCards(p => p.map((c, k) => k === i || k === j ? { ...c, flipped: false } : c))
+          setSel([]); setLocked(false)
+        }, 900)
+        return prev
+      }
+    })
     setMoves(m => m + 1)
-  }, [sel, cards])
+  }, [sel])
 
   useEffect(() => { if (phase === 'play' && cards.length > 0 && cards.every(c => c.matched)) setPhase('over') }, [cards, phase])
 

@@ -27,14 +27,19 @@ export function NumberMaze() {
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const best = getBest()
 
+  // ⑰修正: elapsed=0リセットと timer 起動の競合を避けるため、
+  // mode が 'play' になった直後に elapsed を 0 にセットしてからタイマーを開始する
   useEffect(() => {
     if (mode !== 'play') return
-    timerRef.current = setInterval(() => setElapsed(e => e + 1), 1000)
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+    setElapsed(0)
+    const t = setInterval(() => setElapsed(e => e + 1), 1000)
+    timerRef.current = t
+    return () => { clearInterval(t); timerRef.current = null }
   }, [mode])
 
   function start(s: Size, v: Variant) {
-    setSize(s); setVariant(v); setGrid(makeGrid(s)); setNext(1); setHidden(new Set()); setElapsed(0); setMode('play')
+    setSize(s); setVariant(v); setGrid(makeGrid(s)); setNext(1); setHidden(new Set()); setMode('play')
+    // elapsed は useEffect 内でリセットするので start() では触らない
   }
 
   function tap(n: number, i: number) {

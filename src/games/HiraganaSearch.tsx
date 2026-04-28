@@ -156,8 +156,17 @@ export function HiraganaSearch() {
   function tap(r: number, c: number) {
     if (!startCell) { setStartCell([r, c]); return }
 
+    // ㉑修正: 対角線は明示的にはじいてフィードバックを出す
+    const [r1, c1] = startCell
+    const isDiagonal = r1 !== r && c1 !== c
+    if (isDiagonal) {
+      setStartCell(null)
+      setJustFound('❌ たてかよこでえらんでね！')
+      setTimeout(() => setJustFound(null), 800)
+      return
+    }
+
     const selected = cellsBetween(startCell, [r, c])
-    // セル位置で判定（同じ文字列が別の場所にあっても誤判定しない）
     const match = puzzle.words.find(
       w => !found.has(w.word) && cellsMatch(selected, w.cells),
     )
@@ -166,7 +175,7 @@ export function HiraganaSearch() {
       const next = new Set(found)
       next.add(match.word)
       setFound(next)
-      setJustFound(match.word)
+      setJustFound(`✅ 「${match.word}」みつけた！`)
       setTimeout(() => setJustFound(null), 1200)
       if (next.size === puzzle.words.length) setDone(true)
     }

@@ -41,6 +41,12 @@ function makeChoices(answer: number): number[] {
   return [...set].sort(() => Math.random() - 0.5)
 }
 
+// choices・問題を同時に生成してinitial空ボタン問題を解消
+function makeQAndChoices(level: Level) {
+  const q = makeQuestion(level)
+  return { q, choices: makeChoices(q.answer) }
+}
+
 const LEVEL_LABELS: Record<Level, string> = { 1: '1けた +−', 2: '2けた +−', 3: 'かけざん 2〜6の段' }
 const LEVEL_TIME: Record<Level, number> = { 1: 30, 2: 30, 3: 45 }
 
@@ -48,17 +54,19 @@ export function MathSprint() {
   const [mode, setMode] = useState<Mode>('select')
   const [level, setLevel] = useState<Level>(1)
   const [gameMode, setGameMode] = useState<GameMode>('normal')
-  const [q, setQ] = useState(makeQuestion(1))
-  const [choices, setChoices] = useState<number[]>([])
+  // ①修正: choices と q を同時初期化して空ボタンを防ぐ
+  const [{ q, choices }, setQC] = useState(() => makeQAndChoices(1))
   const [score, setScore] = useState(0)
   const [lives, setLives] = useState(3)
   const [combo, setCombo] = useState(0)
   const [timeLeft, setTimeLeft] = useState(30)
   const [flash, setFlash] = useState<'ok' | 'ng' | null>(null)
   const [comboFlash, setComboFlash] = useState(false)
+  // ③修正: ダブルタップ防止ロック
+  const [locked, setLocked] = useState(false)
 
   const next = useCallback((lv: Level) => {
-    const nq = makeQuestion(lv); setQ(nq); setChoices(makeChoices(nq.answer))
+    setQC(makeQAndChoices(lv))
   }, [])
 
   useEffect(() => { if (mode === 'play') next(level) }, [mode, level, next])
@@ -70,19 +78,24 @@ export function MathSprint() {
   }, [mode, gameMode])
 
   function tap(c: number) {
+    if (locked) return  // ③ダブルタップ防止
+    setLocked(true)
     if (c === q.answer) {
       const nc = combo + 1; setCombo(nc)
       setScore(s => s + (nc >= 5 ? 2 : 1)); setFlash('ok')
       if (nc > 0 && nc % 3 === 0) setComboFlash(true)
     } else {
       setCombo(0); setFlash('ng')
-      if (gameMode === 'survival') { const nl = lives - 1; setLives(nl); if (nl <= 0) { setMode('over'); return } }
+      if (gameMode === 'survival') {
+        const nl = lives - 1; setLives(nl)
+        if (nl <= 0) { setMode('over'); return }
+      }
     }
-    setTimeout(() => { setFlash(null); setComboFlash(false); next(level) }, 300)
+    setTimeout(() => { setFlash(null); setComboFlash(false); setLocked(false); next(level) }, 350)
   }
 
   function start(lv: Level, gm: GameMode) {
-    setLevel(lv); setGameMode(gm); setScore(0); setCombo(0); setLives(3)
+    setLevel(lv); setGameMode(gm); setScore(0); setCombo(0); setLives(3); setLocked(false)
     setTimeLeft(gm === 'normal' ? LEVEL_TIME[lv] : 999); setMode('play')
   }
 
@@ -95,7 +108,11 @@ export function MathSprint() {
         {([1, 2, 3] as Level[]).map(lv => (
           <div key={lv} className="bg-white rounded-2xl border border-orange-100 p-4 shadow-md">
             <p className="font-bold text-gray-700 mb-2">レベル{lv}：{LEVEL_LABELS[lv]}</p>
-            {best[`${lv}_normal`] != null && <p className="text-xs text-gray-400 mb-2">🏆 ベスト {best[`${lv}_normal`]}もん</p>}
+            <div className="flex gap-2 text-xs text-gray-400 mb-2">
+              {/* ②修正: normalとsurvival両方のbestを表示 */}
+              {best[`${lv}_normal`] != null && <span>🏆 ふつう {best[`${lv}_normal`]}もん</span>}
+              {best[`${lv}_survival`] != null && <span>❤️ サバイバル {best[`${lv}_survival`]}もん</span>}
+            </div>
             <div className="flex gap-2">
               <button onClick={() => start(lv, 'normal')} className="flex-1 py-3 text-base font-bold text-white rounded-xl shadow active:scale-95" style={{ background: GRAD }}>
                 ふつう ⏱{LEVEL_TIME[lv]}s
@@ -114,7 +131,7 @@ export function MathSprint() {
     const key = `${level}_${gameMode}`; saveBest(key, score)
     return (
       <GameLayout title="けいさんスプリント" gradient={GRAD}>
-        <ResultScreen score={score} best={getBest()[key]} bestLabel={`ベスト（レベル${level}）`} onRetry={() => start(level, gameMode)} accentColor="text-orange-500" />
+        <ResultScreen score={score} best={getBest()[key]} bestLabel={`ベスト（レベル${level} ${gameMode === 'survival' ? 'サバイバル' : 'ふつう'}）`} onRetry={() => start(level, gameMode)} accentColor="text-orange-500" />
       </GameLayout>
     )
   }
@@ -140,7 +157,13 @@ export function MathSprint() {
         </div>
         <div className="grid grid-cols-2 gap-3 w-full">
           {choices.map((c, i) => (
-            <button key={i} onClick={() => tap(c)} className="bg-white rounded-2xl border-2 border-orange-200 shadow-md active:scale-95 transition-transform" style={{ height: 80, fontSize: 36, fontWeight: 800 }}>
+            <button
+              key={i}
+              onClick={() => tap(c)}
+              disabled={locked}
+              className="bg-white rounded-2xl border-2 border-orange-200 shadow-md active:scale-95 transition-transform disabled:opacity-60"
+              style={{ height: 80, fontSize: 36, fontWeight: 800 }}
+            >
               {c}
             </button>
           ))}

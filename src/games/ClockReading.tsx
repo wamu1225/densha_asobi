@@ -71,17 +71,24 @@ export function ClockReading() {
   const [qNum, setQNum] = useState(1)
   const [flash, setFlash] = useState<'ok' | 'ng' | null>(null)
   const [wrongAns, setWrongAns] = useState('')
+  // ⑦修正: ダブルタップ防止
+  const [locked, setLocked] = useState(false)
 
-  function loadQ(d: Difficulty) { const t = randomTime(d); setTime(t); setChoices(makeChoices(t.h, t.m, d)) }
-  function start(d: Difficulty) { setDiff(d); setScore(0); setQNum(1); loadQ(d); setPhase('play') }
+  function loadQ(d: Difficulty) {
+    // ⑧修正: 問題と選択肢を同時更新（空choicesを防ぐ）
+    const t = randomTime(d); setTime(t); setChoices(makeChoices(t.h, t.m, d))
+  }
+  function start(d: Difficulty) { setDiff(d); setScore(0); setQNum(1); setLocked(false); loadQ(d); setPhase('play') }
 
   function tap(c: { h: number; m: number }) {
+    if (locked) return
+    setLocked(true)
     if (fmt(c.h, c.m) === fmt(time.h, time.m)) { setFlash('ok'); setScore(s => s + 1); setWrongAns('') }
     else { setFlash('ng'); setWrongAns(`こたえ：${fmt(time.h, time.m)}`) }
     setTimeout(() => {
-      setFlash(null); setWrongAns('')
+      setFlash(null); setWrongAns(''); setLocked(false)
       if (qNum >= TOTAL) { setPhase('over') } else { setQNum(n => n + 1); loadQ(diff) }
-    }, 800)
+    }, 900)
   }
 
   const best = getBest()

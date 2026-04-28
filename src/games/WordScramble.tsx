@@ -27,15 +27,28 @@ const CATEGORIES: Record<string, WordEntry[]> = {
   むずかしい: [
     { word: 'えんぴつ', hint: '✏️' }, { word: 'けしごむ', hint: '🧹' }, { word: 'てぶくろ', hint: '🧤' },
     { word: 'めがね', hint: '👓' }, { word: 'かさ', hint: '☂️' }, { word: 'スニーカー', hint: '👟' },
-    { word: 'リュックサック', hint: '🎒' }, { word: 'ハンカチ', hint: '🧣' }, { word: 'ランドセル', hint: '🎒' },
-    { word: 'まくら', hint: '🛏️' },
+    // ⑲修正: ランドセルの絵文字をリュックサックと重複しないよう変更
+    { word: 'リュックサック', hint: '🎒' }, { word: 'ハンカチ', hint: '🧣' },
+    { word: 'ランドセル', hint: '📚' }, { word: 'まくら', hint: '🛏️' },
   ],
 }
 type Cat = keyof typeof CATEGORIES
 
+// ⑱修正: 2文字など短い単語でもかならず異なる順番を返す
 function scramble(word: string): string[] {
-  const chars = word.split(''); let result: string[]; let tries = 0
-  do { result = [...chars].sort(() => Math.random() - 0.5); tries++ } while (result.join('') === word && tries < 20)
+  const chars = word.split('')
+  if (chars.length <= 1) return chars
+  let result: string[]
+  let tries = 0
+  do {
+    result = [...chars].sort(() => Math.random() - 0.5)
+    tries++
+  } while (result.join('') === word && tries < 30)
+  // 30回失敗したら強制的に先頭2文字を入れ替えて必ず違う並びにする
+  if (result.join('') === word) {
+    result = [...chars]
+    ;[result[0], result[result.length - 1]] = [result[result.length - 1], result[0]]
+  }
   return result
 }
 
@@ -80,7 +93,15 @@ export function WordScramble() {
     if (current.length === word.word.length) {
       if (current === word.word) {
         setFlash('ok'); setScore(s => s + 1)
-        setTimeout(() => { if (idx + 1 >= words.length) { setPhase('over') } else { setIdx(i => i + 1) } }, 500)
+        setTimeout(() => {
+          if (timeMode) {
+            // ⑳修正: タイムアタックは全問解いたら最初から繰り返す
+            const nextIdx = (idx + 1) % words.length
+            setIdx(nextIdx)
+          } else {
+            if (idx + 1 >= words.length) { setPhase('over') } else { setIdx(i => i + 1) }
+          }
+        }, 500)
       } else {
         setFlash('ng'); setTimeout(() => { setSelected([]); setFlash(null) }, 400)
       }
@@ -98,7 +119,7 @@ export function WordScramble() {
             </p>
             <div className="flex gap-2">
               <button onClick={() => startGame(c, false)} className="flex-1 py-3 text-sm font-bold text-white rounded-xl shadow active:scale-95" style={{ background: GRAD }}>ふつう</button>
-              <button onClick={() => startGame(c, true)} className="flex-1 py-3 text-sm font-bold bg-orange-500 text-white rounded-xl shadow active:scale-95">⏱90びょう</button>
+              <button onClick={() => startGame(c, true)} className="flex-1 py-3 text-sm font-bold bg-orange-500 text-white rounded-xl shadow active:scale-95">⏱90びょう（くりかえし）</button>
             </div>
           </div>
         ))}
@@ -108,7 +129,7 @@ export function WordScramble() {
 
   if (phase === 'over') return (
     <GameLayout title="もじならべ" gradient={GRAD}>
-      <ResultScreen score={score} total={words.length} onRetry={() => startGame(cat, timeMode)} accentColor="text-amber-500" />
+      <ResultScreen score={score} total={timeMode ? undefined : words.length} onRetry={() => startGame(cat, timeMode)} accentColor="text-amber-500" />
     </GameLayout>
   )
 
@@ -136,8 +157,14 @@ export function WordScramble() {
 
         <div className="flex gap-2 flex-wrap justify-center">
           {tiles.map((t, i) => (
-            <button key={i} onClick={() => tapTile(i)} disabled={selected.includes(i)}
-              className={`w-14 h-14 text-2xl font-black rounded-xl border-2 transition-all active:scale-95 shadow-md ${selected.includes(i) ? 'bg-amber-50 border-amber-100 text-amber-50' : 'bg-white border-amber-300'}`}>
+            <button
+              key={i}
+              onClick={() => tapTile(i)}
+              disabled={selected.includes(i)}
+              className={`w-14 h-14 text-2xl font-black rounded-xl border-2 transition-all active:scale-95 shadow-md ${
+                selected.includes(i) ? 'bg-amber-50 border-amber-100 text-amber-50' : 'bg-white border-amber-300'
+              }`}
+            >
               {selected.includes(i) ? '' : t}
             </button>
           ))}

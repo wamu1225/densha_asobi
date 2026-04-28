@@ -41,6 +41,8 @@ export function ColorChallenge() {
   const [timeLeft, setTimeLeft] = useState(60)
   const [flash, setFlash] = useState(false)
   const [modeKey, setModeKey] = useState('color_60')
+  // ⑫修正: 連打防止 (300ms cooldown)
+  const [findCooldown, setFindCooldown] = useState(false)
 
   useEffect(() => {
     if (mode !== 'play') return
@@ -56,6 +58,9 @@ export function ColorChallenge() {
   }
 
   function found() {
+    if (findCooldown) return  // ⑫連打防止
+    setFindCooldown(true)
+    setTimeout(() => setFindCooldown(false), 300)
     setFlash(true)
     const ns = streak + 1; setStreak(ns); setMaxStreak(m => Math.max(m, ns)); setCount(c => c + 1)
     setTimeout(() => setFlash(false), 200)

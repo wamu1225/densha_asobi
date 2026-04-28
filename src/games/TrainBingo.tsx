@@ -27,8 +27,9 @@ function checkBingo(marked: Set<number>, size: number): number[][] {
 
 function Celebration({ count }: { count: number }) {
   if (count === 0) return null
+  // ⑩修正: key={count} で count が変わったときだけ bounce-in が再発火する
   return (
-    <div className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-2xl px-5 py-3 text-center bounce-in w-full shadow-lg">
+    <div key={count} className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-2xl px-5 py-3 text-center bounce-in w-full shadow-lg">
       <p className="text-2xl font-black text-white">
         {count === 1 ? '🎊 ビンゴ！' : count === 2 ? '🎊🎊 ダブルビンゴ！！' : `🎊 ${count}ビンゴ！！！`}
       </p>
@@ -49,6 +50,9 @@ export function TrainBingo() {
 
   function tap(i: number) {
     const next = new Set(marked)
+    // ⑪修正: ビンゴ成立済みのセルはunmarkできないようにロック
+    const isBingoCell = new Set(bingoLines.flat()).has(i)
+    if (next.has(i) && isBingoCell) return
     if (next.has(i)) { next.delete(i) } else { next.add(i) }
     setMarked(next); setBingoLines(checkBingo(next, gridSize))
   }
