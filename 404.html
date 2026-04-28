@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>でんしゃあそび</title>
+  <script>
+    // GitHub Pages は SPA のサブパスを 404 として返す
+    // sessionStorage にパスを保存してルートにリダイレクト → App が復元する
+    sessionStorage.setItem('spa_redirect', location.pathname + location.search + location.hash);
+    location.replace('/densha_asobi/');
+  </script>
+</head>
+<body>
+  <p style="font-family:sans-serif;text-align:center;margin-top:40px">リダイレクト中...</p>
+</body>
+</html>
