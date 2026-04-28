@@ -1,114 +1,131 @@
 import { useNavigate } from 'react-router-dom'
-import { AdBanner } from '../components/AdBanner'
 
+// 12色→4カテゴリ色に統一
 const GAMES = [
-  { path: '/math',     emoji: '🔢', title: 'けいさん\nスプリント', grad: 'linear-gradient(145deg,#ff9a5c,#f97316)' },
-  { path: '/bigger',   emoji: '⚖️', title: 'どっちが\nおおきい？', grad: 'linear-gradient(145deg,#60a5fa,#3b82f6)' },
-  { path: '/clock',    emoji: '🕐', title: 'とけいを\nよもう',      grad: 'linear-gradient(145deg,#c084fc,#a855f7)' },
-  { path: '/riddles',  emoji: '🤔', title: 'なぞなぞ',             grad: 'linear-gradient(145deg,#fbbf24,#f59e0b)' },
-  { path: '/bingo',    emoji: '🚃', title: 'でんしゃ\nビンゴ',     grad: 'linear-gradient(145deg,#4ade80,#22c55e)' },
-  { path: '/color',    emoji: '🎨', title: 'いろさがし\nチャレンジ', grad: 'linear-gradient(145deg,#f472b6,#ec4899)' },
-  { path: '/memory',   emoji: '🃏', title: 'しんけい\nすいじゃく',  grad: 'linear-gradient(145deg,#2dd4bf,#14b8a6)' },
-  { path: '/next',     emoji: '🔮', title: 'つぎは\nどれ？',        grad: 'linear-gradient(145deg,#818cf8,#6366f1)' },
-  { path: '/maze',     emoji: '🗺️', title: 'すうじ\nめいろ',        grad: 'linear-gradient(145deg,#f87171,#ef4444)' },
-  { path: '/scramble', emoji: '📝', title: 'もじ\nならべ',          grad: 'linear-gradient(145deg,#fcd34d,#f59e0b)' },
-  { path: '/search',   emoji: '🔍', title: 'ひらがな\nさがし',      grad: 'linear-gradient(145deg,#67e8f9,#06b6d4)' },
-  { path: '/dots',     emoji: '✏️', title: 'ドット\nつなぎ',        grad: 'linear-gradient(145deg,#bef264,#84cc16)' },
-]
+  // 算数・数字 — 赤
+  { path: '/math',     emoji: '🔢', title: 'けいさん\nスプリント', sub: 'たしざん・ひきざん',  cat: 'red' },
+  { path: '/bigger',   emoji: '⚖️', title: 'どっちが\nおおきい？', sub: '2けたのかずくらべ',  cat: 'red' },
+  { path: '/clock',    emoji: '🕐', title: 'とけいを\nよもう',      sub: 'なんじなんぷん？',   cat: 'red' },
+  // 言葉・ひらがな — 青
+  { path: '/riddles',  emoji: '🤔', title: 'なぞなぞ',             sub: 'むずかしいぞ！',     cat: 'blue' },
+  { path: '/scramble', emoji: '📝', title: 'もじ\nならべ',          sub: 'ことばをつくろう',   cat: 'blue' },
+  { path: '/search',   emoji: '🔍', title: 'ひらがな\nさがし',      sub: 'かくれたことばは？', cat: 'blue' },
+  // 観察・外 — 緑
+  { path: '/bingo',    emoji: '🚃', title: 'でんしゃ\nビンゴ',     sub: 'まどのそとをみよう', cat: 'green' },
+  { path: '/color',    emoji: '🎨', title: 'いろさがし',            sub: 'そとでみつけよう',   cat: 'green' },
+  // 記憶・パズル — 紫
+  { path: '/memory',   emoji: '🃏', title: 'しんけい\nすいじゃく',  sub: 'えあわせゲーム',     cat: 'purple' },
+  { path: '/next',     emoji: '🔮', title: 'つぎは\nどれ？',        sub: 'パターンをさがせ',   cat: 'purple' },
+  { path: '/maze',     emoji: '🗺️', title: 'すうじ\nめいろ',        sub: 'じゅんばんにタップ', cat: 'orange' },
+  { path: '/dots',     emoji: '✏️', title: 'ドット\nつなぎ',        sub: 'なにができるかな？', cat: 'purple' },
+] as const
 
-function TrainSvg() {
-  return (
-    <div className="overflow-hidden h-10 relative">
-      <div className="train-ride absolute whitespace-nowrap">
-        <span className="text-3xl">🚃🚃🚃</span>
-      </div>
-    </div>
-  )
+// カテゴリ → 色設定
+const CAT = {
+  red:    { border: '#C8352A', bg: '#FFF6F5', text: '#9B1B13' },
+  blue:   { border: '#2558C4', bg: '#F0F5FF', text: '#1A3A9B' },
+  green:  { border: '#217A4B', bg: '#F0FAF4', text: '#145530' },
+  purple: { border: '#6B3FC0', bg: '#F6F0FF', text: '#4A2690' },
+  orange: { border: '#B8500A', bg: '#FFF5EE', text: '#8A3A06' },
 }
 
-function Cloud({ top, left, size }: { top: number; left: number; size: number }) {
-  return (
-    <div
-      className="absolute rounded-full opacity-60"
-      style={{
-        top, left,
-        width: size * 2.5, height: size,
-        background: 'rgba(255,255,255,0.85)',
-        filter: 'blur(2px)',
-      }}
-    />
-  )
-}
+// カードごとの微小回転（手作り感）
+const ROTATIONS = [-1.2, 0.8, -0.5, 1.5, -1, 0.5, -1.8, 1, -0.5, 1.2, -0.8, 0.6]
 
 export function TopPage() {
   const navigate = useNavigate()
+
   return (
-    <div className="min-h-svh" style={{ background: 'linear-gradient(180deg, #bae6fd 0%, #e0f2fe 35%, #f0f9ff 100%)' }}>
+    <div style={{ background: 'var(--cream)', minHeight: '100svh' }}>
       {/* ヘッダー */}
       <header
-        className="relative overflow-hidden pt-8 pb-4 px-4 text-center"
-        style={{ background: 'linear-gradient(180deg, #0ea5e9 0%, #38bdf8 100%)' }}
+        className="relative overflow-hidden px-5 pt-7 pb-10 text-white"
+        style={{ background: '#1C2B40' }}
       >
-        {/* 雲 */}
-        <Cloud top={8} left={10} size={18} />
-        <Cloud top={20} left={55} size={14} />
-        <Cloud top={4} left={80} size={20} />
+        {/* 星 */}
+        {[{t:12,l:15,s:18},{t:8,l:55,s:10},{t:18,l:78,s:14},{t:5,l:88,s:8}].map((star,i) => (
+          <div key={i} className="absolute rounded-full bg-yellow-200 opacity-60"
+            style={{ top:`${star.t}%`, left:`${star.l}%`, width:star.s, height:star.s }} />
+        ))}
 
-        <div className="relative z-10">
-          <p className="text-white/80 text-sm font-bold tracking-widest mb-1">🚃 DENSHA ASOBI</p>
-          <h1 className="text-white font-black text-4xl tracking-tight" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
-            でんしゃあそび
+        <div className="relative z-10 text-center">
+          <p className="text-xs tracking-[0.25em] text-blue-300 font-bold mb-1 uppercase">DENSHA ASOBI</p>
+          <h1 className="font-black text-white leading-none" style={{ fontSize: 'clamp(2rem, 8vw, 2.8rem)', letterSpacing: '-0.02em' }}>
+            でんしゃ<br/>あそび
           </h1>
-          <p className="text-white/90 text-base font-bold mt-1">でんしゃのなかで あそぼう！</p>
+          <p className="text-blue-200 text-sm font-bold mt-2">
+            でんしゃのなかで あそぼう！
+          </p>
         </div>
 
         {/* 走る電車 */}
-        <div className="mt-3">
-          <TrainSvg />
+        <div className="mt-4 overflow-hidden h-9 relative">
+          <div className="train-ride absolute whitespace-nowrap">
+            <span style={{ fontSize: 28 }}>🚃🚃🚃</span>
+          </div>
         </div>
 
-        {/* 波型の下端 */}
-        <svg viewBox="0 0 400 20" preserveAspectRatio="none" className="absolute bottom-0 left-0 w-full" height="20">
-          <path d="M0,10 C100,0 300,20 400,10 L400,20 L0,20 Z" fill="#f0f9ff" />
+        {/* 波型 */}
+        <svg viewBox="0 0 400 24" preserveAspectRatio="none" className="absolute bottom-0 left-0 w-full" height="24">
+          <path d="M0,12 C80,0 160,24 240,12 S360,0 400,12 L400,24 L0,24 Z" fill="var(--cream)" />
         </svg>
       </header>
 
+      {/* カテゴリ凡例 */}
+      <div className="flex justify-center gap-3 flex-wrap px-4 mt-5 mb-1">
+        {([
+          { cat: 'red',    label: '算数・数字' },
+          { cat: 'blue',   label: '言葉・ひらがな' },
+          { cat: 'green',  label: '観察・外' },
+          { cat: 'purple', label: '記憶・パズル' },
+        ] as const).map(({ cat, label }) => (
+          <div key={cat} className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full" style={{ background: CAT[cat].border }} />
+            <span className="text-xs font-bold" style={{ color: 'var(--ink-sub)' }}>{label}</span>
+          </div>
+        ))}
+      </div>
+
       {/* ゲームグリッド */}
-      <main className="px-4 pt-5 pb-8 max-w-lg mx-auto">
-        <p className="text-center text-gray-500 text-sm font-bold mb-4">ゲームをえらんでね 👇</p>
+      <main className="px-4 pt-3 pb-8 max-w-lg mx-auto">
         <div className="grid grid-cols-3 gap-3">
-          {GAMES.map(game => (
-            <button
-              key={game.path}
-              onClick={() => navigate(game.path)}
-              className="rounded-3xl flex flex-col items-center justify-center gap-1.5 active:scale-90 transition-transform duration-100"
-              style={{
-                background: game.grad,
-                aspectRatio: '1',
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25)',
-                padding: '10px 6px 12px',
-              }}
-            >
-              <span style={{ fontSize: 32, lineHeight: 1 }}>{game.emoji}</span>
-              <span
-                className="text-white font-bold text-center leading-tight"
+          {GAMES.map((game, i) => {
+            const c = CAT[game.cat]
+            const rot = ROTATIONS[i] ?? 0
+            return (
+              <button
+                key={game.path}
+                onClick={() => navigate(game.path)}
+                className="flex flex-col items-center text-center active:scale-90 transition-transform duration-100"
                 style={{
-                  fontSize: 11,
-                  whiteSpace: 'pre-line',
-                  textShadow: '0 1px 3px rgba(0,0,0,0.25)',
-                  letterSpacing: '-0.01em',
+                  background: c.bg,
+                  borderRadius: 14,
+                  // 上枠線だけ太く — 「ふせん」のような印象
+                  borderTop: `5px solid ${c.border}`,
+                  boxShadow: `3px 4px 0 rgba(0,0,0,0.08)`,
+                  transform: `rotate(${rot}deg)`,
+                  padding: '12px 6px 10px',
+                  aspectRatio: '1',
                 }}
               >
-                {game.title}
-              </span>
-            </button>
-          ))}
+                <span style={{ fontSize: 30, lineHeight: 1 }}>{game.emoji}</span>
+                <span
+                  className="font-black leading-tight mt-2"
+                  style={{
+                    fontSize: 11,
+                    whiteSpace: 'pre-line',
+                    color: c.text,
+                    letterSpacing: '-0.01em',
+                  }}
+                >
+                  {game.title}
+                </span>
+              </button>
+            )
+          })}
         </div>
 
-        {/* 広告ユニット（ゲームグリッド下） */}
-        <AdBanner slot="8756234109" format="rectangle" className="mt-6 rounded-xl overflow-hidden" />
-
-        <p className="text-center text-gray-400 text-xs mt-6 font-bold">
+        <p className="text-center text-xs font-bold mt-8 mb-2" style={{ color: 'var(--ink-sub)' }}>
           🚃 でんしゃのたびを たのしもう！
         </p>
       </main>

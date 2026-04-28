@@ -69,41 +69,48 @@ export function ResultScreen({ score, total, timeStr, extra = [], best, bestStr,
       <Confetti active={showConfetti} />
 
       <div className="text-6xl">{emoji}</div>
-      <p className="text-3xl font-bold text-gray-800">{message}</p>
+      <p className="text-3xl font-black" style={{ color: 'var(--ink)' }}>{message}</p>
 
-      <div className="bg-white rounded-3xl shadow-lg p-6 w-full border border-gray-100">
+      {/* スコアカード — ふせん風 */}
+      <div className="w-full rounded-2xl p-5"
+        style={{
+          background: 'white',
+          borderLeft: '5px solid #1C2B40',
+          boxShadow: '4px 5px 0 rgba(0,0,0,0.08)',
+        }}
+      >
         {score != null && (
           <div className="text-center mb-3">
             {total != null ? (
               <>
-                <p className="text-base text-gray-500 mb-1">せいかい</p>
+                <p className="text-sm font-bold mb-1" style={{ color: 'var(--ink-sub)' }}>せいかい</p>
                 <p className={`text-6xl font-black ${accentColor}`}>
-                  {score}<span className="text-2xl text-gray-400"> / {total}</span>
+                  {score}<span className="text-2xl" style={{ color: 'var(--ink-sub)' }}> / {total}</span>
                 </p>
               </>
             ) : (
               <>
-                <p className="text-base text-gray-500 mb-1">みつけた かず</p>
-                <p className={`text-6xl font-black ${accentColor}`}>{score}<span className="text-2xl text-gray-400">こ</span></p>
+                <p className="text-sm font-bold mb-1" style={{ color: 'var(--ink-sub)' }}>みつけた かず</p>
+                <p className={`text-6xl font-black ${accentColor}`}>{score}<span className="text-2xl" style={{ color: 'var(--ink-sub)' }}>こ</span></p>
               </>
             )}
           </div>
         )}
         {timeStr && (
           <div className="text-center mb-3">
-            <p className="text-base text-gray-500 mb-1">タイム</p>
+            <p className="text-sm font-bold mb-1" style={{ color: 'var(--ink-sub)' }}>タイム</p>
             <p className={`text-5xl font-black ${accentColor}`}>{timeStr}</p>
           </div>
         )}
         {extra.map((s, i) => (
           <div key={i} className="text-center mb-2">
-            <p className="text-sm text-gray-500">{s.label}</p>
-            <p className="text-2xl font-bold text-gray-700">{s.value}</p>
+            <p className="text-xs font-bold" style={{ color: 'var(--ink-sub)' }}>{s.label}</p>
+            <p className="text-xl font-bold" style={{ color: 'var(--ink)' }}>{s.value}</p>
           </div>
         ))}
         {(best != null || bestStr) && (
           <div className="mt-3 pt-3 border-t border-gray-100 text-center">
-            <p className="text-sm text-gray-400">🏆 {bestLabel}：{bestStr ?? best}</p>
+            <p className="text-sm font-bold" style={{ color: 'var(--ink-sub)' }}>🏆 {bestLabel}：{bestStr ?? best}</p>
           </div>
         )}
       </div>
@@ -111,14 +118,23 @@ export function ResultScreen({ score, total, timeStr, extra = [], best, bestStr,
       <div className="flex gap-3 w-full">
         <button
           onClick={onRetry}
-          className="flex-1 py-4 text-lg font-bold text-white rounded-2xl shadow-lg active:scale-95 transition-transform"
-          style={{ background: 'linear-gradient(135deg, #0ea5e9, #0284c7)' }}
+          className="flex-1 py-4 text-lg font-black text-white rounded-xl active:scale-95 transition-transform"
+          style={{
+            background: '#1C2B40',
+            boxShadow: '3px 4px 0 rgba(0,0,0,0.2)',
+          }}
         >
           もういちど 🔄
         </button>
         <button
           onClick={() => navigate('/')}
-          className="flex-1 py-4 text-lg font-bold bg-white text-gray-600 rounded-2xl shadow active:scale-95 border border-gray-200"
+          className="flex-1 py-4 text-lg font-black rounded-xl active:scale-95 border-2"
+          style={{
+            background: 'white',
+            color: 'var(--ink)',
+            borderColor: '#ddd',
+            boxShadow: '3px 4px 0 rgba(0,0,0,0.06)',
+          }}
         >
           もどる 🏠
         </button>
