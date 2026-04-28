@@ -44,6 +44,8 @@ export function Simon() {
   const [round, setRound]     = useState(1)
   const [wrongId, setWrongId] = useState<number | null>(null)
   const [showSeqHint, setShowSeqHint] = useState(false)
+  // ユーザーがタップしたときの視覚フィードバック用（showing の lit とは別）
+  const [tapLit, setTapLit] = useState<number | null>(null)
 
   // ── シーケンス表示 (showing フェーズ) ──────────────────
   useEffect(() => {
@@ -98,21 +100,27 @@ export function Simon() {
   function startGame() {
     const first = Math.floor(Math.random() * 4)
     setSeq([first]); setRound(1); setInput(0)
-    setLit(null); setWrongId(null); setPhase('showing')
+    setLit(null); setWrongId(null); setTapLit(null); setPhase('showing')
   }
 
   function tap(id: number) {
     if (phase !== 'input') return
+
+    // タップ直後にパネルを光らせる（220ms）
+    setTapLit(id)
+    setTimeout(() => setTapLit(null), 220)
+
     if (id === sequence[inputIdx]) {
       if (inputIdx + 1 === sequence.length) {
-        setPhase('correct')
+        // 最後の正解 — 少し余裕を持たせてから correct へ
+        setTimeout(() => setPhase('correct'), 120)
       } else {
         setInput(i => i + 1)
       }
     } else {
       setWrongId(id)
       saveBest(round - 1)
-      setPhase('wrong')
+      setTimeout(() => setPhase('wrong'), 120)
     }
   }
 
@@ -205,39 +213,50 @@ export function Simon() {
         {/* 4色パネル ── ここが一番重要。光の差を最大化 */}
         <div className="grid grid-cols-2 gap-4 w-full">
           {PANELS.map(p => {
-            const isLit   = lit === p.id
+            // シーケンス点灯 OR ユーザータップの両方で光る
+            const isLit   = lit === p.id || tapLit === p.id
             const isWrong = wrongId === p.id
+            // タップ由来の光は少し抑えてシーケンスと区別
+            const isTapOnly = tapLit === p.id && lit !== p.id
 
             return (
               <button
                 key={p.id}
                 onClick={() => tap(p.id)}
                 disabled={phase !== 'input'}
-                className="aspect-square rounded-3xl flex flex-col items-center justify-center gap-2 transition-all select-none"
+                className="aspect-square rounded-3xl flex flex-col items-center justify-center gap-2 select-none"
                 style={{
-                  background: isLit ? p.bright : isWrong ? '#EF4444' : p.dark,
-                  // 点灯時: 強烈なグロー + 拡大
-                  transform: isLit ? 'scale(1.08)' : isWrong ? 'scale(0.95)' : 'scale(1)',
+                  background: isLit
+                    ? (isTapOnly ? `${p.bright}DD` : p.bright)
+                    : isWrong ? '#EF4444' : p.dark,
+                  transform: isLit
+                    ? (isTapOnly ? 'scale(1.05)' : 'scale(1.08)')
+                    : isWrong ? 'scale(0.95)' : 'scale(1)',
                   boxShadow: isLit
-                    ? `0 0 40px ${p.glow}, 0 0 80px ${p.glow}88, inset 0 2px 0 rgba(255,255,255,0.3), 4px 5px 0 rgba(0,0,0,0.15)`
+                    ? `0 0 ${isTapOnly ? 25 : 40}px ${p.glow}, 0 0 ${isTapOnly ? 50 : 80}px ${p.glow}88, inset 0 2px 0 rgba(255,255,255,0.25), 4px 5px 0 rgba(0,0,0,0.15)`
                     : isWrong
                     ? `0 0 30px #EF4444, 0 0 60px #EF444488`
                     : '4px 5px 0 rgba(0,0,0,0.18)',
-                  transitionDuration: isLit ? '60ms' : '120ms',
+                  // タップ反応は超速く、消灯はゆっくり
+                  transition: isLit
+                    ? 'transform 40ms, box-shadow 40ms, background 40ms'
+                    : 'transform 150ms, box-shadow 150ms, background 150ms',
                 }}
               >
-                {/* 絵文字: 点灯時は明るく、消灯時は暗く */}
                 <span style={{
                   fontSize: 54,
                   filter: isLit
                     ? 'brightness(1.4) drop-shadow(0 0 8px white)'
                     : 'brightness(0.45)',
-                  transition: 'filter 80ms',
+                  transition: isLit ? 'filter 40ms' : 'filter 150ms',
                 }}>
                   {p.emoji}
                 </span>
-                <span className="text-base font-black transition-colors"
-                  style={{ color: isLit ? 'white' : 'rgba(255,255,255,0.35)' }}>
+                <span className="text-base font-black"
+                  style={{
+                    color: isLit ? 'white' : 'rgba(255,255,255,0.35)',
+                    transition: isLit ? 'color 40ms' : 'color 150ms',
+                  }}>
                   {p.label}
                 </span>
               </button>
