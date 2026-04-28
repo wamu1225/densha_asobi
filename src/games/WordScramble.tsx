@@ -25,11 +25,16 @@ const CATEGORIES: Record<string, WordEntry[]> = {
     { word: 'ふね', hint: '🚢' },
   ],
   むずかしい: [
-    { word: 'えんぴつ', hint: '✏️' }, { word: 'けしごむ', hint: '🧹' }, { word: 'てぶくろ', hint: '🧤' },
-    { word: 'めがね', hint: '👓' }, { word: 'かさ', hint: '☂️' }, { word: 'スニーカー', hint: '👟' },
-    // ⑲修正: ランドセルの絵文字をリュックサックと重複しないよう変更
-    { word: 'リュックサック', hint: '🎒' }, { word: 'ハンカチ', hint: '🧣' },
-    { word: 'ランドセル', hint: '📚' }, { word: 'まくら', hint: '🛏️' },
+    { word: 'えんぴつ',     hint: '✏️' },  // えんぴつ
+    { word: 'くつした',     hint: '🧦' },  // けしごむ→絵文字なし→くつしたに変更
+    { word: 'てぶくろ',     hint: '🧤' },  // てぶくろ
+    { word: 'めがね',       hint: '👓' },  // めがね
+    { word: 'かさ',         hint: '☂️' },  // かさ
+    { word: 'スニーカー',   hint: '👟' },  // スニーカー
+    { word: 'リュックサック', hint: '🎒' }, // リュックサック
+    { word: 'かがみ',       hint: '🪞' },  // ハンカチ→絵文字なし→かがみに変更
+    { word: 'でんたく',     hint: '🧮' },  // ランドセル→絵文字なし→でんたくに変更
+    { word: 'まくら',       hint: '🛌' },  // まくら（🛌=寝ている人=枕を使っている）
   ],
 }
 type Cat = keyof typeof CATEGORIES
