@@ -7,7 +7,7 @@ interface Riddle { q: string; a: string; hint: string; level: Level }
 
 const RIDDLES: Riddle[] = [
   // ── やさしい（ダジャレ・なぞなぞ）──
-  { q: 'あかい かさを もっているのに、ぬれている たべものは なに？', a: 'トマト', hint: 'やさい', level: 'easy' },
+  { q: 'しろくて まるくて、ぱかっと われると きいろい のは なに？', a: 'たまご', hint: 'にわとりが うむもの', level: 'easy' },
   { q: 'は（歯）を もっているのに、なにも たべられないのは なに？', a: 'くし', hint: 'かみをとくどうぐ', level: 'easy' },
   { q: 'くろいのに、かくと しろくなるのは なに？', a: 'こくばん（黒板）', hint: 'がっこうにある', level: 'easy' },
   { q: 'あしが 4ほん あるのに、あるけないのは なに？', a: 'いす・つくえ', hint: 'すわるもの', level: 'easy' },

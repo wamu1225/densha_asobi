@@ -7,7 +7,6 @@ const GAMES = [
   { path: '/bigger',   emoji: '⚖️', title: 'どっちが\nおおきい？', sub: '2けたのかずくらべ',  cat: 'red' },
   { path: '/clock',    emoji: '🕐', title: 'とけいを\nよもう',      sub: 'なんじなんぷん？',   cat: 'red' },
   // 言葉・ひらがな — 青
-  { path: '/riddles',  emoji: '🤔', title: 'なぞなぞ',             sub: 'むずかしいぞ！',     cat: 'blue' },
   { path: '/scramble', emoji: '📝', title: 'もじ\nならべ',          sub: 'ことばをつくろう',   cat: 'blue' },
   { path: '/search',   emoji: '🔍', title: 'ひらがな\nさがし',      sub: 'かくれたことばは？', cat: 'blue' },
   // 観察・外 — 緑

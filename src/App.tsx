@@ -3,7 +3,6 @@ import { TopPage } from './pages/TopPage'
 import { MathSprint } from './games/MathSprint'
 import { WhichBigger } from './games/WhichBigger'
 import { ClockReading } from './games/ClockReading'
-import { Riddles } from './games/Riddles'
 import { TrainBingo } from './games/TrainBingo'
 import { ColorChallenge } from './games/ColorChallenge'
 import { MemoryCards } from './games/MemoryCards'
@@ -21,7 +20,6 @@ export default function App() {
         <Route path="/math" element={<MathSprint />} />
         <Route path="/bigger" element={<WhichBigger />} />
         <Route path="/clock" element={<ClockReading />} />
-        <Route path="/riddles" element={<Riddles />} />
         <Route path="/bingo" element={<TrainBingo />} />
         <Route path="/color" element={<ColorChallenge />} />
         <Route path="/memory" element={<MemoryCards />} />
