@@ -74,11 +74,19 @@ export function ClockReading() {
   // ⑦修正: ダブルタップ防止
   const [locked, setLocked] = useState(false)
 
-  function loadQ(d: Difficulty) {
-    // ⑧修正: 問題と選択肢を同時更新（空choicesを防ぐ）
-    const t = randomTime(d); setTime(t); setChoices(makeChoices(t.h, t.m, d))
+  // 後半6問から難易度を1段階上げる（ゲーム内で盛り上がりを作る）
+  function effectiveDiff(base: Difficulty, q: number): Difficulty {
+    if (q < 7) return base
+    if (base === 'easy') return 'normal'
+    if (base === 'normal') return 'hard'
+    return 'hard'
   }
-  function start(d: Difficulty) { setDiff(d); setScore(0); setQNum(1); setLocked(false); loadQ(d); setPhase('play') }
+
+  function loadQ(d: Difficulty, q: number) {
+    const actual = effectiveDiff(d, q)
+    const t = randomTime(actual); setTime(t); setChoices(makeChoices(t.h, t.m, actual))
+  }
+  function start(d: Difficulty) { setDiff(d); setScore(0); setQNum(1); setLocked(false); loadQ(d, 1); setPhase('play') }
 
   function tap(c: { h: number; m: number }) {
     if (locked) return
@@ -87,7 +95,7 @@ export function ClockReading() {
     else { setFlash('ng'); setWrongAns(`こたえ：${fmt(time.h, time.m)}`) }
     setTimeout(() => {
       setFlash(null); setWrongAns(''); setLocked(false)
-      if (qNum >= TOTAL) { setPhase('over') } else { setQNum(n => n + 1); loadQ(diff) }
+      if (qNum >= TOTAL) { setPhase('over') } else { setQNum(n => { loadQ(diff, n + 1); return n + 1 }) }
     }, 900)
   }
 
@@ -131,6 +139,11 @@ export function ClockReading() {
           <span className="text-xl font-bold text-gray-700">{qNum} / {TOTAL}</span>
         </div>
         <p className="text-lg font-bold text-gray-600">なんじ なんぷん？</p>
+        {qNum === 7 && diff !== 'hard' && (
+          <div className="w-full bg-orange-100 border-2 border-orange-300 rounded-xl py-2 text-center bounce-in">
+            <span className="text-base font-black text-orange-600">⚡ ここからむずかしくなるよ！</span>
+          </div>
+        )}
         <ClockSvg h={time.h} m={time.m} />
         <div className="grid grid-cols-2 gap-3 w-full">
           {choices.map((c, i) => (

@@ -46,6 +46,7 @@ export function Simon() {
   const [showSeqHint, setShowSeqHint] = useState(false)
   // ユーザーがタップしたときの視覚フィードバック用（showing の lit とは別）
   const [tapLit, setTapLit] = useState<number | null>(null)
+  const [showingStep, setShowingStep] = useState(0)
 
   // ── シーケンス表示 (showing フェーズ) ──────────────────
   useEffect(() => {
@@ -54,11 +55,13 @@ export function Simon() {
 
     async function run() {
       setShowSeqHint(false)
+      setShowingStep(0)
       await delay(500)
       const { flash, gap } = getTiming(round)
-      for (const id of sequence) {
+      for (let i = 0; i < sequence.length; i++) {
         if (!alive) return
-        setLit(id)
+        setShowingStep(i + 1)
+        setLit(sequence[i])
         await delay(flash)
         if (!alive) return
         setLit(null)
@@ -204,7 +207,7 @@ export function Simon() {
           phase === 'wrong'   ? 'bg-red-100 text-red-700' :
           'bg-amber-100 text-amber-700'
         }`}>
-          {phase === 'showing' && `👀 みてね！（${sequence.length}こ）`}
+          {phase === 'showing' && `👀 みてね！　${showingStep} / ${sequence.length}こ`}
           {phase === 'input'   && `👆 タップ！　${inputIdx + 1} / ${sequence.length}`}
           {phase === 'correct' && '⭕ せいかい！🎉 つぎのラウンド…'}
           {phase === 'wrong'   && '❌ ちがう！'}

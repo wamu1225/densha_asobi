@@ -224,12 +224,10 @@ export function HiraganaSearch() {
                   <button
                     key={k}
                     onClick={() => tap(r, c)}
-                    className={`aspect-square rounded-lg text-base font-black flex items-center justify-center transition-all active:scale-90 ${
-                      isFound
-                        ? 'text-white shadow'
-                        : isSel
-                        ? 'bg-cyan-100 text-cyan-800 scale-95 border-2 border-cyan-400'
-                        : 'bg-gray-50 text-gray-700 border border-gray-200'
+                    className={`aspect-square rounded-lg text-base font-black flex items-center justify-center active:scale-90 ${
+                      isFound ? 'text-white shadow' :
+                      isSel ? 'cell-pulse bg-cyan-100 text-cyan-800' :
+                      'bg-gray-50 text-gray-700 border border-gray-200'
                     }`}
                     style={isFound ? { background: GRAD } : {}}
                   >

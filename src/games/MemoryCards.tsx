@@ -12,7 +12,12 @@ const CATEGORIES: Record<string, string[]> = {
 }
 type Cat = keyof typeof CATEGORIES
 interface Size { pairs: number; cols: number; label: string }
-const SIZES: Size[] = [{ pairs: 6, cols: 4, label: '3×4（かんたん）' }, { pairs: 8, cols: 4, label: '4×4（ふつう）' }, { pairs: 10, cols: 4, label: '4×5（むずかしい）' }]
+const SIZES: Size[] = [
+  { pairs: 3, cols: 3, label: '2×3（超かんたん）' },
+  { pairs: 6, cols: 4, label: '3×4（かんたん）' },
+  { pairs: 8, cols: 4, label: '4×4（ふつう）' },
+  { pairs: 10, cols: 4, label: '4×5（むずかしい）' },
+]
 
 const BEST_KEY = 'densha_memory_best'
 function getBest(): Record<string, number> { try { return JSON.parse(localStorage.getItem(BEST_KEY) || '{}') } catch { return {} } }

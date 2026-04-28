@@ -4,6 +4,10 @@ import { ResultScreen } from '../components/ResultScreen'
 
 const GRAD = 'linear-gradient(135deg, #fcd34d, #f59e0b)'
 
+const TA_BEST_KEY = 'densha_scramble_best'
+function getTaBest(cat: string): number { try { return parseInt(localStorage.getItem(`${TA_BEST_KEY}_${cat}`) ?? '0') } catch { return 0 } }
+function saveTaBest(cat: string, v: number) { if (v > getTaBest(cat)) localStorage.setItem(`${TA_BEST_KEY}_${cat}`, String(v)) }
+
 interface WordEntry { word: string; hint: string }
 const CATEGORIES: Record<string, WordEntry[]> = {
   どうぶつ: [
@@ -132,19 +136,34 @@ export function WordScramble() {
     </GameLayout>
   )
 
-  if (phase === 'over') return (
-    <GameLayout title="もじならべ" gradient={GRAD}>
-      <ResultScreen score={score} total={timeMode ? undefined : words.length} onRetry={() => startGame(cat, timeMode)} accentColor="text-amber-500" />
-    </GameLayout>
-  )
+  if (phase === 'over') {
+    if (timeMode) saveTaBest(cat, score)
+    return (
+      <GameLayout title="もじならべ" gradient={GRAD}>
+        <ResultScreen
+          score={score} total={timeMode ? undefined : words.length}
+          scoreLabel={timeMode ? 'クリアしたもんだい' : undefined}
+          bestStr={timeMode && getTaBest(cat) > 0 ? `${getTaBest(cat)}もん` : undefined}
+          bestLabel="タイムアタック ベスト"
+          onRetry={() => startGame(cat, timeMode)}
+          accentColor="text-amber-500"
+        />
+      </GameLayout>
+    )
+  }
 
   const current = selected.map(i => tiles[i]).join('')
 
   return (
     <GameLayout title="もじならべ" gradient={GRAD}>
       <div className={`flex flex-col items-center gap-4 rounded-3xl p-3 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
-        <div className="flex justify-between w-full">
-          <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
+        <div className="flex justify-between w-full items-center">
+          <div>
+            <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
+            {timeMode && getTaBest(cat) > 0 && (
+              <span className="text-xs text-gray-400 ml-2">🏆 {getTaBest(cat)}</span>
+            )}
+          </div>
           {timeMode
             ? <span className={`text-xl font-bold ${timeLeft <= 20 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>⏱ {timeLeft}s</span>
             : <span className="text-xl font-bold text-gray-700">{idx + 1} / {words.length}</span>

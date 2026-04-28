@@ -67,7 +67,8 @@ export function ColorChallenge() {
     if (Math.random() > 0.35) setItemIdx(Math.floor(Math.random() * (isShape ? SHAPES : COLORS).length))
   }
 
-  function changeItem() { setItemIdx(Math.floor(Math.random() * (isShape ? SHAPES : COLORS).length)); setStreak(0) }
+  // ストリークはリセットしない（変更はペナルティではない）
+  function changeItem() { setItemIdx(Math.floor(Math.random() * (isShape ? SHAPES : COLORS).length)) }
 
   const best = getBest()
 

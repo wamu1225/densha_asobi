@@ -105,6 +105,7 @@ export function MathSprint() {
     <GameLayout title="けいさんスプリント" gradient={GRAD}>
       <div className="flex flex-col gap-4 pt-4">
         <p className="text-center text-xl font-bold text-gray-700">レベルをえらんでね</p>
+        <p className="text-center text-xs" style={{ color: 'var(--ink-sub)' }}>💡 5れんぞく せいかいで ボーナスてん！</p>
         {([1, 2, 3] as Level[]).map(lv => (
           <div key={lv} className="bg-white rounded-2xl border border-orange-100 p-4 shadow-md">
             <p className="font-bold text-gray-700 mb-2">レベル{lv}：{LEVEL_LABELS[lv]}</p>

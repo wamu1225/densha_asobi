@@ -89,6 +89,12 @@ h1, h2, h3, button, p, span, div {
   animation: confetti-fall linear forwards;
 }
 
+@keyframes cell-pulse {
+  0%, 100% { transform: scale(1);    box-shadow: 0 0 0 2px #22d3ee; }
+  50%       { transform: scale(1.12); box-shadow: 0 0 0 4px #22d3ee, 0 0 12px #22d3ee88; }
+}
+.cell-pulse { animation: cell-pulse 0.8s ease infinite; }
+
 @keyframes train-ride {
   0%   { transform: translateX(-180px); }
   100% { transform: translateX(calc(100vw + 180px)); }

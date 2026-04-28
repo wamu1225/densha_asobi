@@ -58,6 +58,21 @@ export function TrainBingo() {
   }
 
   const bingoSet = new Set(bingoLines.flat())
+
+  // あと1個でビンゴになるセルを検出（ビンゴ未成立のラインで未マークが1つだけ）
+  const almostSet = new Set<number>()
+  if (bingoLines.length === 0) {  // まだビンゴしていない場合のみ表示
+    const n = Math.sqrt(gridSize)
+    const allLines: number[][] = []
+    for (let r = 0; r < n; r++) allLines.push(Array.from({ length: n }, (_, c) => r * n + c))
+    for (let c = 0; c < n; c++) allLines.push(Array.from({ length: n }, (_, r) => r * n + c))
+    allLines.push(Array.from({ length: n }, (_, i) => i * n + i))
+    allLines.push(Array.from({ length: n }, (_, i) => i * n + (n - 1 - i)))
+    allLines.forEach(line => {
+      const unmarked = line.filter(i => !marked.has(i))
+      if (unmarked.length === 1) almostSet.add(unmarked[0])
+    })
+  }
   const cols = gridSize === 9 ? 3 : 4
   const textSize = gridSize === 9 ? 13 : 11
 
@@ -96,7 +111,9 @@ export function TrainBingo() {
               <button key={i} onClick={() => tap(i)}
                 className={`aspect-square rounded-2xl flex flex-col items-center justify-center p-1.5 text-center transition-all active:scale-95 border-2 shadow ${
                   isBingo ? 'border-yellow-400' :
-                  marked.has(i) ? 'border-transparent' : 'bg-white border-green-200'
+                  marked.has(i) ? 'border-transparent' :
+                  almostSet.has(i) ? 'bg-yellow-50 border-yellow-400 cell-pulse' :
+                  'bg-white border-green-200'
                 }`}
                 style={isBingo ? { background: 'linear-gradient(135deg,#fbbf24,#f59e0b)' } :
                   marked.has(i) ? { background: GRAD } : {}}>

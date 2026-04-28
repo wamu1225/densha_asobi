@@ -33,8 +33,9 @@ export function WhichBigger() {
   const [streak, setStreak] = useState(0)
   const [maxStreak, setMaxStreak] = useState(0)
   const [flash, setFlash] = useState<'ok' | 'ng' | null>(null)
-  // ⑥修正: ダブルタップ防止
   const [locked, setLocked] = useState(false)
+  // 不正解時にどちらが正解だったかを示すインデックス (0=左, 1=右)
+  const [correctIdx, setCorrectIdx] = useState<number | null>(null)
 
   useEffect(() => {
     if (phase !== 'play') return
@@ -47,20 +48,24 @@ export function WhichBigger() {
   }, [phase, qCount, timeMode])
 
   function start(lv: Level, tm: boolean) {
-    setLevel(lv); setTimeMode(tm); setScore(0); setQCount(0); setStreak(0); setMaxStreak(0); setLocked(false)
-    setTimeLeft(30); setPair(makePair(lv)); setPhase('play')
+    setLevel(lv); setTimeMode(tm); setScore(0); setQCount(0); setStreak(0); setMaxStreak(0)
+    setLocked(false); setCorrectIdx(null); setTimeLeft(30); setPair(makePair(lv)); setPhase('play')
   }
 
   function tap(chosen: number) {
     if (locked) return
     setLocked(true)
-    const correct = Math.max(pair.a, pair.b)
-    if (chosen === correct) {
+    const correctNum = Math.max(pair.a, pair.b)
+    if (chosen === correctNum) {
       const ns = streak + 1; setStreak(ns); setMaxStreak(m => Math.max(m, ns))
-      setScore(s => s + (ns >= 5 ? 2 : 1)); setFlash('ok')
-    } else { setStreak(0); setFlash('ng') }
+      setScore(s => s + (ns >= 5 ? 2 : 1)); setFlash('ok'); setCorrectIdx(null)
+    } else {
+      setStreak(0); setFlash('ng')
+      // どちらが正解かをハイライト
+      setCorrectIdx(pair.a > pair.b ? 0 : 1)
+    }
     setQCount(c => c + 1)
-    setTimeout(() => { setFlash(null); setLocked(false); setPair(makePair(level)) }, 350)
+    setTimeout(() => { setFlash(null); setCorrectIdx(null); setLocked(false); setPair(makePair(level)) }, 700)
   }
 
   const best = getBest()
@@ -116,10 +121,19 @@ export function WhichBigger() {
               key={i}
               onClick={() => tap(n)}
               disabled={locked}
-              className="flex-1 bg-white rounded-2xl border-2 border-blue-200 shadow-md active:scale-95 transition-transform font-black text-gray-800 disabled:opacity-60"
-              style={{ height: 100, fontSize: 40 }}
+              className="flex-1 rounded-2xl border-2 shadow-md active:scale-95 transition-all font-black"
+              style={{
+                height: 100,
+                fontSize: 40,
+                // 不正解時: 正解ボタンを緑にして正解を示す
+                background: correctIdx === i ? '#dcfce7' : 'white',
+                borderColor: correctIdx === i ? '#22c55e' : '#bfdbfe',
+                color: correctIdx === i ? '#15803d' : '#1f2937',
+                transform: correctIdx === i ? 'scale(1.04)' : undefined,
+              }}
             >
               {n.toLocaleString()}
+              {correctIdx === i && <span className="block text-sm font-bold text-green-600">✓ こっちが おおきい！</span>}
             </button>
           ))}
         </div>

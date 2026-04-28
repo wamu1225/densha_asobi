@@ -30,11 +30,12 @@ function makeHardPattern(pool: string[]): Pattern {
   return { seq: full, answer, choices, explanation: `${cycle.join('→')} のくりかえし！` }
 }
 
-// ⑭修正: フィボナッチ系列をランダムなスタートで多様化
+// フィボナッチ系列（ランダム開始）
 const FIB_BASE = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89]
 
 function makeNumberPattern(): Pattern {
-  const type = ['add', 'mul', 'fib'][Math.floor(Math.random() * 3)]
+  // 掛け算（2^5=32 など）は子どもに難しすぎるので除外し、加算とフィボナッチのみ
+  const type = Math.random() < 0.6 ? 'add' : 'fib'
   let seq: number[], answer: number
 
   if (type === 'add') {
@@ -42,12 +43,7 @@ function makeNumberPattern(): Pattern {
     const step = Math.floor(Math.random() * 4) + 1
     seq = Array.from({ length: 5 }, (_, i) => start + i * step)
     answer = start + 5 * step
-  } else if (type === 'mul') {
-    const factor = Math.floor(Math.random() * 2) + 2
-    seq = Array.from({ length: 5 }, (_, i) => Math.pow(factor, i))
-    answer = Math.pow(factor, 5)
   } else {
-    // ⑭修正: 開始位置をランダムに（0〜4）
     const start = Math.floor(Math.random() * 5)
     seq = FIB_BASE.slice(start, start + 5)
     answer = FIB_BASE[start + 5]
@@ -60,8 +56,7 @@ function makeNumberPattern(): Pattern {
 
   const explanation =
     type === 'add' ? `+${seqArr[1] - seqArr[0]} ずつふえる！` :
-    type === 'mul' ? `×${Math.round(seqArr[1] / seqArr[0])} ずつ！` :
-    `まえの2つをたしたフィボナッチ！（${seqArr[seqArr.length - 2]}+${seqArr[seqArr.length - 1]}=${answer}）`
+    `まえの2つをたすと つぎのかず！（${seqArr[seqArr.length - 2]}+${seqArr[seqArr.length - 1]}=${answer}）`
 
   return { seq: seqArr.map(String), answer: ansStr, choices, explanation }
 }
