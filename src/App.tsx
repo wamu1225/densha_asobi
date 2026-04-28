@@ -11,6 +11,7 @@ import { NumberMaze } from './games/NumberMaze'
 import { WordScramble } from './games/WordScramble'
 import { HiraganaSearch } from './games/HiraganaSearch'
 import { DotConnect } from './games/DotConnect'
+import { Simon } from './games/Simon'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/scramble" element={<WordScramble />} />
         <Route path="/search" element={<HiraganaSearch />} />
         <Route path="/dots" element={<DotConnect />} />
+        <Route path="/simon" element={<Simon />} />
       </Routes>
     </HashRouter>
   )

@@ -6,10 +6,11 @@ interface Stat { label: string; value: string | number }
 interface ResultScreenProps {
   score?: number
   total?: number
+  scoreLabel?: string     // スコア行の見出し（デフォルト: "みつけた かず"）
   timeStr?: string
   extra?: Stat[]
   best?: number | null
-  bestStr?: string        // best をフォーマット済み文字列で渡す場合（時間表示など）
+  bestStr?: string
   bestLabel?: string
   onRetry: () => void
   accentColor?: string
@@ -51,7 +52,7 @@ function Confetti({ active }: { active: boolean }) {
   )
 }
 
-export function ResultScreen({ score, total, timeStr, extra = [], best, bestStr, bestLabel = 'ベスト', onRetry, accentColor = 'text-sky-500' }: ResultScreenProps) {
+export function ResultScreen({ score, total, scoreLabel, timeStr, extra = [], best, bestStr, bestLabel = 'ベスト', onRetry, accentColor = 'text-sky-500' }: ResultScreenProps) {
   const navigate = useNavigate()
   const [showConfetti, setShowConfetti] = useState(false)
   const pct = total != null && score != null ? score / total : null
@@ -90,8 +91,8 @@ export function ResultScreen({ score, total, timeStr, extra = [], best, bestStr,
               </>
             ) : (
               <>
-                <p className="text-sm font-bold mb-1" style={{ color: 'var(--ink-sub)' }}>みつけた かず</p>
-                <p className={`text-6xl font-black ${accentColor}`}>{score}<span className="text-2xl" style={{ color: 'var(--ink-sub)' }}>こ</span></p>
+                <p className="text-sm font-bold mb-1" style={{ color: 'var(--ink-sub)' }}>{scoreLabel ?? 'みつけた かず'}</p>
+                <p className={`text-6xl font-black ${accentColor}`}>{score}<span className="text-2xl" style={{ color: 'var(--ink-sub)' }}>{scoreLabel ? '' : 'こ'}</span></p>
               </>
             )}
           </div>

@@ -15,6 +15,7 @@ const GAMES = [
   // 記憶・パズル — 紫
   { path: '/memory',   emoji: '🃏', title: 'しんけい\nすいじゃく',  sub: 'えあわせゲーム',     cat: 'purple' },
   { path: '/next',     emoji: '🔮', title: 'つぎは\nどれ？',        sub: 'パターンをさがせ',   cat: 'purple' },
+  { path: '/simon',    emoji: '🌈', title: 'いろ\nきおく',          sub: 'ひかりをおぼえよう', cat: 'purple' },
   { path: '/maze',     emoji: '🗺️', title: 'すうじ\nめいろ',        sub: 'じゅんばんにタップ', cat: 'orange' },
   { path: '/dots',     emoji: '✏️', title: 'ドット\nつなぎ',        sub: 'なにができるかな？', cat: 'purple' },
 ] as const
