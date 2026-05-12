@@ -54,8 +54,134 @@
     </script>
     <script type="module" crossorigin src="/densha_asobi/assets/index-DMWDrA0x.js"></script>
     <link rel="stylesheet" crossorigin href="/densha_asobi/assets/index-eGFreFNa.css">
-  <link rel="manifest" href="/densha_asobi/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/densha_asobi/registerSW.js"></script></head>
+  <link rel="manifest" href="/densha_asobi/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/densha_asobi/registerSW.js"></script><script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "もじならべ",
+  "description": "バラバラのひらがなを並び替えて言葉を作ろう。どうぶつ・たべもの・のりもの・むずかしいの4カテゴリ。タイムアタックで何問解ける？",
+  "url": "https://study-apps.com/densha_asobi/scramble/",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Any (Web Browser)",
+  "inLanguage": "ja",
+  "isAccessibleForFree": true,
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "JPY"
+  },
+  "audience": {
+    "@type": "EducationalAudience",
+    "educationalRole": "student",
+    "audienceType": "5さい〜9さい"
+  }
+}
+</script>
+  </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><style>
+  .static-fallback{font-family:'M PLUS Rounded 1c','Hiragino Maru Gothic Pro',sans-serif;color:#1a1a1a;background:#FFF7E6;min-height:100vh;line-height:1.7;}
+  .static-fallback *{box-sizing:border-box;}
+  .static-fallback a{color:#1A3A9B;text-decoration:underline;}
+  .static-fallback header.hero{background:#1C2B40;color:#fff;padding:32px 20px;text-align:center;}
+  .static-fallback header.hero .eyebrow{font-size:11px;letter-spacing:.3em;color:#9bb8e6;font-weight:700;margin:0 0 6px;text-transform:uppercase;}
+  .static-fallback header.hero h1{font-size:clamp(2rem,8vw,2.6rem);font-weight:900;margin:0 0 8px;letter-spacing:-.02em;}
+  .static-fallback header.hero .lead{color:#bcd2f0;font-size:14px;font-weight:700;margin:0;}
+  .static-fallback header.hero .train{margin-top:8px;font-size:28px;}
+  .static-fallback main.wrap{max-width:720px;margin:0 auto;padding:24px 18px 48px;}
+  .static-fallback .intro{background:#fff;border-radius:18px;padding:20px;box-shadow:3px 4px 0 rgba(0,0,0,.06);margin-bottom:24px;}
+  .static-fallback .intro h2{font-size:18px;font-weight:900;margin:0 0 10px;color:#1C2B40;}
+  .static-fallback .intro p{margin:0 0 10px;font-size:14px;}
+  .static-fallback .intro ul{margin:8px 0 0;padding-left:20px;font-size:14px;}
+  .static-fallback .intro li{margin:4px 0;}
+  .static-fallback h2.section{font-size:18px;font-weight:900;margin:28px 0 12px;color:#1C2B40;border-left:6px solid #C8352A;padding-left:10px;}
+  .static-fallback .game-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;}
+  .static-fallback .game-card{display:block;background:#fff;border-radius:14px;padding:14px 12px;text-decoration:none;color:#1a1a1a;box-shadow:2px 3px 0 rgba(0,0,0,.08);border:2px solid #f3e8c8;}
+  .static-fallback .game-card .emoji{font-size:30px;display:block;text-align:center;margin-bottom:6px;}
+  .static-fallback .game-card .gname{font-size:13px;font-weight:900;text-align:center;color:#1C2B40;margin:0 0 4px;letter-spacing:-.01em;}
+  .static-fallback .game-card .gsub{font-size:10.5px;color:#6b6b6b;text-align:center;display:block;margin:0 0 4px;}
+  .static-fallback .game-card .gage{font-size:10px;color:#9b1b13;text-align:center;display:block;font-weight:700;}
+  .static-fallback .feature-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:0 0 16px;padding:0;list-style:none;}
+  .static-fallback .feature-list li{background:#fff;border-radius:12px;padding:12px 14px;font-size:13px;box-shadow:2px 2px 0 rgba(0,0,0,.05);}
+  .static-fallback .feature-list strong{display:block;font-size:14px;color:#9b1b13;margin-bottom:4px;font-weight:900;}
+  .static-fallback .howto-box{background:#fff;border-radius:14px;padding:16px 18px;margin:0 0 18px;box-shadow:2px 3px 0 rgba(0,0,0,.06);}
+  .static-fallback .howto-box h3{margin:0 0 8px;font-size:15px;font-weight:900;color:#1C2B40;}
+  .static-fallback .howto-box p{margin:0 0 8px;font-size:13.5px;}
+  .static-fallback .howto-box p:last-child{margin-bottom:0;}
+  .static-fallback footer.fnav{margin-top:32px;padding:18px;background:#1C2B40;color:#bcd2f0;text-align:center;font-size:12px;border-radius:14px;}
+  .static-fallback footer.fnav a{color:#fff;margin:0 8px;text-decoration:underline;}
+  .static-fallback .back-link{display:inline-block;margin:0 0 14px;font-size:13px;color:#1A3A9B;text-decoration:underline;font-weight:700;}
+  .static-fallback .meta-line{font-size:12px;color:#6b6b6b;margin:0 0 10px;}
+  .static-fallback .age-badge{display:inline-block;background:#9b1b13;color:#fff;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;margin-left:6px;}
+  @media (max-width:380px){.static-fallback .game-grid{grid-template-columns:1fr 1fr;gap:8px;}.static-fallback .game-card{padding:10px 8px;}.static-fallback .game-card .gname{font-size:12px;}}
+</style>
+<div class="static-fallback">
+  <header class="hero">
+    <p class="eyebrow">Densha Asobi</p>
+    <h1>📝 もじならべ</h1>
+    <p class="lead">バラバラのひらがなを並び替えて言葉を作ろう。どうぶつ・たべもの・のりもの・むずかしいの4カテゴリ。タイムアタックで何問解ける？！</p>
+  </header>
+  <main class="wrap">
+    <a class="back-link" href="https://study-apps.com/densha_asobi/">← ゲーム いちらんに もどる</a>
+
+    <section class="intro">
+      <h2>もじならべ<span class="age-badge">5さい〜9さい</span></h2>
+      <p>バラバラに なった ひらがなを ならびかえて ことばを つくる ゲームです。</p>
+    </section>
+
+    <h2 class="section">🎯 あそびかた</h2>
+    <div class="howto-box">
+      <p>えと バラバラの もじが でてきます。もじを タップして ただしい じゅんばんに ならべてね。どうぶつ・たべもの・のりもの・むずかしい の 4つの カテゴリから えらべます。タイムアタックで なんもん とけるか チャレンジしよう。</p>
+    </div>
+
+    <h2 class="section">📚 このゲームで そだつ ちから</h2>
+    <div class="howto-box">
+      <p>ことばの ちしき・ごいりょくを そだてます。ひらがなと ことばの けっかを むすびつける こくごの ちからが つきます。</p>
+    </div>
+
+    <h2 class="section">🎮 ほかの ゲームも あそぼう</h2>
+    <div class="game-grid">
+      <a class="game-card" href="https://study-apps.com/densha_asobi/math/">
+        <span class="emoji" aria-hidden="true">🔢</span>
+        <span class="gname">けいさんスプリント</span>
+        <span class="gage">5さい〜9さい</span>
+      </a>
+      <a class="game-card" href="https://study-apps.com/densha_asobi/bigger/">
+        <span class="emoji" aria-hidden="true">⚖️</span>
+        <span class="gname">どっちがおおきい？</span>
+        <span class="gage">6さい〜9さい</span>
+      </a>
+      <a class="game-card" href="https://study-apps.com/densha_asobi/clock/">
+        <span class="emoji" aria-hidden="true">🕐</span>
+        <span class="gname">とけいをよもう</span>
+        <span class="gage">6さい〜9さい</span>
+      </a>
+      <a class="game-card" href="https://study-apps.com/densha_asobi/bingo/">
+        <span class="emoji" aria-hidden="true">🚃</span>
+        <span class="gname">でんしゃビンゴ</span>
+        <span class="gage">4さい〜9さい</span>
+      </a>
+      <a class="game-card" href="https://study-apps.com/densha_asobi/color/">
+        <span class="emoji" aria-hidden="true">🎨</span>
+        <span class="gname">いろさがしチャレンジ</span>
+        <span class="gage">4さい〜9さい</span>
+      </a>
+      <a class="game-card" href="https://study-apps.com/densha_asobi/memory/">
+        <span class="emoji" aria-hidden="true">🃏</span>
+        <span class="gname">しんけいすいじゃく</span>
+        <span class="gage">4さい〜9さい</span>
+      </a>
+    </div>
+
+    <footer class="fnav">
+      <p>🚃 でんしゃの たびを たのしもう！</p>
+      <p style="margin-top:8px;">
+        <a href="https://study-apps.com/densha_asobi/">ホーム</a>
+        <a href="https://study-apps.com/densha_asobi/about/">サイトについて</a>
+        <a href="https://study-apps.com/densha_asobi/privacy/">プライバシーポリシー</a>
+      </p>
+    </footer>
+  </main>
+</div></div>
   </body>
 </html>

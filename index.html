@@ -56,6 +56,165 @@
     <link rel="stylesheet" crossorigin href="/densha_asobi/assets/index-eGFreFNa.css">
   <link rel="manifest" href="/densha_asobi/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/densha_asobi/registerSW.js"></script></head>
   <body>
-    <div id="root"></div>
+    <div id="root"><style>
+  .static-fallback{font-family:'M PLUS Rounded 1c','Hiragino Maru Gothic Pro',sans-serif;color:#1a1a1a;background:#FFF7E6;min-height:100vh;line-height:1.7;}
+  .static-fallback *{box-sizing:border-box;}
+  .static-fallback a{color:#1A3A9B;text-decoration:underline;}
+  .static-fallback header.hero{background:#1C2B40;color:#fff;padding:32px 20px;text-align:center;}
+  .static-fallback header.hero .eyebrow{font-size:11px;letter-spacing:.3em;color:#9bb8e6;font-weight:700;margin:0 0 6px;text-transform:uppercase;}
+  .static-fallback header.hero h1{font-size:clamp(2rem,8vw,2.6rem);font-weight:900;margin:0 0 8px;letter-spacing:-.02em;}
+  .static-fallback header.hero .lead{color:#bcd2f0;font-size:14px;font-weight:700;margin:0;}
+  .static-fallback header.hero .train{margin-top:8px;font-size:28px;}
+  .static-fallback main.wrap{max-width:720px;margin:0 auto;padding:24px 18px 48px;}
+  .static-fallback .intro{background:#fff;border-radius:18px;padding:20px;box-shadow:3px 4px 0 rgba(0,0,0,.06);margin-bottom:24px;}
+  .static-fallback .intro h2{font-size:18px;font-weight:900;margin:0 0 10px;color:#1C2B40;}
+  .static-fallback .intro p{margin:0 0 10px;font-size:14px;}
+  .static-fallback .intro ul{margin:8px 0 0;padding-left:20px;font-size:14px;}
+  .static-fallback .intro li{margin:4px 0;}
+  .static-fallback h2.section{font-size:18px;font-weight:900;margin:28px 0 12px;color:#1C2B40;border-left:6px solid #C8352A;padding-left:10px;}
+  .static-fallback .game-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:16px;}
+  .static-fallback .game-card{display:block;background:#fff;border-radius:14px;padding:14px 12px;text-decoration:none;color:#1a1a1a;box-shadow:2px 3px 0 rgba(0,0,0,.08);border:2px solid #f3e8c8;}
+  .static-fallback .game-card .emoji{font-size:30px;display:block;text-align:center;margin-bottom:6px;}
+  .static-fallback .game-card .gname{font-size:13px;font-weight:900;text-align:center;color:#1C2B40;margin:0 0 4px;letter-spacing:-.01em;}
+  .static-fallback .game-card .gsub{font-size:10.5px;color:#6b6b6b;text-align:center;display:block;margin:0 0 4px;}
+  .static-fallback .game-card .gage{font-size:10px;color:#9b1b13;text-align:center;display:block;font-weight:700;}
+  .static-fallback .feature-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:0 0 16px;padding:0;list-style:none;}
+  .static-fallback .feature-list li{background:#fff;border-radius:12px;padding:12px 14px;font-size:13px;box-shadow:2px 2px 0 rgba(0,0,0,.05);}
+  .static-fallback .feature-list strong{display:block;font-size:14px;color:#9b1b13;margin-bottom:4px;font-weight:900;}
+  .static-fallback .howto-box{background:#fff;border-radius:14px;padding:16px 18px;margin:0 0 18px;box-shadow:2px 3px 0 rgba(0,0,0,.06);}
+  .static-fallback .howto-box h3{margin:0 0 8px;font-size:15px;font-weight:900;color:#1C2B40;}
+  .static-fallback .howto-box p{margin:0 0 8px;font-size:13.5px;}
+  .static-fallback .howto-box p:last-child{margin-bottom:0;}
+  .static-fallback footer.fnav{margin-top:32px;padding:18px;background:#1C2B40;color:#bcd2f0;text-align:center;font-size:12px;border-radius:14px;}
+  .static-fallback footer.fnav a{color:#fff;margin:0 8px;text-decoration:underline;}
+  .static-fallback .back-link{display:inline-block;margin:0 0 14px;font-size:13px;color:#1A3A9B;text-decoration:underline;font-weight:700;}
+  .static-fallback .meta-line{font-size:12px;color:#6b6b6b;margin:0 0 10px;}
+  .static-fallback .age-badge{display:inline-block;background:#9b1b13;color:#fff;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;margin-left:6px;}
+  @media (max-width:380px){.static-fallback .game-grid{grid-template-columns:1fr 1fr;gap:8px;}.static-fallback .game-card{padding:10px 8px;}.static-fallback .game-card .gname{font-size:12px;}}
+</style>
+<div class="static-fallback">
+  <header class="hero">
+    <p class="eyebrow">Densha Asobi</p>
+    <h1>でんしゃあそび</h1>
+    <p class="lead">でんしゃのなかで あそぼう！</p>
+    <div class="train" aria-hidden="true">🚂🚃🚃🚃🚃</div>
+  </header>
+  <main class="wrap">
+    <section class="intro">
+      <h2>このサイトについて</h2>
+      <p>「でんしゃあそび」は、でんしゃや くるまの なかで こどもが あそべる ミニゲームを 12しゅるい あつめた サイトです。たいしょうは ようちえん〜小がっこう3年生（4〜9さい）。すべての ゲームは ブラウザだけで うごき、アプリの ダウンロードや かいいんとうろくは いりません。</p>
+      <ul>
+        <li><strong>むりょう</strong>で あそべます（こうにゅう・サブスクなし）</li>
+        <li><strong>とうろく ふよう</strong>。アカウントは つくりません</li>
+        <li><strong>オフライン たいおう</strong>（PWA）。いちど ひらけば でんぱが なくても あそべます</li>
+        <li><strong>おとが でません</strong>。でんしゃの なかでも あんしんして つかえます</li>
+      </ul>
+    </section>
+
+    <h2 class="section">🎮 ゲーム いちらん（12しゅるい）</h2>
+    <p class="meta-line">タップして あそびたい ゲームを えらんでね。</p>
+    <div class="game-grid">
+        <a class="game-card" href="https://study-apps.com/densha_asobi/math/">
+          <span class="emoji" aria-hidden="true">🔢</span>
+          <span class="gname">けいさんスプリント</span>
+          <span class="gsub">たしざん・ひきざんを30秒で何問解けるかチャレンジ</span>
+          <span class="gage">5さい〜9さい</span>
+        </a>
+        <a class="game-card" href="https://study-apps.com/densha_asobi/bigger/">
+          <span class="emoji" aria-hidden="true">⚖️</span>
+          <span class="gname">どっちがおおきい？</span>
+          <span class="gsub">2けた〜4けたの数の大小をすばやく判断</span>
+          <span class="gage">6さい〜9さい</span>
+        </a>
+        <a class="game-card" href="https://study-apps.com/densha_asobi/clock/">
+          <span class="emoji" aria-hidden="true">🕐</span>
+          <span class="gname">とけいをよもう</span>
+          <span class="gsub">アナログ時計を読む練習ゲーム</span>
+          <span class="gage">6さい〜9さい</span>
+        </a>
+        <a class="game-card" href="https://study-apps.com/densha_asobi/bingo/">
+          <span class="emoji" aria-hidden="true">🚃</span>
+          <span class="gname">でんしゃビンゴ</span>
+          <span class="gsub">電車の窓から見えるものでビンゴ</span>
+          <span class="gage">4さい〜9さい</span>
+        </a>
+        <a class="game-card" href="https://study-apps.com/densha_asobi/color/">
+          <span class="emoji" aria-hidden="true">🎨</span>
+          <span class="gname">いろさがしチャレンジ</span>
+          <span class="gsub">窓の外で指定の色や形を見つけてタップ</span>
+          <span class="gage">4さい〜9さい</span>
+        </a>
+        <a class="game-card" href="https://study-apps.com/densha_asobi/memory/">
+          <span class="emoji" aria-hidden="true">🃏</span>
+          <span class="gname">しんけいすいじゃく</span>
+          <span class="gsub">どうぶつ・たべもの・のりものの絵あわせ神経衰弱。2×3の超かんたんから4×5の難しいまで4段階。何手でクリアできる？</span>
+          <span class="gage">4さい〜9さい</span>
+        </a>
+        <a class="game-card" href="https://study-apps.com/densha_asobi/next/">
+          <span class="emoji" aria-hidden="true">🔮</span>
+          <span class="gname">つぎはどれ？</span>
+          <span class="gsub">色・形・動物・数字のパターンを見て次を当てよう</span>
+          <span class="gage">5さい〜9さい</span>
+        </a>
+        <a class="game-card" href="https://study-apps.com/densha_asobi/maze/">
+          <span class="emoji" aria-hidden="true">🗺️</span>
+          <span class="gname">すうじめいろ</span>
+          <span class="gsub">1から順番にタップするだけ</span>
+          <span class="gage">5さい〜9さい</span>
+        </a>
+        <a class="game-card" href="https://study-apps.com/densha_asobi/scramble/">
+          <span class="emoji" aria-hidden="true">📝</span>
+          <span class="gname">もじならべ</span>
+          <span class="gsub">バラバラのひらがなを並び替えて言葉を作ろう。どうぶつ・たべもの・のりもの・むずかしいの4カテゴリ。タイムアタックで何問解ける？</span>
+          <span class="gage">5さい〜9さい</span>
+        </a>
+        <a class="game-card" href="https://study-apps.com/densha_asobi/search/">
+          <span class="emoji" aria-hidden="true">🔍</span>
+          <span class="gname">ひらがなさがし</span>
+          <span class="gsub">6×6のひらがなグリッドから隠れた言葉を探そう</span>
+          <span class="gage">6さい〜9さい</span>
+        </a>
+        <a class="game-card" href="https://study-apps.com/densha_asobi/dots/">
+          <span class="emoji" aria-hidden="true">✏️</span>
+          <span class="gname">ドットつなぎ</span>
+          <span class="gsub">番号順に点をつないで絵を完成させよう</span>
+          <span class="gage">4さい〜9さい</span>
+        </a>
+        <a class="game-card" href="https://study-apps.com/densha_asobi/simon/">
+          <span class="emoji" aria-hidden="true">🌈</span>
+          <span class="gname">いろきおく</span>
+          <span class="gsub">光るパネルの順番を覚えてタップ</span>
+          <span class="gage">5さい〜9さい</span>
+        </a>
+    </div>
+
+    <h2 class="section">📚 こうかと そだつ ちから</h2>
+    <ul class="feature-list">
+      <li><strong>さんすうの ちから</strong>けいさん・かずの くらべっこ・とけいよみで、けいさんりょくと すうじへの りかいを そだてます。</li>
+      <li><strong>こくごの ちから</strong>もじならべ・ひらがなさがしで、ひらがなを よむ ちからと ごいりょくを そだてます。</li>
+      <li><strong>かんさつりょく</strong>でんしゃビンゴ・いろさがしで、まわりを よく みる しゅうかんを そだてます。</li>
+      <li><strong>きおくりょく・しゅうちゅうりょく</strong>しんけいすいじゃく・いろきおく・すうじめいろで、たんききおくと あつかうちからを きたえます。</li>
+      <li><strong>ろんりてき しこう</strong>つぎはどれ？・ドットつなぎで、きそくを みつけ じゅんじょを おう ちからを そだてます。</li>
+    </ul>
+
+    <h2 class="section">📱 つかいかたガイド</h2>
+    <div class="howto-box">
+      <h3>あそびかた</h3>
+      <p>うえの ゲーム いちらんから あそびたい ものを タップ。ルールは とても かんたんで、よみがな（ひらがな）だけで かかれて います。ちいさい おこさまでも おとなと いっしょに あそべます。</p>
+      <h3>ホームがめんに ついか（おすすめ）</h3>
+      <p>ブラウザの メニューから「ホームがめんに ついか」を えらぶと、アプリのように つかえます。でんぱが ない ばしょ（ちかてつ・しんかんせんの トンネル など）でも あそべるので、おでかけ まえに いちど ひらいて おくと あんしんです。</p>
+      <h3>ほごしゃの かたへ</h3>
+      <p>すべての ゲームは おとが でない 設計で、こうかは バイブレーションのみです。広告は さいしょうげんに とどめ、こどもが あやまって タップしないよう くふうしています。じょうほうの 収集は おこなって おらず、ベストスコアは おこさまの たんまつの localStorage のみに 保存されます。</p>
+    </div>
+
+    <footer class="fnav">
+      <p>🚃 でんしゃの たびを たのしもう！</p>
+      <p style="margin-top:8px;">
+        <a href="https://study-apps.com/densha_asobi/about/">サイトについて</a>
+        <a href="https://study-apps.com/densha_asobi/privacy/">プライバシーポリシー</a>
+      </p>
+    </footer>
+  </main>
+</div></div>
   </body>
 </html>
