@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { GameLayout } from '../components/GameLayout'
+import { GameFeedback } from '../components/GameFeedback'
 import { ResultScreen } from '../components/ResultScreen'
 
 type Difficulty = 'easy' | 'normal' | 'hard'
@@ -7,6 +8,7 @@ type Phase = 'select' | 'play' | 'over'
 
 const GRAD = 'linear-gradient(135deg, #c084fc, #a855f7)'
 const BEST_KEY = 'densha_clock_best'
+const PREF = 'densha_pref_clock'
 function getBest(): Record<string, number> { try { return JSON.parse(localStorage.getItem(BEST_KEY) || '{}') } catch { return {} } }
 function saveBest(key: string, val: number) { const b = getBest(); if (!b[key] || val > b[key]) { b[key] = val; localStorage.setItem(BEST_KEY, JSON.stringify(b)) } }
 
@@ -86,30 +88,38 @@ export function ClockReading() {
     const actual = effectiveDiff(d, q)
     const t = randomTime(actual); setTime(t); setChoices(makeChoices(t.h, t.m, actual))
   }
-  function start(d: Difficulty) { setDiff(d); setScore(0); setQNum(1); setLocked(false); loadQ(d, 1); setPhase('play') }
+  function start(d: Difficulty) {
+    localStorage.setItem(`${PREF}_diff`, d)
+    setDiff(d); setScore(0); setQNum(1); setLocked(false); loadQ(d, 1); setPhase('play')
+  }
 
   function tap(c: { h: number; m: number }) {
     if (locked) return
     setLocked(true)
     if (fmt(c.h, c.m) === fmt(time.h, time.m)) { setFlash('ok'); setScore(s => s + 1); setWrongAns('') }
     else { setFlash('ng'); setWrongAns(`こたえ：${fmt(time.h, time.m)}`) }
+    // 1500msに延長 — 子どもが正解を確認できるように
     setTimeout(() => {
       setFlash(null); setWrongAns(''); setLocked(false)
       if (qNum >= TOTAL) { setPhase('over') } else { setQNum(n => { loadQ(diff, n + 1); return n + 1 }) }
-    }, 900)
+    }, 1500)
   }
 
   const best = getBest()
+  // 設定記憶: 前回の難易度を初期値に
+  const savedDiff = (localStorage.getItem(`${PREF}_diff`) as Difficulty) ?? 'easy'
 
   if (phase === 'select') return (
     <GameLayout title="とけいをよもう" gradient={GRAD}>
       <div className="flex flex-col gap-4 pt-4">
         <p className="text-center text-xl font-bold text-gray-700">むずかしさをえらんでね</p>
         {(['easy', 'normal', 'hard'] as Difficulty[]).map(d => (
-          <button key={d} onClick={() => start(d)} className="bg-white border border-purple-100 rounded-2xl p-4 text-left shadow-md active:scale-95">
+          <button key={d} onClick={() => start(d)}
+            className={`bg-white border-2 rounded-2xl p-4 text-left active:scale-95 ${d === savedDiff ? 'border-purple-400' : 'border-purple-200'}`}
+            style={{ boxShadow: d === savedDiff ? '3px 4px 0 rgba(107,63,192,0.2)' : '3px 4px 0 rgba(0,0,0,0.07)' }}>
             <div className="flex justify-between items-center">
               <div>
-                <p className="font-bold text-gray-700">{d === 'easy' ? '🌟 かんたん' : d === 'normal' ? '⭐ ふつう' : '🔥 むずかしい'}</p>
+                <p className="font-bold text-gray-700">{d === 'easy' ? '★☆☆ かんたん' : d === 'normal' ? '★★☆ ふつう' : '★★★ むずかしい'}</p>
                 <p className="text-sm text-gray-500 mt-1">{DIFF_LABEL[d]}</p>
               </div>
               {best[d] != null && <p className="text-sm text-gray-400">🏆 {best[d]}/{TOTAL}</p>}
@@ -121,14 +131,16 @@ export function ClockReading() {
   )
 
   if (phase === 'over') {
-    saveBest(diff, score)
+    const isNewBest = getBest()[diff] == null || score > getBest()[diff]; saveBest(diff, score)
     return (
       <GameLayout title="とけいをよもう" gradient={GRAD}>
         <ResultScreen
           score={score} total={TOTAL}
-          best={getBest()[diff]}
+          bestStr={getBest()[diff] != null ? `${getBest()[diff]}/${TOTAL}` : undefined}
           bestLabel={`ベスト（${{ easy: 'かんたん', normal: 'ふつう', hard: 'むずかしい' }[diff]}）`}
           onRetry={() => start(diff)}
+          onChangeMode={() => setPhase('select')}
+          isNewBest={isNewBest}
           accentColor="text-purple-500"
         />
       </GameLayout>
@@ -136,10 +148,9 @@ export function ClockReading() {
   }
 
   return (
-    <GameLayout title="とけいをよもう" gradient={GRAD}>
+    <GameLayout title="とけいをよもう" gradient={GRAD} isPlaying={phase === 'play'}>
       <div className="flex flex-col items-center gap-3">
-        {flash === 'ok' && <div className="w-full bg-green-100 border-2 border-green-400 rounded-2xl py-2 text-center bounce-in"><span className="text-xl font-black text-green-600">⭕ せいかい！</span></div>}
-        {flash === 'ng' && wrongAns && <div className="w-full bg-red-100 border-2 border-red-400 rounded-2xl py-2 text-center bounce-in"><span className="text-lg font-black text-red-600">❌ {wrongAns}</span></div>}
+        <GameFeedback flash={flash} wrongHint={wrongAns || undefined} />
         <div className="flex justify-between w-full">
           <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
           <span className="text-xl font-bold text-gray-700">{qNum} / {TOTAL}</span>
@@ -153,7 +164,7 @@ export function ClockReading() {
         <ClockSvg h={time.h} m={time.m} />
         <div className="grid grid-cols-2 gap-3 w-full">
           {choices.map((c, i) => (
-            <button key={i} onClick={() => tap(c)} className="bg-white rounded-2xl border-2 border-purple-200 shadow-md active:scale-95 font-bold text-gray-800" style={{ height: 70, fontSize: 20 }}>
+            <button key={i} onClick={() => tap(c)} className="rounded-2xl border-2 active:scale-95 font-bold text-gray-800" style={{ height: 76, fontSize: 20, background: '#faf5ff', borderColor: '#d8b4fe', boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
               {fmt(c.h, c.m)}
             </button>
           ))}

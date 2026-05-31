@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { GameLayout } from '../components/GameLayout'
+import { GameFeedback } from '../components/GameFeedback'
 import { ResultScreen } from '../components/ResultScreen'
 
 const GRAD = 'linear-gradient(135deg, #818cf8, #6366f1)'
@@ -51,7 +52,9 @@ function makeNumberPattern(): Pattern {
 
   const ansStr = String(answer)
   const seqArr = seq
-  const wrong = [answer + 1, answer - 1, answer + seqArr[seqArr.length - 1]].map(String)
+  const seqNums = new Set(seqArr)
+  const candidates = [answer + 1, answer - 1, answer + seqArr[seqArr.length - 1], answer + 2, answer + 3, answer - 2]
+  const wrong = candidates.filter(n => n > 0 && n !== answer && !seqNums.has(n)).slice(0, 3).map(String)
   const choices = [ansStr, ...wrong].sort(() => Math.random() - 0.5)
 
   const explanation =
@@ -64,7 +67,9 @@ function makeNumberPattern(): Pattern {
 function makePattern(diff: Difficulty): Pattern {
   const pools = [COLORS, SHAPES, ANIMALS]
   const pool = pools[Math.floor(Math.random() * pools.length)]
-  if (Math.random() > 0.6) return makeNumberPattern()
+  // easy: 数列20%・絵柄80% / hard: 数列50%・絵柄50%
+  const numChance = diff === 'easy' ? 0.2 : 0.5
+  if (Math.random() < numChance) return makeNumberPattern()
   return diff === 'easy' ? makeSimplePattern(pool) : makeHardPattern(pool)
 }
 
@@ -108,7 +113,7 @@ export function WhatsNext() {
       <div className="flex flex-col gap-4 pt-6">
         <p className="text-center text-xl font-bold text-gray-700">むずかしさをえらんでね</p>
         {(['easy', 'hard'] as Difficulty[]).map(d => (
-          <button key={d} onClick={() => start(d)} className="bg-white border border-indigo-100 rounded-2xl p-5 text-left shadow-md active:scale-95">
+          <button key={d} onClick={() => start(d)} className="bg-white border-2 border-indigo-200 rounded-2xl p-5 text-left active:scale-95" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
             <p className="font-bold text-gray-700 text-lg">{d === 'easy' ? '🌟 かんたん' : '🔥 むずかしい'}</p>
             <p className="text-sm text-gray-500 mt-1">
               {d === 'easy' ? '2つのくりかえし（いろ・かたち・かず）' : '3〜4つのくりかえし ＋ すうれつ'}
@@ -121,30 +126,20 @@ export function WhatsNext() {
 
   if (phase === 'over') return (
     <GameLayout title="つぎはどれ？" gradient={GRAD}>
-      <ResultScreen score={score} total={TOTAL} onRetry={() => start(diff)} accentColor="text-indigo-500" />
+      <ResultScreen score={score} total={TOTAL} onRetry={() => start(diff)} onChangeMode={() => setPhase('select')} accentColor="text-indigo-500" />
     </GameLayout>
   )
 
   if (!pattern) return null
 
   return (
-    <GameLayout title="つぎはどれ？" gradient={GRAD}>
+    <GameLayout title="つぎはどれ？" gradient={GRAD} isPlaying={phase === 'play'}>
       <div className="flex flex-col items-center gap-4">
         <div className="flex justify-between w-full">
           <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
           <span className="text-xl font-bold text-gray-700">{qNum} / {TOTAL}</span>
         </div>
-
-        {flash === 'ok' && (
-          <div className="w-full bg-green-100 border-2 border-green-400 rounded-2xl py-3 text-center bounce-in">
-            <p className="text-2xl font-black text-green-600">⭕ せいかい！</p>
-          </div>
-        )}
-        {flash === 'ng' && (
-          <div className="w-full bg-red-100 border-2 border-red-400 rounded-2xl py-3 text-center bounce-in">
-            <p className="text-2xl font-black text-red-600">❌ ちがう！</p>
-          </div>
-        )}
+        <GameFeedback flash={flash} />
 
         <p className="text-lg font-bold text-gray-600">つぎは なに？</p>
         <div className="bg-indigo-50 rounded-2xl p-4 w-full border border-indigo-100">
@@ -165,8 +160,8 @@ export function WhatsNext() {
               key={i}
               onClick={() => tap(c)}
               disabled={locked}
-              className="bg-white rounded-2xl border-2 border-indigo-200 shadow-md active:scale-95 transition-transform font-bold text-gray-800 disabled:opacity-60"
-              style={{ height: 80, fontSize: 32 }}
+              className="rounded-2xl border-2 active:scale-95 transition-transform font-bold text-gray-800 disabled:opacity-60"
+              style={{ height: 80, fontSize: 32, background: '#eef2ff', borderColor: '#a5b4fc', boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}
             >
               {c}
             </button>

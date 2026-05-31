@@ -59,9 +59,9 @@ export function TrainBingo() {
 
   const bingoSet = new Set(bingoLines.flat())
 
-  // あと1個でビンゴになるセルを検出（ビンゴ未成立のラインで未マークが1つだけ）
+  // あと1個でビンゴになるセルを検出（ビンゴ未成立ラインで未マークが1つ — ダブルビンゴ後も継続）
   const almostSet = new Set<number>()
-  if (bingoLines.length === 0) {  // まだビンゴしていない場合のみ表示
+  {
     const n = Math.sqrt(gridSize)
     const allLines: number[][] = []
     for (let r = 0; r < n; r++) allLines.push(Array.from({ length: n }, (_, c) => r * n + c))
@@ -82,7 +82,7 @@ export function TrainBingo() {
         <p className="text-xl font-bold text-gray-700">テーマとサイズをえらんでね</p>
         <p className="text-sm text-gray-500 text-center">まどのそとでみつけたらタップ！</p>
         {(Object.keys(THEMES) as ThemeKey[]).map(t => (
-          <div key={t} className="bg-white rounded-2xl border border-green-100 p-4 w-full shadow-md">
+          <div key={t} className="bg-white rounded-2xl border-2 border-green-200 p-4 w-full" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
             <p className="font-bold text-gray-700 mb-2">
               {t === 'まち' ? '🏙️' : t === 'しぜん' ? '🌿' : t === 'のりもの' ? '🚗' : '🍎'} {t}
             </p>
@@ -97,7 +97,7 @@ export function TrainBingo() {
   )
 
   return (
-    <GameLayout title="でんしゃビンゴ" gradient={GRAD}>
+    <GameLayout title="でんしゃビンゴ" gradient={GRAD} isPlaying={marked.size > 0}>
       <div className="flex flex-col items-center gap-3">
         <Celebration count={bingoLines.length} />
         <div className="flex justify-between w-full">

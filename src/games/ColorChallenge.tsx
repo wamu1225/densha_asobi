@@ -73,10 +73,10 @@ export function ColorChallenge() {
   const best = getBest()
 
   if (mode === 'result') {
-    saveBest(modeKey, count)
+    const isNewBest = getBest()[modeKey] == null || count > getBest()[modeKey]; saveBest(modeKey, count)
     return (
       <GameLayout title="いろさがしチャレンジ" gradient={GRAD}>
-        <ResultScreen score={count} extra={[{ label: 'さいこうれんぞく', value: `${maxStreak}かい 🔥` }]} best={getBest()[modeKey]} onRetry={() => startMode(isShape, timeLimit)} accentColor="text-pink-500" />
+        <ResultScreen score={count} extra={[{ label: 'さいこうれんぞく', value: `${maxStreak}かい 🔥` }]} bestStr={getBest()[modeKey] != null ? `${getBest()[modeKey]}こ` : undefined} onRetry={() => startMode(isShape, timeLimit)} onChangeMode={() => setMode('select')} isNewBest={isNewBest} accentColor="text-pink-500" />
       </GameLayout>
     )
   }
@@ -88,7 +88,7 @@ export function ColorChallenge() {
         {[{ shape: false, label: '🎨 いろさがし', desc: 'そのいろのものをまどのそとでさがそう' },
           { shape: true,  label: '🔺 かたちさがし', desc: 'そのかたちのものをそとでさがそう' }
         ].map(o => (
-          <div key={String(o.shape)} className="bg-white rounded-2xl border border-pink-100 p-4 shadow-md">
+          <div key={String(o.shape)} className="bg-white rounded-2xl border-2 border-pink-200 p-4" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
             <p className="font-bold text-gray-700 mb-1">{o.label}</p>
             <p className="text-sm text-gray-500 mb-3">{o.desc}</p>
             <div className="flex gap-2">
@@ -108,7 +108,7 @@ export function ColorChallenge() {
   const shapeItem = isShape ? SHAPES[itemIdx] : null
 
   return (
-    <GameLayout title="いろさがしチャレンジ" gradient={GRAD}>
+    <GameLayout title="いろさがしチャレンジ" gradient={GRAD} isPlaying={mode === 'play'}>
       <div className="flex flex-col items-center gap-4">
         <div className="flex justify-between w-full">
           <span className="text-xl font-bold text-gray-700">🎨 {count}こ</span>

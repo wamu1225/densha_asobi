@@ -80,6 +80,7 @@ src/data/*_rebuilt.ts
 # Vite template default assets (replace with site logo if needed)
 src/assets/react.svg
 src/assets/vite.svg
+src/assets/hero.png
 
 # Internal design docs (kept locally only)
 DESIGN.md

@@ -37,8 +37,8 @@ const CATEGORIES: Record<string, WordEntry[]> = {
     { word: 'スニーカー',   hint: '👟' },  // スニーカー
     { word: 'リュックサック', hint: '🎒' }, // リュックサック
     { word: 'かがみ',       hint: '🪞' },  // ハンカチ→絵文字なし→かがみに変更
-    { word: 'でんたく',     hint: '🧮' },  // ランドセル→絵文字なし→でんたくに変更
-    { word: 'まくら',       hint: '🛌' },  // まくら（🛌=寝ている人=枕を使っている）
+    { word: 'はさみ',       hint: '✂️' },
+    { word: 'たいこ',       hint: '🥁' },
   ],
 }
 type Cat = keyof typeof CATEGORIES
@@ -120,9 +120,13 @@ export function WordScramble() {
   if (phase === 'select') return (
     <GameLayout title="もじならべ" gradient={GRAD}>
       <div className="flex flex-col gap-4 pt-4">
+        <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3 text-center">
+          <p className="text-base font-black text-amber-700">📝 バラバラのもじを ただしいじゅんに タップしよう！</p>
+          <p className="text-xs text-amber-600 mt-1">たとえば「こ・ね」→「ね」「こ」でねこ！</p>
+        </div>
         <p className="text-center text-xl font-bold text-gray-700">カテゴリをえらんでね</p>
         {(Object.keys(CATEGORIES) as Cat[]).map(c => (
-          <div key={c} className="bg-white rounded-2xl border border-amber-100 p-4 shadow-md">
+          <div key={c} className="bg-white rounded-2xl border-2 border-amber-200 p-4" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
             <p className="font-bold text-gray-700 mb-2">
               {c === 'どうぶつ' ? '🐾' : c === 'たべもの' ? '🍎' : c === 'のりもの' ? '🚃' : '🎓'} {c}（{CATEGORIES[c].length}もん）
             </p>
@@ -137,7 +141,7 @@ export function WordScramble() {
   )
 
   if (phase === 'over') {
-    if (timeMode) saveTaBest(cat, score)
+    const isNewBest = timeMode && (getTaBest(cat) === 0 || score > getTaBest(cat)); if (timeMode) saveTaBest(cat, score)
     return (
       <GameLayout title="もじならべ" gradient={GRAD}>
         <ResultScreen
@@ -147,6 +151,8 @@ export function WordScramble() {
           bestStr={timeMode && getTaBest(cat) > 0 ? `${getTaBest(cat)}もん` : undefined}
           bestLabel="タイムアタック ベスト"
           onRetry={() => startGame(cat, timeMode)}
+          onChangeMode={() => setPhase('select')}
+          isNewBest={isNewBest}
           accentColor="text-amber-500"
         />
       </GameLayout>
@@ -156,7 +162,7 @@ export function WordScramble() {
   const current = selected.map(i => tiles[i]).join('')
 
   return (
-    <GameLayout title="もじならべ" gradient={GRAD}>
+    <GameLayout title="もじならべ" gradient={GRAD} isPlaying={phase === 'play'}>
       <div className={`flex flex-col items-center gap-4 rounded-3xl p-3 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
         <div className="flex justify-between w-full items-center">
           <div>
@@ -171,7 +177,9 @@ export function WordScramble() {
           }
         </div>
         <div className="text-7xl mt-1">{word.hint}</div>
-        <p className="text-lg font-bold text-gray-600">{cat}の なまえを つくってね</p>
+        <p className="text-lg font-bold text-gray-600">
+          {cat === 'むずかしい' ? 'なんのえかな？ なまえを つくってね' : `${cat}の なまえを つくってね`}
+        </p>
 
         <div className="flex gap-2 bg-amber-50 rounded-2xl px-5 py-4 min-h-16 items-center justify-center w-full border-2 border-amber-200">
           {current.length > 0

@@ -13,7 +13,7 @@ const CATEGORIES: Record<string, string[]> = {
 type Cat = keyof typeof CATEGORIES
 interface Size { pairs: number; cols: number; label: string }
 const SIZES: Size[] = [
-  { pairs: 3, cols: 3, label: '2×3（超かんたん）' },
+  { pairs: 3, cols: 3, label: '2×3（すごくかんたん）' },
   { pairs: 6, cols: 4, label: '3×4（かんたん）' },
   { pairs: 8, cols: 4, label: '4×4（ふつう）' },
   { pairs: 10, cols: 4, label: '4×5（むずかしい）' },
@@ -86,6 +86,10 @@ export function MemoryCards() {
   if (phase === 'select') return (
     <GameLayout title="しんけいすいじゃく" gradient={GRAD}>
       <div className="flex flex-col gap-4 pt-4">
+        <div className="bg-teal-50 border-2 border-teal-200 rounded-2xl p-3 text-center">
+          <p className="text-base font-black text-teal-700">🃏 カードをめくって おなじえを 2まい みつけよう！</p>
+          <p className="text-xs text-teal-600 mt-1">すくない てかずで クリアしよう</p>
+        </div>
         <p className="text-center text-xl font-bold text-gray-700">カテゴリをえらんでね</p>
         <div className="grid grid-cols-2 gap-2">
           {(Object.keys(CATEGORIES) as Cat[]).map(c => (
@@ -97,7 +101,7 @@ export function MemoryCards() {
         <p className="text-center text-lg font-bold text-gray-700">サイズをえらんでね</p>
         {SIZES.map((s, i) => (
           <button key={i} onClick={() => setSizeIdx(i)} className={`py-3 text-base font-bold rounded-2xl border-2 active:scale-95 transition-all ${sizeIdx === i ? 'text-white border-transparent' : 'bg-white text-gray-700 border-gray-200'}`} style={sizeIdx === i ? { background: GRAD } : {}}>
-            {s.label}{best[`${cat}_${i}`] != null ? ` 🏆最少${best[`${cat}_${i}`]}て` : ''}
+            {s.label}{best[`${cat}_${i}`] != null ? ` 🏆ベスト${best[`${cat}_${i}`]}て` : ''}
           </button>
         ))}
         <button onClick={start} className="py-5 text-xl font-black text-white rounded-2xl shadow-lg active:scale-95 mt-2" style={{ background: GRAD }}>はじめる！</button>
@@ -106,16 +110,16 @@ export function MemoryCards() {
   )
 
   if (phase === 'over') {
-    saveBest(bestKey, moves)
+    const isNewBest = getBest()[bestKey] == null || moves < getBest()[bestKey]; saveBest(bestKey, moves)
     return (
       <GameLayout title="しんけいすいじゃく" gradient={GRAD}>
-        <ResultScreen timeStr={fmt(elapsed)} extra={[{ label: 'てかず', value: `${moves}て` }]} best={getBest()[bestKey]} bestLabel="最少手数" onRetry={start} accentColor="text-teal-500" />
+        <ResultScreen timeStr={fmt(elapsed)} extra={[{ label: 'てかず', value: `${moves}て` }]} bestStr={getBest()[bestKey] != null ? `${getBest()[bestKey]}て` : undefined} bestLabel="ベストてかず" onRetry={start} onChangeMode={() => setPhase('select')} isNewBest={isNewBest} accentColor="text-teal-500" />
       </GameLayout>
     )
   }
 
   return (
-    <GameLayout title="しんけいすいじゃく" gradient={GRAD}>
+    <GameLayout title="しんけいすいじゃく" gradient={GRAD} isPlaying={phase === 'play'}>
       <div className="flex flex-col items-center gap-3">
         <div className="flex justify-between w-full">
           <span className="text-lg font-bold text-gray-700">🃏 {moves}て</span>

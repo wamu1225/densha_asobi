@@ -13,7 +13,7 @@ type Phase = 'select' | 'preview' | 'play' | 'over'
 
 const VARIANTS: Record<Variant, { emoji: string; label: string; desc: string; color: string }> = {
   speed:   { emoji: '⚡', label: 'スピード',    desc: '1からじゅんばんにタップ！\nはやさをきそおう',   color: '#ef4444' },
-  memory:  { emoji: '🧠', label: 'きおく',      desc: '3びょうでばしょをおぼえて！\nきえたら こころのめで探せ', color: '#8b5cf6' },
+  memory:  { emoji: '🧠', label: 'きおく',      desc: '3びょうでばしょをおぼえて！\nきえたら こころのめで さがせ', color: '#8b5cf6' },
   reverse: { emoji: '🔄', label: 'ぎゃくじゅん', desc: 'おおきいかずからさがして\nN→1の じゅんでタップ！', color: '#f59e0b' },
 }
 
@@ -31,6 +31,8 @@ export function NumberMaze() {
   const [shake, setShake]       = useState<number | null>(null)
   const [elapsed, setElapsed]   = useState(0)
   const [countdown, setCountdown] = useState(3)
+  const [hintUsed, setHintUsed]   = useState(false)
+  const [showHint, setShowHint]   = useState(false)
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const best = getBest()
 
@@ -43,25 +45,33 @@ export function NumberMaze() {
     return () => { clearInterval(t); timerRef.current = null }
   }, [phase])
 
-  // ── きおくモードのプレビューカウントダウン ──────────────
+  // ── きおくモードのプレビューカウントダウン（4×4:4秒 / 5×5:6秒）──
   useEffect(() => {
     if (phase !== 'preview') return
-    setCountdown(3)
-    let c = 3
+    const total = size === 5 ? 6 : 4
+    setCountdown(total)
+    let c = total
     const t = setInterval(() => {
       c--
       setCountdown(c)
       if (c <= 0) { clearInterval(t); setPhase('play') }
     }, 1000)
     return () => clearInterval(t)
-  }, [phase])
+  }, [phase, size])
 
   function start(s: Size, v: Variant) {
     const g = makeGrid(s)
     setSize(s); setVariant(v); setGrid(g)
     setTapped(new Set()); setElapsed(0)
+    setHintUsed(false); setShowHint(false)
     setNext(v === 'reverse' ? s * s : 1)
     setPhase(v === 'memory' ? 'preview' : 'play')
+  }
+
+  function useHint() {
+    if (hintUsed) return
+    setHintUsed(true); setShowHint(true)
+    setTimeout(() => setShowHint(false), 2000)
   }
 
   function tap(n: number, i: number) {
@@ -151,8 +161,8 @@ export function NumberMaze() {
             🧠 {countdown > 0 ? `${countdown}びょうで おぼえて！` : 'きえる！'}
           </p>
           <div className="flex justify-center gap-1 mt-1">
-            {[3, 2, 1].map(n => (
-              <div key={n} className="w-6 h-6 rounded-full transition-all"
+            {Array.from({ length: size === 5 ? 6 : 4 }, (_, i) => i + 1).map(n => (
+              <div key={n} className="w-5 h-5 rounded-full transition-all"
                 style={{ background: countdown >= n ? '#8b5cf6' : '#e9d5ff' }} />
             ))}
           </div>
@@ -173,7 +183,7 @@ export function NumberMaze() {
 
   // ── 結果画面 ──────────────────────────────────────────
   if (phase === 'over') {
-    saveBest(bk, elapsed)
+    const isNewBest = best[bk] == null || elapsed < best[bk]; saveBest(bk, elapsed)
     return (
       <GameLayout title="すうじめいろ" gradient={GRAD}>
         <ResultScreen
@@ -181,6 +191,8 @@ export function NumberMaze() {
           bestStr={getBest()[bk] != null ? fmt(getBest()[bk]) : undefined}
           bestLabel={`ベスト（${size}×${size} ${VARIANTS[variant].label}）`}
           onRetry={() => start(size, variant)}
+          onChangeMode={() => setPhase('select')}
+          isNewBest={isNewBest}
           accentColor="text-red-500"
         />
       </GameLayout>
@@ -193,7 +205,7 @@ export function NumberMaze() {
     : `タップ：${next}`
 
   return (
-    <GameLayout title="すうじめいろ" gradient={GRAD}>
+    <GameLayout title="すうじめいろ" gradient={GRAD} isPlaying={phase === 'play'}>
       <div className="flex flex-col items-center gap-3">
         <div className="flex justify-between w-full items-center">
           <span className="text-xl font-black" style={{ color: variant === 'reverse' ? '#f59e0b' : variant === 'memory' ? '#8b5cf6' : 'var(--ink)' }}>
@@ -210,7 +222,7 @@ export function NumberMaze() {
           {grid.map((n, i) => {
             const isDone = tapped.has(i)
             // きおくモードは未タップセルを非表示（プレイ中は真っ白）
-            const showNum = variant === 'memory' ? (isDone ? '✓' : '') : (isDone ? '✓' : n)
+            const showNum = variant === 'memory' ? (isDone ? '✓' : showHint ? n : '') : (isDone ? '✓' : n)
             const cellBg = isDone
               ? GRAD
               : 'white'
@@ -234,9 +246,16 @@ export function NumberMaze() {
         </div>
 
         {variant === 'memory' && (
-          <p className="text-sm font-bold text-purple-600">
-            🧠 きおくをたよりに タップ！
-          </p>
+          <div className="flex items-center justify-between w-full">
+            <p className="text-sm font-bold text-purple-600">🧠 きおくをたよりに タップ！</p>
+            <button
+              onClick={useHint}
+              disabled={hintUsed}
+              className="text-xs font-bold px-3 py-1.5 rounded-lg active:scale-95 disabled:opacity-40"
+              style={{ background: hintUsed ? '#e9d5ff' : '#7c3aed', color: 'white' }}>
+              {hintUsed ? '👁 つかった' : '👁 ちょっとみる'}
+            </button>
+          </div>
         )}
       </div>
     </GameLayout>

@@ -88,6 +88,12 @@ h1, h2, h3, button, p, span, div {
   border-radius: 3px;
   animation: confetti-fall linear forwards;
 }
+@media (prefers-reduced-motion: reduce) {
+  .confetti-piece { display: none; }
+  .bounce-in { animation: none; }
+  .cell-pulse { animation: none; }
+  .train-ride { animation: none; }
+}
 
 @keyframes cell-pulse {
   0%, 100% { transform: scale(1);    box-shadow: 0 0 0 2px #22d3ee; }
@@ -95,8 +101,17 @@ h1, h2, h3, button, p, span, div {
 }
 .cell-pulse { animation: cell-pulse 0.8s ease infinite; }
 
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter { animation: page-fade-in 0.22s ease forwards; }
+
+/* ゲーム内テキストの最小フォントサイズ */
+.game-text { font-size: max(14px, 1em); }
+
 @keyframes train-ride {
-  0%   { transform: translateX(-180px); }
-  100% { transform: translateX(calc(100vw + 180px)); }
+  0%   { transform: translateX(calc(100vw + 200px)); }
+  100% { transform: translateX(-320px); }
 }
 .train-ride { animation: train-ride 9s linear infinite; display: inline-block; }

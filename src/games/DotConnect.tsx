@@ -9,28 +9,28 @@ interface DotPattern { name: string; emoji: string; dots: { x: number; y: number
 const PATTERNS: DotPattern[] = [
   { name: 'さんかく', emoji: '🔺', close: true,   // 3点
     dots: [{ x:150,y:35 },{ x:255,y:240 },{ x:45,y:240 }] },
-  { name: 'かみなり', emoji: '⚡', close: false,   // 7点
-    dots: [{ x:198,y:30 },{ x:122,y:132 },{ x:168,y:132 },{ x:92,y:265 },{ x:172,y:152 },{ x:130,y:152 },{ x:198,y:30 }] },
+  { name: 'かみなり', emoji: '⚡', close: false,   // 6点 ※全ドット32px以上の間隔
+    dots: [{ x:210,y:20 },{ x:140,y:105 },{ x:195,y:105 },{ x:135,y:185 },{ x:180,y:185 },{ x:100,y:270 }] },
   { name: 'ハート',   emoji: '❤️', close: true,   // 8点
     dots: [{ x:150,y:255 },{ x:55,y:130 },{ x:55,y:82 },{ x:98,y:48 },{ x:150,y:88 },{ x:202,y:48 },{ x:245,y:82 },{ x:245,y:130 }] },
-  { name: 'おうち',   emoji: '🏠', close: false,  // 8点
-    dots: [{ x:150,y:35 },{ x:250,y:120 },{ x:225,y:120 },{ x:225,y:240 },{ x:75,y:240 },{ x:75,y:120 },{ x:50,y:120 },{ x:150,y:35 }] },
-  { name: 'さかな',   emoji: '🐟', close: false,  // 9点
-    dots: [{ x:240,y:80 },{ x:270,y:45 },{ x:270,y:125 },{ x:240,y:108 },{ x:158,y:100 },{ x:80,y:150 },{ x:158,y:200 },{ x:240,y:192 },{ x:270,y:125 }] },
+  { name: 'おうち',   emoji: '🏠', close: true,   // 7点 ※重複末尾除去・屋根角を32px確保
+    dots: [{ x:150,y:35 },{ x:262,y:130 },{ x:230,y:130 },{ x:230,y:245 },{ x:70,y:245 },{ x:70,y:130 },{ x:38,y:130 }] },
+  { name: 'さかな',   emoji: '🐟', close: false,  // 10点 ※重複末尾除去・全ドット47px以上
+    dots: [
+      { x:75,y:150 },{ x:120,y:90 },{ x:195,y:75 },{ x:240,y:90 },
+      { x:275,y:50 },{ x:275,y:150 },{ x:275,y:250 },
+      { x:240,y:210 },{ x:195,y:225 },{ x:120,y:210 },
+    ] },
   { name: 'ほし',     emoji: '⭐', close: true,   // 10点
     dots: [{ x:150,y:30 },{ x:188,y:112 },{ x:270,y:112 },{ x:205,y:170 },{ x:232,y:258 },{ x:150,y:208 },{ x:68,y:258 },{ x:95,y:170 },{ x:30,y:112 },{ x:112,y:112 }] },
-  { name: 'ロケット', emoji: '🚀', close: false,  // 11点
-    dots: [{ x:150,y:30 },{ x:198,y:95 },{ x:198,y:188 },{ x:235,y:248 },{ x:198,y:230 },{ x:150,y:258 },{ x:102,y:230 },{ x:65,y:248 },{ x:102,y:188 },{ x:102,y:95 },{ x:150,y:30 }] },
-  { name: 'でんしゃ', emoji: '🚃', close: false,  // 12点
-    dots: [
-      { x:65,y:240 },{ x:65,y:105 },{ x:105,y:65 },{ x:195,y:65 },{ x:235,y:105 },{ x:235,y:240 },
-      { x:210,y:240 },{ x:198,y:258 },{ x:186,y:240 },{ x:114,y:240 },{ x:102,y:258 },{ x:90,y:240 },
-    ],
-  },
-  { name: 'きのこ',   emoji: '🍄', close: false,  // 13点
-    dots: [{ x:150,y:265 },{ x:112,y:265 },{ x:112,y:188 },{ x:65,y:150 },{ x:55,y:102 },{ x:82,y:55 },{ x:150,y:35 },{ x:218,y:55 },{ x:245,y:102 },{ x:235,y:150 },{ x:188,y:188 },{ x:188,y:265 },{ x:150,y:265 }] },
-  { name: 'とり',     emoji: '🐦', close: false,  // 14点
-    dots: [{ x:100,y:198 },{ x:100,y:122 },{ x:82,y:82 },{ x:120,y:62 },{ x:158,y:80 },{ x:158,y:62 },{ x:198,y:52 },{ x:235,y:80 },{ x:218,y:120 },{ x:198,y:158 },{ x:158,y:178 },{ x:100,y:198 },{ x:82,y:248 },{ x:128,y:265 }] },
+  { name: 'ロケット', emoji: '🚀', close: true,   // 10点 ※重複末尾除去
+    dots: [{ x:150,y:30 },{ x:198,y:95 },{ x:198,y:188 },{ x:235,y:248 },{ x:198,y:230 },{ x:150,y:258 },{ x:102,y:230 },{ x:65,y:248 },{ x:102,y:188 },{ x:102,y:95 }] },
+  { name: 'でんしゃ', emoji: '🚃', close: true,   // 8点 ※底辺を2点に簡略化
+    dots: [{ x:65,y:230 },{ x:65,y:105 },{ x:105,y:65 },{ x:195,y:65 },{ x:235,y:105 },{ x:235,y:230 },{ x:200,y:265 },{ x:100,y:265 }] },
+  { name: 'きのこ',   emoji: '🍄', close: true,   // 12点 ※重複末尾除去
+    dots: [{ x:150,y:265 },{ x:112,y:265 },{ x:112,y:188 },{ x:65,y:150 },{ x:55,y:102 },{ x:82,y:55 },{ x:150,y:35 },{ x:218,y:55 },{ x:245,y:102 },{ x:235,y:150 },{ x:188,y:188 },{ x:188,y:265 }] },
+  { name: 'とり',     emoji: '🐦', close: true,   // 11点 ※重複dot11除去・胴体クローズ
+    dots: [{ x:100,y:198 },{ x:100,y:122 },{ x:82,y:82 },{ x:120,y:62 },{ x:158,y:80 },{ x:158,y:62 },{ x:198,y:52 },{ x:235,y:80 },{ x:218,y:120 },{ x:198,y:158 },{ x:158,y:178 }] },
 ]
 
 export function DotConnect() {
@@ -60,7 +60,7 @@ export function DotConnect() {
   }
 
   return (
-    <GameLayout title="ドットつなぎ" gradient={GRAD}>
+    <GameLayout title="ドットつなぎ" gradient={GRAD} isPlaying={connected > 0 && !done}>
       <div className="flex flex-col items-center gap-3">
         <div className="flex justify-between w-full">
           <span className="text-base font-bold text-gray-700">{pIdx + 1} / {PATTERNS.length}</span>
@@ -97,12 +97,12 @@ export function DotConnect() {
               const tapped = i < connected; const isNext = i === connected; const isWrong = wrong === i
               return (
                 <g key={i} onClick={() => !tapped && tap(i)} style={{ cursor: !tapped ? 'pointer' : 'default' }}>
-                  <circle cx={d.x} cy={d.y} r={isNext ? 20 : 14}
+                  <circle cx={d.x} cy={d.y} r={isNext ? 24 : 18}
                     fill={isWrong ? '#fee2e2' : tapped ? '#84cc16' : isNext ? '#d9f99d' : 'white'}
                     stroke={isWrong ? '#ef4444' : isNext ? '#65a30d' : tapped ? '#65a30d' : '#a3e635'}
                     strokeWidth={isNext ? 3 : 2}
                     style={isNext ? { filter: 'drop-shadow(0 0 6px #84cc16)' } : {}} />
-                  {!tapped && <text x={d.x} y={d.y} textAnchor="middle" dominantBaseline="central" fontSize={isNext ? "14" : "11"} fontWeight="800" fill={isNext ? '#3f6212' : '#6b7280'}>{i + 1}</text>}
+                  {!tapped && <text x={d.x} y={d.y} textAnchor="middle" dominantBaseline="central" fontSize={isNext ? "16" : "13"} fontWeight="800" fill={isNext ? '#3f6212' : '#6b7280'}>{i + 1}</text>}
                   {tapped && <text x={d.x} y={d.y} textAnchor="middle" dominantBaseline="central" fontSize="12" fill="white">✓</text>}
                 </g>
               )

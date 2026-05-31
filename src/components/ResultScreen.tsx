@@ -1,5 +1,20 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
+
+const NEXT_GAMES = [
+  { path: '/math',     emoji: '🔢', name: 'けいさんスプリント' },
+  { path: '/bigger',   emoji: '⚖️', name: 'どっちがおおきい？' },
+  { path: '/clock',    emoji: '🕐', name: 'とけいをよもう' },
+  { path: '/bingo',    emoji: '🚃', name: 'でんしゃビンゴ' },
+  { path: '/color',    emoji: '🎨', name: 'いろさがし' },
+  { path: '/memory',   emoji: '🃏', name: 'しんけいすいじゃく' },
+  { path: '/next',     emoji: '🔮', name: 'つぎはどれ？' },
+  { path: '/simon',    emoji: '🌈', name: 'いろきおく' },
+  { path: '/maze',     emoji: '🗺️', name: 'すうじめいろ' },
+  { path: '/scramble', emoji: '📝', name: 'もじならべ' },
+  { path: '/search',   emoji: '🔍', name: 'ひらがなさがし' },
+  { path: '/dots',     emoji: '✏️', name: 'ドットつなぎ' },
+]
 
 interface Stat { label: string; value: string | number }
 
@@ -14,6 +29,8 @@ interface ResultScreenProps {
   bestStr?: string
   bestLabel?: string
   onRetry: () => void
+  onChangeMode?: () => void
+  isNewBest?: boolean         // ベスト更新時 true
   accentColor?: string
 }
 
@@ -53,16 +70,24 @@ function Confetti({ active }: { active: boolean }) {
   )
 }
 
-export function ResultScreen({ score, total, scoreLabel, scoreSuffix, timeStr, extra = [], best, bestStr, bestLabel = 'ベスト', onRetry, accentColor = 'text-sky-500' }: ResultScreenProps) {
+export function ResultScreen({ score, total, scoreLabel, scoreSuffix, timeStr, extra = [], best, bestStr, bestLabel = 'ベスト', onRetry, onChangeMode, isNewBest = false, accentColor = 'text-sky-500' }: ResultScreenProps) {
   const navigate = useNavigate()
+  const location = useLocation()
+
+
+  // 現在のゲームを除外してランダムに2個選ぶ
+  const suggestions = NEXT_GAMES
+    .filter(g => g.path !== location.pathname)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 2)
   const [showConfetti, setShowConfetti] = useState(false)
   const pct = total != null && score != null ? score / total : null
   const isPerfect = pct === 1.0
   const isGreat   = pct != null ? pct >= 0.8 : true
 
   useEffect(() => {
-    if (isGreat) { setShowConfetti(true); setTimeout(() => setShowConfetti(false), 2500) }
-  }, [isGreat])
+    if (isGreat || isNewBest) { setShowConfetti(true); setTimeout(() => setShowConfetti(false), 2500) }
+  }, [isGreat, isNewBest])
 
   // 「かんぺき」は 100% のときだけ
   const emoji =
@@ -82,6 +107,13 @@ export function ResultScreen({ score, total, scoreLabel, scoreSuffix, timeStr, e
   return (
     <div className="flex flex-col items-center gap-5 pt-8 bounce-in">
       <Confetti active={showConfetti} />
+
+      {isNewBest && (
+        <div className="w-full rounded-2xl px-5 py-3 text-center bounce-in"
+          style={{ background: 'linear-gradient(135deg,#fbbf24,#f59e0b)', boxShadow: '0 4px 16px rgba(245,158,11,0.5)' }}>
+          <p className="text-2xl font-black text-white">🏆 ベスト更新！！ 🎊</p>
+        </div>
+      )}
 
       <div className="text-6xl">{emoji}</div>
       <p className="text-3xl font-black" style={{ color: 'var(--ink)' }}>{message}</p>
@@ -135,29 +167,56 @@ export function ResultScreen({ score, total, scoreLabel, scoreSuffix, timeStr, e
         )}
       </div>
 
+      {/* もういちど — 常に最大幅・最目立ちの主ボタン */}
+      <button
+        onClick={onRetry}
+        className="w-full py-5 text-xl font-black text-white rounded-2xl active:scale-95 transition-transform"
+        style={{ background: '#1C2B40', boxShadow: '4px 5px 0 rgba(0,0,0,0.22)' }}
+      >
+        もういちど 🔄
+      </button>
+
+      {/* 副ボタン行 */}
       <div className="flex gap-3 w-full">
-        <button
-          onClick={onRetry}
-          className="flex-1 py-4 text-lg font-black text-white rounded-xl active:scale-95 transition-transform"
-          style={{
-            background: '#1C2B40',
-            boxShadow: '3px 4px 0 rgba(0,0,0,0.2)',
-          }}
-        >
-          もういちど 🔄
-        </button>
+        {onChangeMode && (
+          <button
+            onClick={onChangeMode}
+            className="flex-1 py-3 text-sm font-bold rounded-xl active:scale-95 border-2"
+            style={{ background: 'white', color: 'var(--ink)', borderColor: '#ddd', boxShadow: '2px 3px 0 rgba(0,0,0,0.06)' }}
+          >
+            ⚙️ せっていをかえる
+          </button>
+        )}
         <button
           onClick={() => navigate('/')}
-          className="flex-1 py-4 text-lg font-black rounded-xl active:scale-95 border-2"
-          style={{
-            background: 'white',
-            color: 'var(--ink)',
-            borderColor: '#ddd',
-            boxShadow: '3px 4px 0 rgba(0,0,0,0.06)',
-          }}
+          className="flex-1 py-3 text-sm font-bold rounded-xl active:scale-95 border-2"
+          style={{ background: 'white', color: 'var(--ink-sub)', borderColor: '#e5e7eb', boxShadow: '2px 3px 0 rgba(0,0,0,0.06)' }}
         >
-          もどる 🏠
+          🏠 もどる
         </button>
+      </div>
+
+
+      {/* 次のゲーム提案 */}
+      <div className="w-full">
+        <p className="text-xs font-bold text-center mb-2" style={{ color: 'var(--ink-sub)' }}>
+          このゲームも どう？ 👇
+        </p>
+        <div className="flex gap-2">
+          {suggestions.map(g => (
+            <button
+              key={g.path}
+              onClick={() => navigate(g.path)}
+              className="flex-1 py-3 bg-white rounded-xl border-2 border-gray-200 shadow active:scale-95 text-center"
+              style={{ boxShadow: '2px 3px 0 rgba(0,0,0,0.06)' }}
+            >
+              <span className="text-2xl block">{g.emoji}</span>
+              <span className="text-xs font-bold leading-tight block mt-1" style={{ color: 'var(--ink)' }}>
+                {g.name}
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )

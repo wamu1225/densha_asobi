@@ -43,6 +43,7 @@ export function Simon() {
   const [inputIdx, setInput]  = useState(0)
   const [round, setRound]     = useState(1)
   const [wrongId, setWrongId] = useState<number | null>(null)
+  const [correctHintId, setCorrectHintId] = useState<number | null>(null)
   const [showSeqHint, setShowSeqHint] = useState(false)
   // ユーザーがタップしたときの視覚フィードバック用（showing の lit とは別）
   const [tapLit, setTapLit] = useState<number | null>(null)
@@ -122,8 +123,9 @@ export function Simon() {
       }
     } else {
       setWrongId(id)
+      setCorrectHintId(sequence[inputIdx])  // 正解のパネルを緑で表示
       saveBest(round - 1)
-      setTimeout(() => setPhase('wrong'), 120)
+      setTimeout(() => { setPhase('wrong'); setCorrectHintId(null) }, 900)
     }
   }
 
@@ -139,6 +141,7 @@ export function Simon() {
           bestStr={best > 0 ? `${best}ラウンド` : undefined}
           bestLabel="ベスト"
           onRetry={startGame}
+          onChangeMode={() => setPhase('select')}
           accentColor="text-purple-600"
         />
       </GameLayout>
@@ -188,7 +191,7 @@ export function Simon() {
   const { label: speedLabel } = getTiming(round)
 
   return (
-    <GameLayout title="いろきおく" gradient={GRAD}>
+    <GameLayout title="いろきおく" gradient={GRAD} isPlaying={['showing','input','correct','wrong'].includes(phase)}>
       <div className="flex flex-col items-center gap-4">
 
         {/* ステータス */}
@@ -217,11 +220,10 @@ export function Simon() {
         {/* 4色パネル ── ここが一番重要。光の差を最大化 */}
         <div className="grid grid-cols-2 gap-4 w-full">
           {PANELS.map(p => {
-            // シーケンス点灯 OR ユーザータップの両方で光る
-            const isLit   = lit === p.id || tapLit === p.id
-            const isWrong = wrongId === p.id
-            // タップ由来の光は少し抑えてシーケンスと区別
-            const isTapOnly = tapLit === p.id && lit !== p.id
+            const isLit        = lit === p.id || tapLit === p.id
+            const isWrong      = wrongId === p.id
+            const isCorrectHint = correctHintId === p.id  // 正解ヒント（緑で点灯）
+            const isTapOnly    = tapLit === p.id && lit !== p.id
 
             return (
               <button
@@ -230,13 +232,15 @@ export function Simon() {
                 disabled={phase !== 'input'}
                 className="aspect-square rounded-3xl flex flex-col items-center justify-center gap-2 select-none"
                 style={{
-                  background: isLit
-                    ? (isTapOnly ? `${p.bright}DD` : p.bright)
+                  background: isCorrectHint ? '#30D158'
+                    : isLit ? (isTapOnly ? `${p.bright}DD` : p.bright)
                     : isWrong ? '#EF4444' : p.dark,
-                  transform: isLit
-                    ? (isTapOnly ? 'scale(1.05)' : 'scale(1.08)')
+                  transform: isCorrectHint ? 'scale(1.08)'
+                    : isLit ? (isTapOnly ? 'scale(1.05)' : 'scale(1.08)')
                     : isWrong ? 'scale(0.95)' : 'scale(1)',
-                  boxShadow: isLit
+                  boxShadow: isCorrectHint
+                    ? `0 0 40px #30D158, 0 0 80px #30D15888, inset 0 2px 0 rgba(255,255,255,0.25), 4px 5px 0 rgba(0,0,0,0.15)`
+                    : isLit
                     ? `0 0 ${isTapOnly ? 25 : 40}px ${p.glow}, 0 0 ${isTapOnly ? 50 : 80}px ${p.glow}88, inset 0 2px 0 rgba(255,255,255,0.25), 4px 5px 0 rgba(0,0,0,0.15)`
                     : isWrong
                     ? `0 0 30px #EF4444, 0 0 60px #EF444488`

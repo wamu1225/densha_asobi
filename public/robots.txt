@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://wamu1225.github.io/densha_asobi/sitemap.xml
+Sitemap: https://study-apps.com/densha_asobi/sitemap.xml
