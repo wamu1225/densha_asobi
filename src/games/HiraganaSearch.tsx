@@ -187,7 +187,7 @@ export function HiraganaSearch() {
   const startKey = startCell ? key(startCell[0], startCell[1]) : null
 
   return (
-    <GameLayout title="ひらがなさがし" gradient={GRAD} isPlaying={found.size > 0 && !done}>
+    <GameLayout title="ひらがなさがし" gradient={GRAD} isPlaying={found.size > 0 && !done} hideAd={!done}>
       <div className="flex flex-col items-center gap-3">
         <div className="flex justify-between w-full">
           <span className="text-base font-bold text-gray-700">{pIdx + 1}/{PUZZLES.length}：{puzzle.title}</span>

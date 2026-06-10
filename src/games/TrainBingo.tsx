@@ -97,7 +97,7 @@ export function TrainBingo() {
   )
 
   return (
-    <GameLayout title="でんしゃビンゴ" gradient={GRAD} isPlaying={marked.size > 0}>
+    <GameLayout title="でんしゃビンゴ" gradient={GRAD} isPlaying={marked.size > 0} hideAd>
       <div className="flex flex-col items-center gap-3">
         <Celebration count={bingoLines.length} />
         <div className="flex justify-between w-full">

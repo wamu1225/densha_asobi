@@ -6,6 +6,7 @@ interface GameLayoutProps {
   title: string
   gradient?: string
   isPlaying?: boolean   // true のときに「もどる」で確認ダイアログを出す
+  hideAd?: boolean      // 常時タップ操作する画面で広告を出さない（誤タップ防止）
   children: React.ReactNode
 }
 
@@ -22,7 +23,7 @@ function darken(hex: string, amount = 30): string {
   return `#${r.toString(16).padStart(2,'0')}${g.toString(16).padStart(2,'0')}${b.toString(16).padStart(2,'0')}`
 }
 
-export function GameLayout({ title, gradient, isPlaying = false, children }: GameLayoutProps) {
+export function GameLayout({ title, gradient, isPlaying = false, hideAd = false, children }: GameLayoutProps) {
   const navigate = useNavigate()
   const [showConfirm, setShowConfirm] = useState(false)
 
@@ -98,7 +99,8 @@ export function GameLayout({ title, gradient, isPlaying = false, children }: Gam
 
       <main className="flex-1 p-4 max-w-lg mx-auto w-full">
         {children}
-        <AdBanner slot="5432198760" format="horizontal" className="mt-6" />
+        {/* プレイ中はタップ動線に広告を出さない。選択・結果画面のみ・ボタン群から40px離す */}
+        {!isPlaying && !hideAd && <AdBanner slot="5432198760" className="mt-10" />}
       </main>
     </div>
   )

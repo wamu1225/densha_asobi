@@ -60,7 +60,7 @@ export function DotConnect() {
   }
 
   return (
-    <GameLayout title="ドットつなぎ" gradient={GRAD} isPlaying={connected > 0 && !done}>
+    <GameLayout title="ドットつなぎ" gradient={GRAD} isPlaying={connected > 0 && !done} hideAd={!done}>
       <div className="flex flex-col items-center gap-3">
         <div className="flex justify-between w-full">
           <span className="text-base font-bold text-gray-700">{pIdx + 1} / {PATTERNS.length}</span>
