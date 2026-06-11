@@ -13,7 +13,7 @@ const BEST_KEYS: Record<string, string[]> = {
   '/memory':  ['densha_memory_best'],
   '/simon':   ['densha_simon_best'],
   '/maze':    ['densha_maze_best'],
-  '/scramble':['densha_scramble_best_どうぶつ','densha_scramble_best_たべもの','densha_scramble_best_のりもの','densha_scramble_best_むずかしい'],
+  '/scramble':['densha_scramble_best_どうぶつ','densha_scramble_best_たべもの','densha_scramble_best_のりもの','densha_scramble_best_みのまわり','densha_scramble_best_むずかしい'],
   '/search':  ['densha_search_cleared'],
   '/dots':    ['densha_dots_cleared'],
 }
