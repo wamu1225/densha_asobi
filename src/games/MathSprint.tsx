@@ -85,20 +85,20 @@ export function MathSprint() {
     <GameLayout title="けいさんスプリント" gradient={GRAD}>
       <div className="flex flex-col gap-4 pt-4">
         <p className="text-center text-xl font-bold text-gray-700">レベルをえらんでね</p>
-        <p className="text-center text-xs" style={{ color: 'var(--ink-sub)' }}>💡 5れんぞく せいかいで ボーナスてん！</p>
+        <p className="text-center text-xs" style={{ color: 'var(--ink-sub)' }}>5れんぞく せいかいで ボーナスてん！</p>
         {([1, 2, 3] as Level[]).map(lv => (
           <div key={lv} className="bg-white rounded-2xl border-2 border-orange-200 p-4" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
             <p className="font-bold text-gray-700 mb-2">{LEVEL_LABELS[lv]}</p>
             <div className="flex gap-2 text-xs text-gray-400 mb-2">
-              {best[`${lv}_normal`] != null && <span>🏆 ふつう {best[`${lv}_normal`]}てん</span>}
-              {best[`${lv}_survival`] != null && <span>❤️ サバイバル {best[`${lv}_survival`]}てん</span>}
+              {best[`${lv}_normal`] != null && <span>ふつう ベスト {best[`${lv}_normal`]}てん</span>}
+              {best[`${lv}_survival`] != null && <span>♥ サバイバル ベスト {best[`${lv}_survival`]}てん</span>}
             </div>
             <div className="flex gap-2">
               <button onClick={() => start(lv, 'normal')} className="flex-1 py-3 text-base font-bold text-white rounded-xl shadow active:scale-95" style={{ background: GRAD }}>
-                ふつう ⏱{LEVEL_TIME[lv]}s
+                ふつう {LEVEL_TIME[lv]}びょう
               </button>
               <button onClick={() => start(lv, 'survival')} className="flex-1 py-3 text-base font-bold bg-red-500 text-white rounded-xl shadow active:scale-95">
-                サバイバル ❤️
+                サバイバル ♥
               </button>
             </div>
           </div>
@@ -121,12 +121,12 @@ export function MathSprint() {
       <div className="flex flex-col items-center gap-4">
         <div className="flex justify-between w-full items-center">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
-            {combo >= 3 && <span className="text-sm font-bold text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full">🔥 {combo}れんぞく！</span>}
+            <span className="text-xl font-bold text-gray-700">★ {score}</span>
+            {combo >= 3 && <span className="text-sm font-bold text-orange-500 bg-orange-100 px-2 py-0.5 rounded-full">{combo}れんぞく！</span>}
           </div>
           {gameMode === 'survival'
-            ? <span className="text-xl">{[...Array(lives)].map((_, i) => <span key={i}>❤️</span>)}</span>
-            : <span className={`text-xl font-bold ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>⏱ {timeLeft}s</span>
+            ? <span className="text-xl">{[...Array(lives)].map((_, i) => <span key={i} className="text-red-500">♥</span>)}</span>
+            : <span className={`text-xl font-bold ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>のこり {timeLeft}s</span>
           }
         </div>
         <GameFeedback flash={flash} />
@@ -134,11 +134,11 @@ export function MathSprint() {
           combo >= 10 ? (
             <div className="w-full rounded-2xl px-5 py-3 text-center bounce-in"
               style={{ background: 'linear-gradient(135deg,#f59e0b,#ef4444,#a855f7)', boxShadow: '0 4px 20px rgba(239,68,68,0.55)' }}>
-              <span className="text-2xl font-black text-white">🏆 {combo}れんぞく！MAX！！</span>
+              <span className="text-2xl font-black text-white">{combo}れんぞく！MAX！！</span>
             </div>
           ) : (
             <div className="bg-yellow-100 border-2 border-yellow-300 rounded-2xl px-5 py-2 bounce-in">
-              <span className="text-xl font-bold text-yellow-700">🔥 {combo}れんぞく！ボーナス！</span>
+              <span className="text-xl font-bold text-yellow-700">{combo}れんぞく！ボーナス！</span>
             </div>
           )
         )}

@@ -80,7 +80,7 @@ export function ColorChallenge() {
     const isNewBest = getBest()[modeKey] == null || count > getBest()[modeKey]; saveBest(modeKey, count)
     return (
       <GameLayout title="いろさがしチャレンジ" gradient={GRAD}>
-        <ResultScreen score={count} extra={[{ label: 'さいこうれんぞく', value: `${maxStreak}かい 🔥` }]} bestStr={getBest()[modeKey] != null ? `${getBest()[modeKey]}こ` : undefined} onRetry={() => startMode(isShape, timeLimit)} onChangeMode={() => setMode('select')} isNewBest={isNewBest} accentColor="text-pink-500" />
+        <ResultScreen score={count} extra={[{ label: 'さいこうれんぞく', value: `${maxStreak}かい` }]} bestStr={getBest()[modeKey] != null ? `${getBest()[modeKey]}こ` : undefined} onRetry={() => startMode(isShape, timeLimit)} onChangeMode={() => setMode('select')} isNewBest={isNewBest} accentColor="text-pink-500" />
       </GameLayout>
     )
   }
@@ -89,8 +89,8 @@ export function ColorChallenge() {
     <GameLayout title="いろさがしチャレンジ" gradient={GRAD}>
       <div className="flex flex-col gap-4 pt-4">
         <p className="text-center text-xl font-bold text-gray-700">モードをえらんでね</p>
-        {[{ shape: false, label: '🎨 いろさがし', desc: 'そのいろのものをまどのそとでさがそう' },
-          { shape: true,  label: '🔺 かたちさがし', desc: 'そのかたちのものをそとでさがそう' }
+        {[{ shape: false, label: 'いろさがし', desc: 'そのいろのものをまどのそとでさがそう' },
+          { shape: true,  label: 'かたちさがし', desc: 'そのかたちのものをそとでさがそう' }
         ].map(o => (
           <div key={String(o.shape)} className="bg-white rounded-2xl border-2 border-pink-200 p-4" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
             <p className="font-bold text-gray-700 mb-1">{o.label}</p>
@@ -98,7 +98,7 @@ export function ColorChallenge() {
             <div className="flex gap-2">
               {[60, 90].map(s => (
                 <button key={s} onClick={() => startMode(o.shape, s)} className="flex-1 py-3 text-base font-bold text-white rounded-xl shadow active:scale-95" style={{ background: GRAD }}>
-                  ⏱{s}びょう{best[`${o.shape ? 'shape' : 'color'}_${s}`] != null ? ` 🏆${best[`${o.shape ? 'shape' : 'color'}_${s}`]}` : ''}
+                  {s}びょう{best[`${o.shape ? 'shape' : 'color'}_${s}`] != null ? ` ベスト${best[`${o.shape ? 'shape' : 'color'}_${s}`]}` : ''}
                 </button>
               ))}
             </div>
@@ -115,8 +115,8 @@ export function ColorChallenge() {
     <GameLayout title="いろさがしチャレンジ" gradient={GRAD} isPlaying={mode === 'play'}>
       <div className="flex flex-col items-center gap-4">
         <div className="flex justify-between w-full">
-          <span className="text-xl font-bold text-gray-700">🎨 {count}こ</span>
-          <span className={`text-xl font-bold ${timeLeft <= 15 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>⏱ {timeLeft}s</span>
+          <span className="text-xl font-bold text-gray-700">みつけた {count}こ</span>
+          <span className={`text-xl font-bold ${timeLeft <= 15 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>のこり {timeLeft}s</span>
         </div>
         {streak >= 5 && <div className="bg-orange-100 border-2 border-orange-300 rounded-full px-5 py-1 bounce-in"><span className="font-bold text-orange-600">{streak}れんぞく！すごい！</span></div>}
         {/* ベストへの挑戦を見せて張り合いを作る */}
@@ -150,10 +150,10 @@ export function ColorChallenge() {
         </div>
 
         <button onClick={found} className="w-full text-3xl font-black text-white rounded-3xl shadow-xl active:scale-95 transition-all mt-2" style={{ background: flash ? '#22c55e' : 'linear-gradient(135deg,#f472b6,#ec4899)', height: 80 }}>
-          {flash ? '✅ みつけた！' : '👆 みつけた！'}
+          みつけた！
         </button>
         <button onClick={changeItem} className="w-full py-3 text-base font-bold bg-white text-gray-600 rounded-2xl shadow active:scale-95 border border-gray-200">
-          ほかのものにする 🔄
+          ほかのものにする
         </button>
       </div>
     </GameLayout>

@@ -87,7 +87,7 @@ export function MemoryCards() {
     <GameLayout title="しんけいすいじゃく" gradient={GRAD}>
       <div className="flex flex-col gap-4 pt-4">
         <div className="bg-teal-50 border-2 border-teal-200 rounded-2xl p-3 text-center">
-          <p className="text-base font-black text-teal-700">🃏 カードをめくって おなじえを 2まい みつけよう！</p>
+          <p className="text-base font-black text-teal-700">カードをめくって おなじえを 2まい みつけよう！</p>
           <p className="text-xs text-teal-600 mt-1">すくない てかずで クリアしよう</p>
         </div>
         <p className="text-center text-xl font-bold text-gray-700">カテゴリをえらんでね</p>
@@ -101,7 +101,7 @@ export function MemoryCards() {
         <p className="text-center text-lg font-bold text-gray-700">サイズをえらんでね</p>
         {SIZES.map((s, i) => (
           <button key={i} onClick={() => setSizeIdx(i)} className={`py-3 text-base font-bold rounded-2xl border-2 active:scale-95 transition-all ${sizeIdx === i ? 'text-white border-transparent' : 'bg-white text-gray-700 border-gray-200'}`} style={sizeIdx === i ? { background: GRAD } : {}}>
-            {s.label}{best[`${cat}_${i}`] != null ? ` 🏆ベスト${best[`${cat}_${i}`]}て` : ''}
+            {s.label}{best[`${cat}_${i}`] != null ? ` ベスト${best[`${cat}_${i}`]}て` : ''}
           </button>
         ))}
         <button onClick={start} className="py-5 text-xl font-black text-white rounded-2xl shadow-lg active:scale-95 mt-2" style={{ background: GRAD }}>はじめる！</button>
@@ -122,8 +122,8 @@ export function MemoryCards() {
     <GameLayout title="しんけいすいじゃく" gradient={GRAD} isPlaying={phase === 'play'}>
       <div className="flex flex-col items-center gap-3">
         <div className="flex justify-between w-full">
-          <span className="text-lg font-bold text-gray-700">🃏 {moves}て</span>
-          <span className="text-lg font-bold text-gray-700">⏱ {fmt(elapsed)}</span>
+          <span className="text-lg font-bold text-gray-700">{moves}て</span>
+          <span className="text-lg font-bold text-gray-700">タイム {fmt(elapsed)}</span>
           <span className="text-lg font-bold text-gray-700">{cards.filter(c => c.matched).length / 2}/{size.pairs}ペア</span>
         </div>
         <div className={`grid gap-2 w-full`} style={{ gridTemplateColumns: `repeat(${size.cols}, 1fr)` }}>

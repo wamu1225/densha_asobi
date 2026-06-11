@@ -20,8 +20,8 @@ const PANELS = [
 function getTiming(round: number): { flash: number; gap: number; label: string } {
   if (round <= 3)  return { flash: 800, gap: 280, label: '🐢 ゆっくり' }
   if (round <= 6)  return { flash: 620, gap: 230, label: '🐇 ふつう' }
-  if (round <= 10) return { flash: 470, gap: 180, label: '⚡ はやい' }
-  if (round <= 15) return { flash: 360, gap: 150, label: '🔥 すごい！' }
+  if (round <= 10) return { flash: 470, gap: 180, label: 'はやい' }
+  if (round <= 15) return { flash: 360, gap: 150, label: 'とてもはやい' }
   return                  { flash: 280, gap: 120, label: '💥 むずかしい！！' }
 }
 
@@ -159,7 +159,7 @@ export function Simon() {
           </p>
           {best > 0 && (
             <p className="text-sm font-bold px-4 py-1 rounded-full bg-purple-100 text-purple-700">
-              🏆 ベスト {best} ラウンド
+              ベスト {best} ラウンド
             </p>
           )}
 
@@ -211,10 +211,10 @@ export function Simon() {
           phase === 'wrong'   ? 'bg-red-100 text-red-700' :
           'bg-amber-100 text-amber-700'
         }`}>
-          {phase === 'showing' && `👀 みてね！　${showingStep} / ${sequence.length}こ`}
-          {phase === 'input'   && `👆 タップ！　${inputIdx + 1} / ${sequence.length}`}
-          {phase === 'correct' && '⭕ せいかい！🎉 つぎのラウンド…'}
-          {phase === 'wrong'   && '❌ ちがう！'}
+          {phase === 'showing' && `みてね！　${showingStep} / ${sequence.length}こ`}
+          {phase === 'input'   && `タップ！　${inputIdx + 1} / ${sequence.length}`}
+          {phase === 'correct' && '○ せいかい！つぎのラウンド…'}
+          {phase === 'wrong'   && '× ちがう！'}
         </div>
 
         {/* 4色パネル ── ここが一番重要。光の差を最大化 */}

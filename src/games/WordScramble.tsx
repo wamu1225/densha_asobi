@@ -229,7 +229,7 @@ export function WordScramble() {
     <GameLayout title="もじならべ" gradient={GRAD}>
       <div className="flex flex-col gap-4 pt-4">
         <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3 text-center">
-          <p className="text-base font-black text-amber-700">📝 バラバラのもじを ただしいじゅんに タップしよう！</p>
+          <p className="text-base font-black text-amber-700">バラバラのもじを ただしいじゅんに タップしよう！</p>
           <p className="text-xs text-amber-600 mt-1">たとえば「こ・ね」→「ね」「こ」でねこ！</p>
         </div>
         <p className="text-center text-xl font-bold text-gray-700">カテゴリをえらんでね</p>
@@ -240,7 +240,7 @@ export function WordScramble() {
             </p>
             <div className="flex gap-2">
               <button onClick={() => startGame(c, false)} className="flex-1 py-3 text-sm font-bold text-white rounded-xl shadow active:scale-95" style={{ background: GRAD }}>ふつう（10もん）</button>
-              <button onClick={() => startGame(c, true)} className="flex-1 py-3 text-sm font-bold bg-orange-500 text-white rounded-xl shadow active:scale-95">⏱90びょう（くりかえし）</button>
+              <button onClick={() => startGame(c, true)} className="flex-1 py-3 text-sm font-bold bg-orange-500 text-white rounded-xl shadow active:scale-95">90びょう（くりかえし）</button>
             </div>
           </div>
         ))}
@@ -274,13 +274,13 @@ export function WordScramble() {
       <div className={`flex flex-col items-center gap-4 rounded-3xl p-3 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
         <div className="flex justify-between w-full items-center">
           <div>
-            <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
+            <span className="text-xl font-bold text-gray-700">★ {score}</span>
             {timeMode && getTaBest(cat) > 0 && (
-              <span className="text-xs text-gray-400 ml-2">🏆 {getTaBest(cat)}</span>
+              <span className="text-xs text-gray-400 ml-2">ベスト {getTaBest(cat)}</span>
             )}
           </div>
           {timeMode
-            ? <span className={`text-xl font-bold ${timeLeft <= 20 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>⏱ {timeLeft}s</span>
+            ? <span className={`text-xl font-bold ${timeLeft <= 20 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>のこり {timeLeft}s</span>
             : <span className="text-xl font-bold text-gray-700">{idx + 1} / {words.length}</span>
           }
         </div>

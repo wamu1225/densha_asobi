@@ -179,13 +179,13 @@ export function ClockReading() {
       <div className="flex flex-col items-center gap-3">
         <GameFeedback flash={flash} wrongHint={wrongAns || undefined} />
         <div className="flex justify-between w-full">
-          <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
+          <span className="text-xl font-bold text-gray-700">★ {score}</span>
           <span className="text-xl font-bold text-gray-700">{qNum} / {TOTAL}</span>
         </div>
         <p className="text-lg font-bold text-gray-600">なんじ なんぷん？</p>
         {qNum === 7 && diff !== 'hard' && (
           <div className="w-full bg-orange-100 border-2 border-orange-300 rounded-xl py-2 text-center bounce-in">
-            <span className="text-base font-black text-orange-600">⚡ ここからむずかしくなるよ！</span>
+            <span className="text-base font-black text-orange-600">ここから むずかしくなるよ！</span>
           </div>
         )}
         <ClockSvg h={time.h} m={time.m} />

@@ -92,12 +92,12 @@ export function WhichBigger() {
             <p className="font-bold text-gray-700 mb-1">レベル{lv}：{LEVEL_LABEL[lv]}</p>
             {/* ④修正: タイムモードのbestも表示 */}
             <div className="flex gap-3 text-xs text-gray-400 mb-2">
-              {best[`${lv}_q`] != null && <span>🏆 {best[`${lv}_q`]}/{TOTAL}せいかい</span>}
-              {best[`${lv}_t`] != null && <span>⏱ {best[`${lv}_t`]}もん（30s）</span>}
+              {best[`${lv}_q`] != null && <span>ベスト {best[`${lv}_q`]}/{TOTAL}せいかい</span>}
+              {best[`${lv}_t`] != null && <span>タイム {best[`${lv}_t`]}もん（30s）</span>}
             </div>
             <div className="flex gap-2">
               <button onClick={() => start(lv, false)} className="flex-1 py-3 text-base font-bold text-white rounded-xl shadow active:scale-95" style={{ background: GRAD }}>{TOTAL}もん</button>
-              <button onClick={() => start(lv, true)} className="flex-1 py-3 text-base font-bold bg-indigo-500 text-white rounded-xl shadow active:scale-95">⏱30びょう</button>
+              <button onClick={() => start(lv, true)} className="flex-1 py-3 text-base font-bold bg-indigo-500 text-white rounded-xl shadow active:scale-95">30びょう</button>
             </div>
           </div>
         ))}
@@ -114,7 +114,7 @@ export function WhichBigger() {
           total={timeMode ? undefined : TOTAL}
           scoreLabel={timeMode ? 'せいかい' : undefined}
           scoreSuffix={timeMode ? 'もん' : undefined}
-          extra={[{ label: 'さいこうれんぞく', value: `${maxStreak}かい 🔥` }]}
+          extra={[{ label: 'さいこうれんぞく', value: `${maxStreak}かい` }]}
           bestStr={getBest()[key] != null ? (timeMode ? `${getBest()[key]}もん` : `${getBest()[key]}/${TOTAL}`) : undefined}
           onRetry={() => start(level, timeMode)}
           onChangeMode={() => setPhase('select')}
@@ -130,13 +130,13 @@ export function WhichBigger() {
       <div className="flex flex-col items-center gap-4">
         <GameFeedback flash={flash} />
         <div className="flex justify-between w-full items-center">
-          <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
+          <span className="text-xl font-bold text-gray-700">★ {score}</span>
           {timeMode
-            ? <span className={`text-xl font-bold ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>⏱ {timeLeft}s</span>
+            ? <span className={`text-xl font-bold ${timeLeft <= 10 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>のこり {timeLeft}s</span>
             : <span className="text-xl font-bold text-gray-700">{qCount}/{TOTAL}</span>
           }
         </div>
-        {streak >= 3 && <div className="bg-orange-100 rounded-full px-4 py-1 bounce-in"><span className="text-base font-bold text-orange-600">🔥 {streak}れんぞく！</span></div>}
+        {streak >= 3 && <div className="bg-orange-100 rounded-full px-4 py-1 bounce-in"><span className="text-base font-bold text-orange-600">{streak}れんぞく！</span></div>}
         <p className="text-lg text-gray-600 mt-2">おおきいほうを タップ！</p>
         <div className="flex gap-4 w-full">
           {[pair.a, pair.b].map((n, i) => (

@@ -31,7 +31,7 @@ function Celebration({ count }: { count: number }) {
   return (
     <div key={count} className="bg-gradient-to-r from-yellow-400 to-orange-400 rounded-2xl px-5 py-3 text-center bounce-in w-full shadow-lg">
       <p className="text-2xl font-black text-white">
-        {count === 1 ? '🎊 ビンゴ！' : count === 2 ? '🎊🎊 ダブルビンゴ！！' : `🎊 ${count}ビンゴ！！！`}
+        {count === 1 ? 'ビンゴ！' : count === 2 ? 'ダブルビンゴ！！' : `${count}ビンゴ！！！`}
       </p>
     </div>
   )
@@ -101,7 +101,7 @@ export function TrainBingo() {
         {(Object.keys(THEMES) as ThemeKey[]).map(t => (
           <div key={t} className="bg-white rounded-2xl border-2 border-green-200 p-4 w-full" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
             <p className="font-bold text-gray-700 mb-2">
-              {t === 'まち' ? '🏙️' : t === 'しぜん' ? '🌿' : t === 'のりもの' ? '🚗' : '🍎'} {t}
+              {t}
             </p>
             <div className="flex gap-2">
               <button onClick={() => start(t, 9)} className="flex-1 py-3 text-sm font-bold text-white rounded-xl shadow active:scale-95" style={{ background: GRAD }}>3×3（かんたん）</button>

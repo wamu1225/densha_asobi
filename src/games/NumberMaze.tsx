@@ -141,7 +141,7 @@ export function NumberMaze() {
                 </div>
                 {best[bkKey] != null && (
                   <span className="text-xs font-bold bg-gray-100 rounded-lg px-2 py-1 shrink-0" style={{ color: 'var(--ink-sub)' }}>
-                    🏆 {fmt(best[bkKey])}
+                    ベスト {fmt(best[bkKey])}
                   </span>
                 )}
               </div>
@@ -158,7 +158,7 @@ export function NumberMaze() {
       <div className="flex flex-col items-center gap-4">
         <div className="w-full bg-purple-100 border-2 border-purple-400 rounded-2xl py-3 text-center">
           <p className="text-xl font-black text-purple-700">
-            🧠 {countdown > 0 ? `${countdown}びょうで おぼえて！` : 'きえる！'}
+            {countdown > 0 ? `${countdown}びょうで おぼえて！` : 'きえる！'}
           </p>
           <div className="flex justify-center gap-1 mt-1">
             {Array.from({ length: size === 5 ? 6 : 4 }, (_, i) => i + 1).map(n => (
@@ -211,7 +211,7 @@ export function NumberMaze() {
           <span className="text-xl font-black" style={{ color: variant === 'reverse' ? '#f59e0b' : variant === 'memory' ? '#8b5cf6' : 'var(--ink)' }}>
             {VARIANTS[variant].emoji} {targetLabel}
           </span>
-          <span className="text-xl font-bold" style={{ color: 'var(--ink)' }}>⏱ {fmt(elapsed)}</span>
+          <span className="text-xl font-bold" style={{ color: 'var(--ink)' }}>タイム {fmt(elapsed)}</span>
         </div>
 
         <div className="w-full bg-gray-200 rounded-full h-2.5 overflow-hidden">
@@ -247,13 +247,13 @@ export function NumberMaze() {
 
         {variant === 'memory' && (
           <div className="flex items-center justify-between w-full">
-            <p className="text-sm font-bold text-purple-600">🧠 きおくをたよりに タップ！</p>
+            <p className="text-sm font-bold text-purple-600">きおくを たよりに タップ！</p>
             <button
               onClick={useHint}
               disabled={hintUsed}
               className="text-xs font-bold px-3 py-1.5 rounded-lg active:scale-95 disabled:opacity-40"
               style={{ background: hintUsed ? '#e9d5ff' : '#7c3aed', color: 'white' }}>
-              {hintUsed ? '👁 つかった' : '👁 ちょっとみる'}
+              {hintUsed ? 'つかった' : 'ちょっとみる'}
             </button>
           </div>
         )}

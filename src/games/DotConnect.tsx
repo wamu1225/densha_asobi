@@ -122,12 +122,12 @@ export function DotConnect() {
 
         {done ? (
           <div className="w-full rounded-2xl px-6 py-3 text-center bounce-in shadow-lg" style={{ background: 'linear-gradient(135deg,#fbbf24,#f59e0b)' }}>
-            <p className="text-3xl font-black text-white">✨ {pattern.emoji} {pattern.name}！</p>
+            <p className="text-3xl font-black text-white">{pattern.emoji} {pattern.name}！</p>
           </div>
         ) : (
           <div className="bg-lime-50 border-2 border-lime-200 rounded-xl px-4 py-2 w-full text-center">
             <p className="text-base font-black text-lime-700">
-              {connected === 0 ? `🔢「1」からタップしよう！` : `「${connected + 1}」をタップ！`}
+              {connected === 0 ? `「1」からタップしよう！` : `「${connected + 1}」をタップ！`}
             </p>
           </div>
         )}
@@ -135,7 +135,7 @@ export function DotConnect() {
         <div className="w-full bg-white rounded-2xl border-2 border-lime-200 shadow-md overflow-hidden">
           {done && (
             <div className="bg-lime-50 text-center py-1 text-sm font-bold text-lime-700 border-b border-lime-200">
-              🎉 かんせい！なんのえかわかった？
+              かんせい！なんのえか わかった？
             </div>
           )}
           <svg viewBox="0 0 300 300" className="w-full">

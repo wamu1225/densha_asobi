@@ -399,7 +399,7 @@ export function HiraganaSearch() {
     const isDiagonal = r1 !== r && c1 !== c
     if (isDiagonal) {
       setStartCell(null)
-      setJustFound('❌ たてかよこでえらんでね！')
+      setJustFound('× たてかよこで えらんでね！')
       setTimeout(() => setJustFound(null), 800)
       return
     }
@@ -417,7 +417,7 @@ export function HiraganaSearch() {
       const next = new Map(found)
       next.set(match.word, selected)
       setFound(next)
-      setJustFound(`✅ 「${match.word}」みつけた！`)
+      setJustFound(`○ 「${match.word}」みつけた！`)
       setTimeout(() => setJustFound(null), 1200)
       if (next.size === puzzle.words.length) {
         setDone(true)
@@ -426,7 +426,7 @@ export function HiraganaSearch() {
         localStorage.setItem(CLEARED_KEY, JSON.stringify(c))
       }
     } else if (selected.length >= 2) {
-      setJustFound('❌ そこにはない！もういちど！')
+      setJustFound('× そこにはない！もういちど！')
       setTimeout(() => setJustFound(null), 700)
     }
     setStartCell(null)
@@ -455,21 +455,21 @@ export function HiraganaSearch() {
         <div className="w-full" style={{ minHeight: 52 }}>
           {done ? (
             <div className="w-full rounded-2xl px-5 py-3 text-center bounce-in shadow-lg" style={{ background: 'linear-gradient(135deg,#fbbf24,#f59e0b)' }}>
-              <p className="text-2xl font-black text-white">🎉 ぜんぶみつけた！</p>
+              <p className="text-2xl font-black text-white">ぜんぶ みつけた！</p>
             </div>
           ) : justFound ? (
-            <div className={`w-full rounded-xl px-5 py-2 text-center bounce-in border-2 ${justFound.startsWith('❌') ? 'bg-amber-50 border-amber-300' : 'bg-green-100 border-green-400'}`}>
-              <p className={`text-lg font-black ${justFound.startsWith('❌') ? 'text-amber-700' : 'text-green-700'}`}>{justFound}</p>
+            <div className={`w-full rounded-xl px-5 py-2 text-center bounce-in border-2 ${justFound.startsWith('×') ? 'bg-amber-50 border-amber-300' : 'bg-green-100 border-green-400'}`}>
+              <p className={`text-lg font-black ${justFound.startsWith('×') ? 'text-amber-700' : 'text-green-700'}`}>{justFound}</p>
             </div>
           ) : found.size === 0 && !startCell ? (
             <div className="bg-cyan-50 border-2 border-cyan-300 rounded-xl px-4 py-2 w-full">
               <p className="text-sm font-black text-cyan-700 text-center">
-                💡 さいしょ のもじ → さいご のもじ の じゅんでタップ！
+                さいしょ のもじ → さいご のもじ の じゅんでタップ！
               </p>
             </div>
           ) : (
             <p className="text-xs text-gray-500 text-center font-bold pt-3">
-              {startCell ? '📍 さいごのもじをタップ！（たて・よこ）' : '📍 さいしょのもじをタップ！'}
+              {startCell ? 'さいごの もじを タップ！（たて・よこ）' : 'さいしょの もじを タップ！'}
             </p>
           )}
         </div>
