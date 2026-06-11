@@ -64,6 +64,32 @@ function ClockSvg({ h, m }: { h: number; m: number }) {
   )
 }
 
+// 選択画面用ミニ時計盤（難易度ごとの例題時刻を見せる）
+function MiniClock({ h, m, size = 58 }: { h: number; m: number; size?: number }) {
+  const cx = 30, cy = 30
+  const mAng = (m / 60) * 360 - 90
+  const hAng = ((h % 12) / 12) * 360 + (m / 60) * 30 - 90
+  const xy = (a: number, l: number) => ({ x: cx + l * Math.cos((a * Math.PI) / 180), y: cy + l * Math.sin((a * Math.PI) / 180) })
+  const mp = xy(mAng, 19), hp = xy(hAng, 13)
+  return (
+    <svg width={size} height={size} viewBox="0 0 60 60" aria-hidden="true">
+      <circle cx={cx} cy={cy} r="26" fill="#faf5ff" stroke="#a855f7" strokeWidth="3" />
+      {[0, 90, 180, 270].map(a => {
+        const p1 = xy(a - 90, 21), p2 = xy(a - 90, 24)
+        return <line key={a} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke="#9333ea" strokeWidth="2" />
+      })}
+      <line x1={cx} y1={cy} x2={mp.x} y2={mp.y} stroke="#1e293b" strokeWidth="2.4" strokeLinecap="round" />
+      <line x1={cx} y1={cy} x2={hp.x} y2={hp.y} stroke="#1e293b" strokeWidth="3.4" strokeLinecap="round" />
+      <circle cx={cx} cy={cy} r="2" fill="#e11d48" />
+    </svg>
+  )
+}
+
+// 難易度カードに見せる例題時刻
+const DIFF_SAMPLE: Record<Difficulty, { h: number; m: number }> = {
+  easy: { h: 3, m: 0 }, normal: { h: 4, m: 30 }, hard: { h: 7, m: 25 },
+}
+
 export function ClockReading() {
   const [phase, setPhase] = useState<Phase>('select')
   const [diff, setDiff] = useState<Difficulty>('easy')
@@ -117,12 +143,13 @@ export function ClockReading() {
           <button key={d} onClick={() => start(d)}
             className={`bg-white border-2 rounded-2xl p-4 text-left active:scale-95 ${d === savedDiff ? 'border-purple-400' : 'border-purple-200'}`}
             style={{ boxShadow: d === savedDiff ? '3px 4px 0 rgba(107,63,192,0.2)' : '3px 4px 0 rgba(0,0,0,0.07)' }}>
-            <div className="flex justify-between items-center">
-              <div>
+            <div className="flex items-center gap-3.5">
+              <MiniClock h={DIFF_SAMPLE[d].h} m={DIFF_SAMPLE[d].m} />
+              <div className="flex-1">
                 <p className="font-bold text-gray-700">{d === 'easy' ? '★☆☆ かんたん' : d === 'normal' ? '★★☆ ふつう' : '★★★ むずかしい'}</p>
-                <p className="text-sm text-gray-500 mt-1">{DIFF_LABEL[d]}</p>
+                <p className="text-sm text-gray-500 mt-1">{DIFF_LABEL[d]}　<span className="text-purple-400 font-bold">「{fmt(DIFF_SAMPLE[d].h, DIFF_SAMPLE[d].m)}」みたいな もんだい</span></p>
               </div>
-              {best[d] != null && <p className="text-sm text-gray-400">🏆 {best[d]}/{TOTAL}</p>}
+              {best[d] != null && <p className="text-sm text-gray-400 shrink-0">ベスト {best[d]}/{TOTAL}</p>}
             </div>
           </button>
         ))}

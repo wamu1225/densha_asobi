@@ -1,5 +1,5 @@
 // 全ゲーム共通の正解・不正解フィードバックバナー
-// 「❌ちがう！」の代わりに「おしい！もういちど！」で発達的に健全な表現に統一
+// 不正解は「おしい！もういちど！」で発達的に健全な表現に統一
 
 interface GameFeedbackProps {
   flash: 'ok' | 'ng' | null
@@ -11,12 +11,16 @@ export function GameFeedback({ flash, wrongHint }: GameFeedbackProps) {
 
   if (flash === 'ok') {
     return (
-      <div className="w-full rounded-2xl py-3 text-center bounce-in"
+      <div className="w-full rounded-2xl py-3 bounce-in flex items-center justify-center gap-2"
         style={{
           background: 'linear-gradient(135deg, #4ade80, #16a34a)',
           boxShadow: '0 4px 18px rgba(34,197,94,0.5), 3px 4px 0 rgba(0,0,0,0.1)',
         }}>
-        <span className="text-2xl font-black text-white">⭕ せいかい！ 🎉</span>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="9.5" />
+          <path d="M7.8 12.5l2.8 2.8 5.6-5.9" />
+        </svg>
+        <span className="text-2xl font-black text-white">せいかい！</span>
       </div>
     )
   }
@@ -24,8 +28,8 @@ export function GameFeedback({ flash, wrongHint }: GameFeedbackProps) {
   return (
     <div className="w-full bg-amber-50 border border-amber-200 rounded-xl py-1.5 text-center">
       <span className="text-sm font-bold text-amber-600">
-        💪 おしい！もういちど！
-        {wrongHint && <span className="block text-xs mt-0.5 text-amber-500">こたえ：{wrongHint}</span>}
+        おしい！もういちど！
+        {wrongHint && <span className="block text-xs mt-0.5 text-amber-500">{wrongHint}</span>}
       </span>
     </div>
   )
