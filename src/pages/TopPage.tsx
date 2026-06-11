@@ -1,5 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { GameIcon, TrainSide } from '../components/GameIcons'
 
 interface BeforeInstallPromptEvent extends Event { prompt(): Promise<void> }
 
@@ -29,33 +30,50 @@ function hasPlayed(path: string): boolean {
   })
 }
 
-const GAMES = [
-  // 算数・数字 — 赤
-  { path: '/math',     emoji: '🔢', title: 'けいさん',      sub: 'たしざん・ひきざん',  cat: 'red',    age: '5さい〜' },
-  { path: '/bigger',   emoji: '⚖️', title: 'どっちが おおきい？', sub: 'かずのくらべっこ', cat: 'red',    age: '6さい〜' },
-  { path: '/clock',    emoji: '🕐', title: 'とけいよみ',    sub: 'なんじなんぷん？',    cat: 'red',    age: '6さい〜' },
-  // 言葉・ひらがな — 青
-  { path: '/scramble', emoji: '📝', title: 'もじならべ',    sub: 'ことばをつくろう',    cat: 'blue',   age: '5さい〜' },
-  { path: '/search',   emoji: '🔍', title: 'ひらがなさがし', sub: 'かくれたことばは？',  cat: 'blue',   age: '6さい〜' },
-  // 観察・外 — 緑
-  { path: '/bingo',    emoji: '🚃', title: 'でんしゃビンゴ', sub: 'まどのそとをみよう',  cat: 'green',  age: '4さい〜' },
-  { path: '/color',    emoji: '🎨', title: 'いろさがし',    sub: 'そとでみつけよう',    cat: 'green',  age: '4さい〜' },
-  // 記憶・パズル — 紫
-  { path: '/memory',   emoji: '🃏', title: 'しんけいすいじゃく', sub: 'えあわせ',        cat: 'purple', age: '4さい〜' },
-  { path: '/next',     emoji: '🔮', title: 'つぎはどれ？',  sub: 'パターンをさがせ',    cat: 'purple', age: '5さい〜' },
-  { path: '/simon',    emoji: '🌈', title: 'いろきおく',    sub: 'ひかりをおぼえよう',  cat: 'purple', age: '5さい〜' },
-  // オレンジ
-  { path: '/maze',     emoji: '🗺️', title: 'すうじめいろ',  sub: 'じゅんばんにタップ',  cat: 'red',    age: '5さい〜' },
-  { path: '/dots',     emoji: '✏️', title: 'ドットつなぎ',  sub: 'なにができるかな？',  cat: 'purple', age: '4さい〜' },
-] as const
+interface Game { path: string; icon: string; title: string; sub: string; age: string }
 
 const CAT = {
   red:    { border: '#C8352A', bg: '#FFF6F5', text: '#9B1B13' },
   blue:   { border: '#2558C4', bg: '#F0F5FF', text: '#1A3A9B' },
   green:  { border: '#217A4B', bg: '#F0FAF4', text: '#145530' },
   purple: { border: '#6B3FC0', bg: '#F6F0FF', text: '#4A2690' },
-  orange: { border: '#C8352A', bg: '#FFF6F5', text: '#9B1B13' }, // 赤に統合
-}
+} as const
+
+// カテゴリ見出し付きセクション。まどのそと（電車ならでは）を先頭で大きく見せる
+const SECTIONS: { label: string; tagline?: string; cat: keyof typeof CAT; featured?: boolean; games: Game[] }[] = [
+  {
+    label: 'まどのそと', tagline: 'でんしゃならではの あそび', cat: 'green', featured: true,
+    games: [
+      { path: '/bingo', icon: 'bingo', title: 'でんしゃビンゴ', sub: 'まどのそとで みつけてビンゴ！', age: '4さい〜' },
+      { path: '/color', icon: 'color', title: 'いろさがし',     sub: 'おだいの いろを そとでさがそう', age: '4さい〜' },
+    ],
+  },
+  {
+    label: 'さんすう', cat: 'red',
+    games: [
+      { path: '/math',   icon: 'math',   title: 'けいさん',          sub: 'たしざん・ひきざん', age: '5さい〜' },
+      { path: '/bigger', icon: 'bigger', title: 'どっちが おおきい？', sub: 'かずのくらべっこ',   age: '6さい〜' },
+      { path: '/clock',  icon: 'clock',  title: 'とけいよみ',        sub: 'なんじなんぷん？',   age: '6さい〜' },
+      { path: '/maze',   icon: 'maze',   title: 'すうじめいろ',      sub: 'じゅんばんにタップ', age: '5さい〜' },
+    ],
+  },
+  {
+    label: 'ことば', cat: 'blue',
+    games: [
+      { path: '/scramble', icon: 'scramble', title: 'もじならべ',     sub: 'ことばをつくろう',   age: '5さい〜' },
+      { path: '/search',   icon: 'search',   title: 'ひらがなさがし', sub: 'かくれたことばは？', age: '6さい〜' },
+    ],
+  },
+  {
+    label: 'きおく・パズル', cat: 'purple',
+    games: [
+      { path: '/memory', icon: 'memory', title: 'しんけいすいじゃく', sub: 'えあわせ',           age: '4さい〜' },
+      { path: '/next',   icon: 'next',   title: 'つぎはどれ？',      sub: 'パターンをさがせ',   age: '5さい〜' },
+      { path: '/simon',  icon: 'simon',  title: 'いろきおく',        sub: 'ひかりをおぼえよう', age: '5さい〜' },
+      { path: '/dots',   icon: 'dots',   title: 'ドットつなぎ',      sub: 'なにができるかな？', age: '4さい〜' },
+    ],
+  },
+]
 
 export function TopPage() {
   const navigate = useNavigate()
@@ -63,7 +81,8 @@ export function TopPage() {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
 
   useEffect(() => {
-    setPlayed(new Set(GAMES.map(g => g.path).filter(p => hasPlayed(p))))
+    const paths = SECTIONS.flatMap(s => s.games.map(g => g.path))
+    setPlayed(new Set(paths.filter(p => hasPlayed(p))))
     const handler = (e: Event) => { e.preventDefault(); setInstallPrompt(e as BeforeInstallPromptEvent) }
     window.addEventListener('beforeinstallprompt', handler)
     return () => window.removeEventListener('beforeinstallprompt', handler)
@@ -87,8 +106,8 @@ export function TopPage() {
           <p className="text-blue-200 text-sm font-bold mt-2">でんしゃのなかで あそぼう！</p>
         </div>
         <div className="mt-3 overflow-hidden h-9 relative">
-          <div className="train-ride absolute whitespace-nowrap">
-            <span style={{ fontSize: 30 }}>🚂🚃🚃🚃🚃</span>
+          <div className="train-ride absolute" style={{ color: '#9bb8e6' }}>
+            <TrainSide height={28} />
           </div>
         </div>
         <svg viewBox="0 0 400 24" preserveAspectRatio="none" className="absolute bottom-0 left-0 w-full" height="24">
@@ -102,7 +121,7 @@ export function TopPage() {
         {installPrompt && (
           <div className="flex items-center gap-3 rounded-2xl px-4 py-3 mb-4"
             style={{ background: '#1C2B40', boxShadow: '3px 4px 0 rgba(0,0,0,0.15)' }}>
-            <span style={{ fontSize: 28 }}>🚃</span>
+            <span style={{ color: '#9bb8e6' }}><GameIcon id="bingo" size={28} /></span>
             <div className="flex-1">
               <p className="text-xs font-black text-white leading-tight">ホーム画面に追加しよう！</p>
               <p className="text-[10px] text-blue-300 mt-0.5">オフラインでもあそべるよ</p>
@@ -118,59 +137,91 @@ export function TopPage() {
         )}
 
         {/* 親向け情報バー */}
-        <div className="flex justify-center gap-4 text-xs font-bold py-2.5 px-4 rounded-xl mb-4"
-          style={{ background: 'white', boxShadow: '2px 3px 0 rgba(0,0,0,0.06)' }}>
-          <span style={{ color: 'var(--ink-sub)' }}>🔇 おとがでない</span>
-          <span style={{ color: '#d1d5db' }}>|</span>
-          <span style={{ color: 'var(--ink-sub)' }}>💰 むりょう</span>
-          <span style={{ color: '#d1d5db' }}>|</span>
-          <span style={{ color: 'var(--ink-sub)' }}>👶 4〜9さい</span>
+        <div className="flex justify-center gap-3 text-xs font-bold py-2.5 px-4 rounded-xl mb-2"
+          style={{ background: 'white', boxShadow: '2px 3px 0 rgba(0,0,0,0.06)', color: 'var(--ink-sub)' }}>
+          <span>おとがでない</span>
+          <span style={{ color: '#d1d5db' }}>・</span>
+          <span>むりょう</span>
+          <span style={{ color: '#d1d5db' }}>・</span>
+          <span>4〜9さい</span>
         </div>
 
-        {/* ゲームグリッド — 2列（タップ面積確保） */}
-        <div className="grid grid-cols-2 gap-4">
-          {GAMES.map((game) => {
-            const c = CAT[game.cat]
-            return (
-              <button
-                key={game.path}
-                onClick={() => navigate(game.path)}
-                className="flex flex-col active:scale-90 transition-transform duration-100 overflow-hidden"
-                style={{
-                  borderRadius: 18,
-                  boxShadow: '3px 4px 0 rgba(0,0,0,0.13)',
-                }}
-              >
-                {/* カラーアイコンエリア */}
-                <div className="relative flex items-center justify-center py-4"
-                  style={{ background: c.border }}>
-                  <span style={{ fontSize: 36, lineHeight: 1, filter: 'drop-shadow(0 2px 5px rgba(0,0,0,0.3))' }}>
-                    {game.emoji}
-                  </span>
-                  {played.has(game.path) && (
-                    <span className="absolute top-1 right-1.5 text-xs font-black text-white"
-                      style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)', fontSize: 11 }}>★</span>
-                  )}
+        {/* カテゴリ別セクション */}
+        {SECTIONS.map(section => {
+          const c = CAT[section.cat]
+          return (
+            <section key={section.label}>
+              <div className="flex items-center gap-2 mt-6 mb-2.5">
+                <span style={{ width: 18, height: 4, borderRadius: 2, background: c.border, flexShrink: 0 }} />
+                <h2 className="text-sm font-black" style={{ color: 'var(--ink)' }}>{section.label}</h2>
+                {section.tagline && (
+                  <span className="text-[10px] font-bold" style={{ color: 'var(--ink-sub)' }}>{section.tagline}</span>
+                )}
+              </div>
+
+              {section.featured ? (
+                /* まどのそと: 横長カードで大きく */
+                <div className="flex flex-col gap-3">
+                  {section.games.map(game => (
+                    <button
+                      key={game.path}
+                      onClick={() => navigate(game.path)}
+                      className="w-full flex items-stretch overflow-hidden text-left active:scale-[0.97] transition-transform duration-100"
+                      style={{ borderRadius: 18, boxShadow: '3px 4px 0 rgba(0,0,0,0.13)', background: c.bg }}
+                    >
+                      <div className="flex items-center justify-center shrink-0" style={{ width: 76, background: c.border, color: 'white' }}>
+                        <GameIcon id={game.icon} size={40} />
+                      </div>
+                      <div className="flex-1 px-3.5 py-3">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-black leading-tight" style={{ fontSize: 15, color: c.text }}>{game.title}</span>
+                          {played.has(game.path) && <span style={{ color: c.border, fontSize: 12 }}>★</span>}
+                        </div>
+                        <p className="leading-tight mt-1" style={{ fontSize: 10.5, color: c.text + 'aa' }}>{game.sub}</p>
+                        <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full font-bold"
+                          style={{ fontSize: 9, background: 'white', color: c.text, border: `1px solid ${c.border}33` }}>
+                          {game.age}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
                 </div>
-                {/* テキストエリア */}
-                <div className="flex flex-col items-center justify-center text-center px-1.5 py-2.5"
-                  style={{ background: c.bg, minHeight: 58 }}>
-                  <span className="font-black leading-tight"
-                    style={{ fontSize: 12, color: c.text, letterSpacing: '-0.01em' }}>
-                    {game.title}
-                  </span>
-                  <span className="mt-0.5 leading-tight"
-                    style={{ fontSize: 9, color: c.text + '99' }}>
-                    {game.sub}
-                  </span>
+              ) : (
+                /* 通常: 2列グリッド */
+                <div className="grid grid-cols-2 gap-3">
+                  {section.games.map(game => (
+                    <button
+                      key={game.path}
+                      onClick={() => navigate(game.path)}
+                      className="flex flex-col active:scale-90 transition-transform duration-100 overflow-hidden"
+                      style={{ borderRadius: 18, boxShadow: '3px 4px 0 rgba(0,0,0,0.13)' }}
+                    >
+                      <div className="relative flex items-center justify-center py-3.5" style={{ background: c.border, color: 'white' }}>
+                        <GameIcon id={game.icon} size={32} />
+                        {played.has(game.path) && (
+                          <span className="absolute top-1 right-1.5 font-black text-white"
+                            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)', fontSize: 11 }}>★</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col items-center justify-center text-center px-1.5 py-2.5 flex-1"
+                        style={{ background: c.bg, minHeight: 56 }}>
+                        <span className="font-black leading-tight" style={{ fontSize: 12.5, color: c.text, letterSpacing: '-0.01em' }}>
+                          {game.title}
+                        </span>
+                        <span className="mt-0.5 leading-tight" style={{ fontSize: 9.5, color: c.text + '99' }}>
+                          {game.sub}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
                 </div>
-              </button>
-            )
-          })}
-        </div>
+              )}
+            </section>
+          )
+        })}
 
         <p className="text-center text-xs font-bold mt-8 mb-2" style={{ color: 'var(--ink-sub)' }}>
-          🚃 でんしゃのたびを たのしもう！
+          でんしゃのたびを たのしもう！
         </p>
 
         <footer className="mt-6 pt-4 pb-2 text-center" style={{ borderTop: '1px solid #ece5d8' }}>
