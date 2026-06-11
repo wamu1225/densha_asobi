@@ -59,11 +59,15 @@ export function WhichBigger() {
     setLocked(false); setCorrectIdx(null); setTimeLeft(30); setPair(makePair(lv)); setPhase('play')
   }
 
+  // 回答後に「どれくらい大きいか」を棒の長さで見せる（P5f）
+  const [showBars, setShowBars] = useState(false)
+
   function tap(chosen: number) {
     if (locked) return
     setLocked(true)
     const correctNum = Math.max(pair.a, pair.b)
-    if (chosen === correctNum) {
+    const isCorrect = chosen === correctNum
+    if (isCorrect) {
       const ns = streak + 1; setStreak(ns); setMaxStreak(m => Math.max(m, ns))
       setScore(s => s + 1); setFlash('ok'); setCorrectIdx(null)
     } else {
@@ -71,8 +75,10 @@ export function WhichBigger() {
       // どちらが正解かをハイライト
       setCorrectIdx(pair.a > pair.b ? 0 : 1)
     }
+    setShowBars(true)
     setQCount(c => c + 1)
-    setTimeout(() => { setFlash(null); setCorrectIdx(null); setLocked(false); setPair(makePair(level)) }, 700)
+    // バーを読む時間を確保（正解1000ms・不正解1500ms）
+    setTimeout(() => { setFlash(null); setCorrectIdx(null); setShowBars(false); setLocked(false); setPair(makePair(level)) }, isCorrect ? 1000 : 1500)
   }
 
   const best = getBest()
@@ -154,6 +160,29 @@ export function WhichBigger() {
               {correctIdx === i && <span className="block text-sm font-bold text-green-600">✓ こっちが おおきい！</span>}
             </button>
           ))}
+        </div>
+
+        {/* どれくらい大きいかを棒の長さで見せる（回答後だけ表示・高さ予約でガタつき防止） */}
+        <div className="w-full" style={{ minHeight: 76 }}>
+          {showBars && (
+            <div className="w-full bg-white rounded-2xl px-4 py-3 bounce-in" style={{ boxShadow: '2px 3px 0 rgba(0,0,0,0.06)' }}>
+              {[pair.a, pair.b].map((n, i) => {
+                const isBigger = n === Math.max(pair.a, pair.b)
+                return (
+                  <div key={i} className="flex items-center gap-2 my-1">
+                    <div className="rounded-md transition-all" style={{
+                      height: 18,
+                      width: `${Math.max(8, (n / Math.max(pair.a, pair.b)) * 100)}%`,
+                      background: isBigger ? '#3b82f6' : '#cbd5e1',
+                    }} />
+                    <span className="text-xs font-black shrink-0" style={{ color: isBigger ? '#1d4ed8' : '#94a3b8' }}>
+                      {n.toLocaleString()}{isBigger ? ' ←おおきい' : ''}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
       </div>
     </GameLayout>
