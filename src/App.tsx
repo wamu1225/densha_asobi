@@ -1,5 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { TopPage } from './pages/TopPage'
+import { AboutPage } from './pages/AboutPage'
+import { PrivacyPage } from './pages/PrivacyPage'
+import { NotFound } from './pages/NotFound'
 import { MathSprint } from './games/MathSprint'
 import { WhichBigger } from './games/WhichBigger'
 import { ClockReading } from './games/ClockReading'
@@ -30,6 +33,9 @@ export default function App() {
         <Route path="/search" element={<HiraganaSearch />} />
         <Route path="/dots" element={<DotConnect />} />
         <Route path="/simon" element={<Simon />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   )

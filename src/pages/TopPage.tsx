@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 
 interface BeforeInstallPromptEvent extends Event { prompt(): Promise<void> }
@@ -172,6 +172,13 @@ export function TopPage() {
         <p className="text-center text-xs font-bold mt-8 mb-2" style={{ color: 'var(--ink-sub)' }}>
           🚃 でんしゃのたびを たのしもう！
         </p>
+
+        <footer className="mt-6 pt-4 pb-2 text-center" style={{ borderTop: '1px solid #ece5d8' }}>
+          <nav className="flex justify-center gap-6 text-xs font-bold">
+            <Link to="/about" className="underline" style={{ color: 'var(--ink-sub)' }}>サイトについて</Link>
+            <Link to="/privacy" className="underline" style={{ color: 'var(--ink-sub)' }}>プライバシーポリシー</Link>
+          </nav>
+        </footer>
       </main>
     </div>
   )
