@@ -69,6 +69,13 @@ const LEVEL_BG: Record<Level, string> = {
   hard: 'bg-red-100 text-red-700',
 }
 
+const SEEN_KEY = 'densha_riddles_seen'
+function bumpSeen(): number {
+  const n = (parseInt(localStorage.getItem(SEEN_KEY) || '0') || 0) + 1
+  localStorage.setItem(SEEN_KEY, String(n))
+  return n
+}
+
 export function Riddles() {
   const [filter, setFilter] = useState<Level | 'all'>('all')
   const [idx, setIdx] = useState(0)
@@ -87,7 +94,7 @@ export function Riddles() {
   }
   function next() {
     setIdx(i => (i + 1) % filtered.length)
-    setRevealed(false); setShowHint(false); setSeenCount(c => c + 1)
+    setRevealed(false); setShowHint(false); setSeenCount(c => c + 1); bumpSeen()
   }
   function prev() {
     setIdx(i => (i - 1 + filtered.length) % filtered.length)
@@ -140,7 +147,7 @@ export function Riddles() {
         ) : (
           <div className="flex flex-col gap-2 w-full">
             <button
-              onClick={() => { setRevealed(true); setSeenCount(c => c + 1) }}
+              onClick={() => { setRevealed(true); setSeenCount(c => c + 1); bumpSeen() }}
               className="w-full py-5 text-xl font-black text-white rounded-2xl shadow-lg active:scale-95"
               style={{ background: GRAD }}
             >

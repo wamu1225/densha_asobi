@@ -17,6 +17,8 @@ const BEST_KEYS: Record<string, string[]> = {
   '/search':  ['densha_search_cleared'],
   '/dots':    ['densha_dots_cleared'],
   '/bingo':   ['densha_bingo_complete'],
+  '/next':    ['densha_next_best'],
+  '/riddles': ['densha_riddles_seen'],
 }
 
 function hasPlayed(path: string): boolean {
@@ -141,7 +143,7 @@ export function TopPage() {
         )}
 
         {/* 親向け情報バー */}
-        <div className="flex justify-center gap-3 text-xs font-bold py-2.5 px-4 rounded-xl mb-2"
+        <div className="flex justify-center gap-3 text-xs font-bold py-2.5 px-4 rounded-xl mb-3"
           style={{ background: 'white', boxShadow: '2px 3px 0 rgba(0,0,0,0.06)', color: 'var(--ink-sub)' }}>
           <span>おとがでない</span>
           <span style={{ color: '#d1d5db' }}>・</span>
@@ -149,6 +151,47 @@ export function TopPage() {
           <span style={{ color: '#d1d5db' }}>・</span>
           <span>4〜9さい</span>
         </div>
+
+        {/* でんしゃスタンプラリー（遊んだゲームのスタンプが貯まる台紙） */}
+        {(() => {
+          const allGames = SECTIONS.flatMap(s => s.games.map(g => ({ ...g, cat: s.cat })))
+          const stamped = allGames.filter(g => played.has(g.path)).length
+          return (
+            <div className="rounded-2xl px-4 py-3 mb-2"
+              style={{ background: 'white', boxShadow: '2px 3px 0 rgba(0,0,0,0.06)' }}>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-black" style={{ color: 'var(--ink)' }}>でんしゃスタンプラリー</span>
+                <span className="text-xs font-bold" style={{ color: stamped === allGames.length ? '#b45309' : 'var(--ink-sub)' }}>
+                  {stamped} / {allGames.length}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {allGames.map(g => {
+                  const earned = played.has(g.path)
+                  return (
+                    <button key={g.path} onClick={() => navigate(g.path)} aria-label={g.title}
+                      className="rounded-full flex items-center justify-center active:scale-90 transition-transform"
+                      style={{
+                        width: 38, height: 38,
+                        background: earned ? CAT[g.cat].border : '#f4f2ec',
+                        color: earned ? 'white' : '#cfccc2',
+                        border: earned ? 'none' : '1.5px dashed #d8d4c8',
+                      }}>
+                      <GameIcon id={g.icon} size={21} />
+                    </button>
+                  )
+                })}
+              </div>
+              {stamped === allGames.length ? (
+                <p className="text-xs font-black mt-2" style={{ color: '#b45309' }}>ぜんぶ あつめた！すごい！</p>
+              ) : stamped > 0 ? (
+                <p className="text-[10px] font-bold mt-2" style={{ color: 'var(--ink-sub)' }}>あそんだ ゲームの スタンプが たまるよ</p>
+              ) : (
+                <p className="text-[10px] font-bold mt-2" style={{ color: 'var(--ink-sub)' }}>ゲームで あそぶと スタンプが たまるよ</p>
+              )}
+            </div>
+          )
+        })()}
 
         {/* カテゴリ別セクション */}
         {SECTIONS.map(section => {
@@ -179,7 +222,6 @@ export function TopPage() {
                       <div className="flex-1 px-3.5 py-3">
                         <div className="flex items-center gap-1.5">
                           <span className="font-black leading-tight" style={{ fontSize: 15, color: c.text }}>{game.title}</span>
-                          {played.has(game.path) && <span style={{ color: c.border, fontSize: 12 }}>★</span>}
                         </div>
                         <p className="leading-tight mt-1" style={{ fontSize: 10.5, color: c.text + 'aa' }}>{game.sub}</p>
                         <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full font-bold"
@@ -202,10 +244,6 @@ export function TopPage() {
                     >
                       <div className="relative flex items-center justify-center py-3.5" style={{ background: c.border, color: 'white' }}>
                         <GameIcon id={game.icon} size={32} />
-                        {played.has(game.path) && (
-                          <span className="absolute top-1 right-1.5 font-black text-white"
-                            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.4)', fontSize: 11 }}>★</span>
-                        )}
                       </div>
                       <div className="flex flex-col items-center justify-center text-center px-1.5 py-2.5 flex-1"
                         style={{ background: c.bg, minHeight: 56 }}>

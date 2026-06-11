@@ -131,6 +131,9 @@ function makePattern(diff: Difficulty): Pattern {
 }
 
 const TOTAL = 15
+const BEST_KEY = 'densha_next_best'
+function getBest(): Record<string, number> { try { return JSON.parse(localStorage.getItem(BEST_KEY) || '{}') } catch { return {} } }
+function saveBest(key: string, val: number) { const b = getBest(); if (!b[key] || val > b[key]) { b[key] = val; localStorage.setItem(BEST_KEY, JSON.stringify(b)) } }
 
 export function WhatsNext() {
   const [phase, setPhase] = useState<'select' | 'play' | 'over'>('select')
@@ -181,11 +184,18 @@ export function WhatsNext() {
     </GameLayout>
   )
 
-  if (phase === 'over') return (
-    <GameLayout title="つぎはどれ？" gradient={GRAD}>
-      <ResultScreen score={score} total={TOTAL} onRetry={() => start(diff)} onChangeMode={() => setPhase('select')} accentColor="text-indigo-500" />
-    </GameLayout>
-  )
+  if (phase === 'over') {
+    const isNewBest = getBest()[diff] == null || score > getBest()[diff]; saveBest(diff, score)
+    return (
+      <GameLayout title="つぎはどれ？" gradient={GRAD}>
+        <ResultScreen score={score} total={TOTAL}
+          bestStr={getBest()[diff] != null ? `${getBest()[diff]}/${TOTAL}` : undefined}
+          bestLabel={`ベスト（${diff === 'easy' ? 'かんたん' : 'むずかしい'}）`}
+          isNewBest={isNewBest}
+          onRetry={() => start(diff)} onChangeMode={() => setPhase('select')} accentColor="text-indigo-500" />
+      </GameLayout>
+    )
+  }
 
   if (!pattern) return null
 
