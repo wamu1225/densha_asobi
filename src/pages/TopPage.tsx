@@ -14,6 +14,7 @@ const BEST_KEYS: Record<string, string[]> = {
   '/simon':   ['densha_simon_best'],
   '/maze':    ['densha_maze_best'],
   '/scramble':['densha_scramble_best_どうぶつ','densha_scramble_best_たべもの','densha_scramble_best_のりもの','densha_scramble_best_むずかしい'],
+  '/search':  ['densha_search_cleared'],
 }
 
 function hasPlayed(path: string): boolean {
