@@ -6,29 +6,80 @@ import { ResultScreen } from '../components/ResultScreen'
 const GRAD = 'linear-gradient(135deg, #818cf8, #6366f1)'
 type Difficulty = 'easy' | 'hard'
 
-const COLORS  = ['🔴','🔵','🟡','🟢','🟠','🟣','🩷','🩵']
-const SHAPES  = ['⭐','🌙','❤️','💎','🔶','🔷','🌀','⚡']
-const ANIMALS = ['🐶','🐱','🐰','🐻','🐸','🐯','🦊','🐼']
+// 2026-06-11 P5e: 駒を絵文字→SVGチップ（文字列ID）に変更。判定は文字列比較のまま
+const COLORS = ['c:red','c:blue','c:yellow','c:green','c:purple','c:orange']
+const SHAPES = ['s:star','s:heart','s:diamond','s:triangle','s:square','s:moon']
+const SIZES  = ['z:big','z:small','z:mid']   // おおきさ交互パターン用
+
+const CHIP_COLOR: Record<string, string> = {
+  'c:red': '#ef4444', 'c:blue': '#3b82f6', 'c:yellow': '#facc15',
+  'c:green': '#22c55e', 'c:purple': '#a855f7', 'c:orange': '#f97316',
+}
+const SHAPE_PATH: Record<string, string> = {
+  's:star': 'M12 2.8l2.6 5.6 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.2l6-.8z',
+  's:heart': 'M12 21C5 16 2 12.2 2 8.8 2 6 4.2 4 6.8 4c2 0 3.9 1.2 5.2 3.1C13.3 5.2 15.2 4 17.2 4 19.8 4 22 6 22 8.8c0 3.4-3 7.2-10 12.2z',
+  's:diamond': 'M12 2l9 10-9 10L3 12z',
+  's:triangle': 'M12 3.5L21.5 20h-19z',
+  's:square': 'M5.5 4.5h13a1.5 1.5 0 0 1 1.5 1.5v12a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18V6a1.5 1.5 0 0 1 1.5-1.5z',
+  's:moon': 'M14.5 2.5A9.5 9.5 0 1 0 21.5 14 7.5 7.5 0 0 1 14.5 2.5z',
+}
+const SIZE_R: Record<string, number> = { 'z:big': 10, 'z:mid': 6.5, 'z:small': 3.5 }
+
+// 駒の描画。数字はそのままテキスト
+export function Chip({ id, size = 36 }: { id: string; size?: number }) {
+  if (id.startsWith('c:')) return (
+    <svg width={size} height={size} viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill={CHIP_COLOR[id]} /></svg>
+  )
+  if (id.startsWith('s:')) return (
+    <svg width={size} height={size} viewBox="0 0 24 24"><path d={SHAPE_PATH[id]} fill="#6366f1" /></svg>
+  )
+  if (id.startsWith('z:')) return (
+    <svg width={size} height={size} viewBox="0 0 24 24"><circle cx="12" cy="12" r={SIZE_R[id]} fill="#6366f1" /></svg>
+  )
+  return <span style={{ fontSize: size * 0.72, fontWeight: 800, lineHeight: 1 }}>{id}</span>
+}
 
 type Pattern = { seq: string[]; answer: string; choices: string[]; explanation: string }
 
 function pick<T>(arr: T[], n: number): T[] { return [...arr].sort(() => Math.random() - 0.5).slice(0, n) }
+function randPool(): string[] { const pools = [COLORS, SHAPES, SIZES]; return pools[Math.floor(Math.random() * pools.length)] }
 
+// ABAB…のくりかえし
 function makeSimplePattern(pool: string[]): Pattern {
   const cycle = pick(pool, 2)
   const full = [...cycle, ...cycle, ...cycle].slice(0, 5)
   const answer = cycle[full.length % cycle.length]
   const choices = [answer, ...pick(pool.filter(x => x !== answer), 3)].sort(() => Math.random() - 0.5)
-  return { seq: full, answer, choices, explanation: `${cycle.join('→')} のくりかえし！` }
+  return { seq: full, answer, choices, explanation: 'おなじ ならびの くりかえしだよ！' }
 }
 
+// 3〜4要素のくりかえし
 function makeHardPattern(pool: string[]): Pattern {
   const n = Math.random() > 0.5 ? 3 : 4
   const cycle = pick(pool, n)
   const full = [...cycle, ...cycle].slice(0, 6)
   const answer = cycle[full.length % cycle.length]
   const choices = [answer, ...pick(pool.filter(x => x !== answer), 3)].sort(() => Math.random() - 0.5)
-  return { seq: full, answer, choices, explanation: `${cycle.join('→')} のくりかえし！` }
+  return { seq: full, answer, choices, explanation: 'おなじ ならびの くりかえしだよ！' }
+}
+
+// AABB…2こずつ交代
+function makeDoublePattern(pool: string[]): Pattern {
+  const [a, b] = pick(pool, 2)
+  const cycle = [a, a, b, b]
+  const full = [...cycle, ...cycle].slice(0, 6)
+  const answer = cycle[full.length % cycle.length]
+  const choices = [answer, ...pick(pool.filter(x => x !== answer), 3)].sort(() => Math.random() - 0.5)
+  return { seq: full, answer, choices, explanation: '2こずつ かわりばんこ だよ！' }
+}
+
+// かがみ（A B C B A）
+function makeMirrorPattern(pool: string[]): Pattern {
+  const [a, b, c] = pick(pool, 3)
+  const seq = [a, b, c, b]
+  const answer = a
+  const choices = [answer, ...pick(pool.filter(x => x !== answer), 3)].sort(() => Math.random() - 0.5)
+  return { seq, answer, choices, explanation: 'かがみみたいに おりかえす ならびだよ！' }
 }
 
 // フィボナッチ系列（ランダム開始）
@@ -65,12 +116,18 @@ function makeNumberPattern(): Pattern {
 }
 
 function makePattern(diff: Difficulty): Pattern {
-  const pools = [COLORS, SHAPES, ANIMALS]
-  const pool = pools[Math.floor(Math.random() * pools.length)]
-  // easy: 数列20%・絵柄80% / hard: 数列50%・絵柄50%
-  const numChance = diff === 'easy' ? 0.2 : 0.5
-  if (Math.random() < numChance) return makeNumberPattern()
-  return diff === 'easy' ? makeSimplePattern(pool) : makeHardPattern(pool)
+  const r = Math.random()
+  if (diff === 'easy') {
+    // かんたん: くりかえし60% / 2こずつ25% / 数列15%
+    if (r < 0.15) return makeNumberPattern()
+    if (r < 0.40) return makeDoublePattern(randPool())
+    return makeSimplePattern(randPool())
+  }
+  // むずかしい: 数列35% / かがみ20% / 2こずつ15% / 3〜4くりかえし30%
+  if (r < 0.35) return makeNumberPattern()
+  if (r < 0.55) return makeMirrorPattern(randPool())
+  if (r < 0.70) return makeDoublePattern(randPool())
+  return makeHardPattern(randPool())
 }
 
 const TOTAL = 15
@@ -114,9 +171,9 @@ export function WhatsNext() {
         <p className="text-center text-xl font-bold text-gray-700">むずかしさをえらんでね</p>
         {(['easy', 'hard'] as Difficulty[]).map(d => (
           <button key={d} onClick={() => start(d)} className="bg-white border-2 border-indigo-200 rounded-2xl p-5 text-left active:scale-95" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
-            <p className="font-bold text-gray-700 text-lg">{d === 'easy' ? '🌟 かんたん' : '🔥 むずかしい'}</p>
+            <p className="font-bold text-gray-700 text-lg">{d === 'easy' ? '★☆ かんたん' : '★★ むずかしい'}</p>
             <p className="text-sm text-gray-500 mt-1">
-              {d === 'easy' ? '2つのくりかえし（いろ・かたち・かず）' : '3〜4つのくりかえし ＋ すうれつ'}
+              {d === 'easy' ? 'くりかえし・2こずつ（いろ・かたち・おおきさ・かず）' : '3〜4のくりかえし・かがみ・すうれつ'}
             </p>
           </button>
         ))}
@@ -144,7 +201,9 @@ export function WhatsNext() {
         <p className="text-lg font-bold text-gray-600">つぎは なに？</p>
         <div className="bg-indigo-50 rounded-2xl p-4 w-full border border-indigo-100">
           <div className="flex items-center gap-1.5 flex-wrap justify-center">
-            {pattern.seq.map((s, i) => <span key={i} className="text-3xl px-1">{s}</span>)}
+            {pattern.seq.map((s, i) => (
+              <span key={i} className="flex items-center justify-center px-0.5"><Chip id={s} size={38} /></span>
+            ))}
             <span className="text-2xl font-bold text-indigo-400 px-1">→</span>
             <span className="text-3xl font-bold text-indigo-300 bg-indigo-100 rounded-xl px-3 py-1">？</span>
           </div>
@@ -160,10 +219,10 @@ export function WhatsNext() {
               key={i}
               onClick={() => tap(c)}
               disabled={locked}
-              className="rounded-2xl border-2 active:scale-95 transition-transform font-bold text-gray-800 disabled:opacity-60"
-              style={{ height: 80, fontSize: 32, background: '#eef2ff', borderColor: '#a5b4fc', boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}
+              className="rounded-2xl border-2 active:scale-95 transition-transform font-bold text-gray-800 disabled:opacity-60 flex items-center justify-center"
+              style={{ height: 80, background: '#eef2ff', borderColor: '#a5b4fc', boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}
             >
-              {c}
+              <Chip id={c} size={44} />
             </button>
           ))}
         </div>
