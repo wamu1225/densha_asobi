@@ -64,7 +64,11 @@ export function ColorChallenge() {
     setFlash(true)
     const ns = streak + 1; setStreak(ns); setMaxStreak(m => Math.max(m, ns)); setCount(c => c + 1)
     setTimeout(() => setFlash(false), 200)
-    if (Math.random() > 0.35) setItemIdx(Math.floor(Math.random() * (isShape ? SHAPES : COLORS).length))
+    // 毎回かならず別のお題へ（「つぎはコレ！」のテンポを作る）
+    const pool = isShape ? SHAPES : COLORS
+    let ni = Math.floor(Math.random() * pool.length)
+    if (ni === itemIdx) ni = (ni + 1) % pool.length
+    setItemIdx(ni)
   }
 
   // ストリークはリセットしない（変更はペナルティではない）
@@ -114,7 +118,18 @@ export function ColorChallenge() {
           <span className="text-xl font-bold text-gray-700">🎨 {count}こ</span>
           <span className={`text-xl font-bold ${timeLeft <= 15 ? 'text-red-500 animate-pulse' : 'text-gray-700'}`}>⏱ {timeLeft}s</span>
         </div>
-        {streak >= 5 && <div className="bg-orange-100 border-2 border-orange-300 rounded-full px-5 py-1 bounce-in"><span className="font-bold text-orange-600">🔥 {streak}れんぞく！すごい！</span></div>}
+        {streak >= 5 && <div className="bg-orange-100 border-2 border-orange-300 rounded-full px-5 py-1 bounce-in"><span className="font-bold text-orange-600">{streak}れんぞく！すごい！</span></div>}
+        {/* ベストへの挑戦を見せて張り合いを作る */}
+        {best[modeKey] != null && count > best[modeKey] && (
+          <div className="bg-amber-100 border-2 border-amber-300 rounded-full px-5 py-1 bounce-in">
+            <span className="font-bold text-amber-700">★ ベスト こうしんちゅう！</span>
+          </div>
+        )}
+        {best[modeKey] != null && count < best[modeKey] && best[modeKey] - count <= 3 && (
+          <div className="bg-sky-100 border-2 border-sky-300 rounded-full px-5 py-1 bounce-in">
+            <span className="font-bold text-sky-700">ベストまで あと {best[modeKey] - count}こ！</span>
+          </div>
+        )}
 
         <div className="text-center mt-2">
           <p className="text-lg text-gray-600 mb-3">まどのそとでさがそう！</p>

@@ -37,12 +37,16 @@ function Celebration({ count }: { count: number }) {
   )
 }
 
+const COMPLETE_KEY = 'densha_bingo_complete'
+function getCompleteCount(): number { try { return parseInt(localStorage.getItem(COMPLETE_KEY) || '0') || 0 } catch { return 0 } }
+
 export function TrainBingo() {
   const [theme, setTheme] = useState<ThemeKey | null>(null)
   const [gridSize, setGridSize] = useState<GridSize>(9)
   const [card, setCard] = useState<string[]>([])
   const [marked, setMarked] = useState(new Set<number>())
   const [bingoLines, setBingoLines] = useState<number[][]>([])
+  const [completeCount, setCompleteCount] = useState(getCompleteCount)
 
   function start(t: ThemeKey, gs: GridSize) {
     setTheme(t); setGridSize(gs); setCard(shuffle(THEMES[t]).slice(0, gs)); setMarked(new Set()); setBingoLines([])
@@ -55,7 +59,15 @@ export function TrainBingo() {
     if (next.has(i) && isBingoCell) return
     if (next.has(i)) { next.delete(i) } else { next.add(i) }
     setMarked(next); setBingoLines(checkBingo(next, gridSize))
+    // 全マスコンプリート（全セルがビンゴラインに含まれてロックされるため二重カウントなし）
+    if (next.size === gridSize) {
+      const c = getCompleteCount() + 1
+      localStorage.setItem(COMPLETE_KEY, String(c))
+      setCompleteCount(c)
+    }
   }
+
+  const isComplete = theme != null && marked.size === gridSize
 
   const bingoSet = new Set(bingoLines.flat())
 
@@ -81,6 +93,11 @@ export function TrainBingo() {
       <div className="flex flex-col items-center gap-4 pt-4">
         <p className="text-xl font-bold text-gray-700">テーマとサイズをえらんでね</p>
         <p className="text-sm text-gray-500 text-center">まどのそとでみつけたらタップ！</p>
+        {completeCount > 0 && (
+          <p className="text-xs font-black px-4 py-1.5 rounded-full bg-amber-100 text-amber-700">
+            コンプリートした カード：{completeCount}まい
+          </p>
+        )}
         {(Object.keys(THEMES) as ThemeKey[]).map(t => (
           <div key={t} className="bg-white rounded-2xl border-2 border-green-200 p-4 w-full" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
             <p className="font-bold text-gray-700 mb-2">
@@ -99,7 +116,21 @@ export function TrainBingo() {
   return (
     <GameLayout title="でんしゃビンゴ" gradient={GRAD} isPlaying={marked.size > 0} hideAd>
       <div className="flex flex-col items-center gap-3">
-        <Celebration count={bingoLines.length} />
+        {/* 全マス達成: ビンゴ演出より優先して次の1枚へ誘導（dead-end解消） */}
+        {isComplete ? (
+          <div className="w-full rounded-2xl px-5 py-4 text-center bounce-in shadow-lg"
+            style={{ background: 'linear-gradient(135deg,#fbbf24,#f43f5e)' }}>
+            <p className="text-2xl font-black text-white">カード コンプリート！</p>
+            <p className="text-xs font-bold text-white/90 mt-1">ぜんぶ みつけたね！（つうさん {completeCount}まいめ）</p>
+            <button onClick={() => start(theme, gridSize)}
+              className="mt-3 w-full py-3.5 text-base font-black rounded-xl bg-white active:scale-95"
+              style={{ color: '#b45309' }}>
+              あたらしいカードで もういちど！
+            </button>
+          </div>
+        ) : (
+          <Celebration count={bingoLines.length} />
+        )}
         <div className="flex justify-between w-full">
           <span className="text-sm font-bold text-gray-600">{theme}・{gridSize === 9 ? '3×3' : '4×4'}</span>
           <span className="text-sm font-bold text-gray-700">{marked.size}/{gridSize} みつけた！</span>

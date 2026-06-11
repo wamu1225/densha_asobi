@@ -16,6 +16,7 @@ const BEST_KEYS: Record<string, string[]> = {
   '/scramble':['densha_scramble_best_どうぶつ','densha_scramble_best_たべもの','densha_scramble_best_のりもの','densha_scramble_best_みのまわり','densha_scramble_best_むずかしい'],
   '/search':  ['densha_search_cleared'],
   '/dots':    ['densha_dots_cleared'],
+  '/bingo':   ['densha_bingo_complete'],
 }
 
 function hasPlayed(path: string): boolean {
