@@ -65,6 +65,7 @@ const SECTIONS: { label: string; tagline?: string; cat: keyof typeof CAT; featur
     games: [
       { path: '/scramble', icon: 'scramble', title: 'もじならべ',     sub: 'ことばをつくろう',   age: '5さい〜' },
       { path: '/search',   icon: 'search',   title: 'ひらがなさがし', sub: 'かくれたことばは？', age: '6さい〜' },
+      { path: '/riddles',  icon: 'riddles',  title: 'なぞなぞ',       sub: 'おやこで かんがえよう', age: '4さい〜' },
     ],
   },
   {

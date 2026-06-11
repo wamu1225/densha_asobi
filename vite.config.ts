@@ -28,7 +28,7 @@ export default defineConfig({
       manifest: {
         name: 'でんしゃあそび',
         short_name: 'でんしゃあそび',
-        description: '電車の中でこどもが楽しめる12種類のゲームサイト。幼稚園〜小学3年生向け。',
+        description: '電車の中でこどもが楽しめる13種類のゲームサイト。幼稚園〜小学3年生向け。',
         theme_color: '#1C2B40',
         background_color: '#fffdf5',
         display: 'standalone',

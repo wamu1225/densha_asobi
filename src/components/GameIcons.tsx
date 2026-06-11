@@ -109,6 +109,14 @@ export function GameIcon({ id, size = 32 }: GameIconProps) {
           <path d="M3.4 12h17.2" />
         </svg>
       )
+    case 'riddles': // ふきだし＋はてな
+      return (
+        <svg {...p}>
+          <path d="M4 5.5h16v11.5h-9l-4.2 3.4v-3.4H4z" strokeLinejoin="round" />
+          <path d="M9.8 9.2a2.6 2.6 0 0 1 4.9 1.1c0 1.7-2.4 1.8-2.4 3.2" />
+          <circle cx="12.3" cy="15.6" r="0.4" fill="currentColor" stroke="none" />
+        </svg>
+      )
     case 'dots': // 点つなぎ（山型）
       return (
         <svg {...p}>

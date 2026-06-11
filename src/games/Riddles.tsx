@@ -39,9 +39,30 @@ const RIDDLES: Riddle[] = [
   { q: 'みずを のまないのに、みずのそばに いつも いるのは なに？', a: 'はし（橋）', hint: 'かわのうえにある', level: 'hard' },
   { q: 'あながあっても、なにも はいらないのは なに？', a: 'ドーナツ', hint: 'たべもの', level: 'hard' },
   { q: 'はしを わたらずに、はしのしたを とおるのは なに？', a: 'かわのみず（川の水）', hint: 'かわのながれ', level: 'hard' },
+  // ── 2026-06-12 追加20問（P6） ──
+  { q: 'ぱんは ぱんでも、たべられない ぱんは なに？', a: 'ふらいぱん', hint: 'りょうりに つかうよ', level: 'easy' },
+  { q: 'いすは いすでも、つめたくて あまい いすは なに？', a: 'あいす', hint: 'おやつだよ', level: 'easy' },
+  { q: '「かばん」の なかに かくれている どうぶつは なに？', a: 'かば', hint: 'もじを よく みてみよう', level: 'easy' },
+  { q: '「ぼうし」の なかに かくれている どうぶつは なに？', a: 'うし', hint: 'もじの なかに いるよ', level: 'easy' },
+  { q: '「すいか」の なかに かくれている うみの いきものは？', a: 'いか', hint: 'もじの なかだよ', level: 'easy' },
+  { q: '「くじら」の なかに かくれている、あたると うれしい ものは？', a: 'くじ', hint: 'おまつりで ひくよ', level: 'easy' },
+  { q: 'まえから よんでも うしろから よんでも おなじ、あかい やさいは？', a: 'とまと', hint: 'さらだに はいってる', level: 'easy' },
+  { q: 'たたいても たたいても、いたくない ものは なに？', a: 'たいこ', hint: 'がっきだよ', level: 'easy' },
+  { q: 'かさは かさでも、あめのひに させない かさは なに？', a: 'まつかさ（まつぼっくり）', hint: 'まつのきに あるよ', level: 'normal' },
+  { q: 'とけいは とけいでも、はりが ない とけいは なに？', a: 'でじたるどけい', hint: 'すうじで じかんが でる', level: 'normal' },
+  { q: '「きる」と へやから きえる ものは なに？', a: 'でんき', hint: 'すいっちで つけるもの', level: 'normal' },
+  { q: 'ふっても ふっても、ぬれない ものは なに？', a: 'ふとん', hint: '「ふる」には いみが 2つ', level: 'normal' },
+  { q: 'かいても かいても へらない、うんどうすると でてくる みずは？', a: 'あせ', hint: '「かく」にも いみが 2つ', level: 'normal' },
+  { q: 'あかちゃんを のせて おす くるまは なに？', a: 'べびーかー', hint: 'あかちゃんの おでかけ', level: 'normal' },
+  { q: 'きつねの なきごえで ふってくる ものは なに？', a: 'ゆき', hint: 'こんこん ふるよ', level: 'normal' },
+  { q: '365にち やすまず うごきつづけている、からだの なかに ある ものは？', a: 'しんぞう（心臓）', hint: 'むねに てを あててみよう', level: 'hard' },
+  { q: 'たんじょうびの たびに ふえるのに、めに みえない ものは？', a: 'とし（ねんれい）', hint: 'ろうそくの かずと おなじ', level: 'hard' },
+  { q: 'みんなには みえるのに、じぶんの めでは ぜったいに みえない ものは？', a: 'じぶんの かお', hint: 'かがみが ないと みえない', level: 'hard' },
+  { q: 'おしても ひいても うごかないのに、じかんが たつと うごいている ものは？', a: 'かげ（影）', hint: 'たいようが うごかすよ', level: 'hard' },
+  { q: 'こわすひとは いないのに、まいあさ かならず「あける」ものは？', a: 'よる（夜）', hint: 'あさに なると おわるもの', level: 'hard' },
 ]
 
-const LEVEL_LABELS: Record<Level, string> = { easy: '🌟 やさしい', normal: '⭐ ふつう', hard: '🔥 むずかしい' }
+const LEVEL_LABELS: Record<Level, string> = { easy: '★ やさしい', normal: '★★ ふつう', hard: '★★★ むずかしい' }
 const LEVEL_BG: Record<Level, string> = {
   easy: 'bg-green-100 text-green-700',
   normal: 'bg-yellow-100 text-yellow-700',
@@ -87,7 +108,7 @@ export function Riddles() {
               }`}
               style={filter === f ? { background: GRAD } : {}}
             >
-              {f === 'all' ? '📚 ぜんぶ' : LEVEL_LABELS[f]}
+              {f === 'all' ? 'ぜんぶ' : LEVEL_LABELS[f]}
             </button>
           ))}
         </div>
@@ -101,19 +122,19 @@ export function Riddles() {
 
         {/* 問題 */}
         <div className="bg-amber-50 border-2 border-amber-200 rounded-3xl p-5 w-full shadow-md">
-          <p className="text-2xl font-bold text-gray-800 leading-relaxed text-center">🤔 {riddle.q}</p>
+          <p className="text-2xl font-bold text-gray-800 leading-relaxed text-center">{riddle.q}</p>
         </div>
 
         {showHint && (
           <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl px-5 py-3 w-full bounce-in">
-            <p className="text-lg text-orange-600 text-center font-bold">💡 ヒント：{riddle.hint}</p>
+            <p className="text-lg text-orange-600 text-center font-bold">ヒント：{riddle.hint}</p>
           </div>
         )}
 
         {/* 答え */}
         {revealed ? (
           <div className="bg-green-50 border-2 border-green-300 rounded-3xl p-5 w-full shadow bounce-in">
-            <p className="text-base text-gray-500 text-center mb-1">こたえ 🎉</p>
+            <p className="text-base text-gray-500 text-center mb-1">こたえ</p>
             <p className="text-2xl font-black text-green-600 text-center">{riddle.a}</p>
           </div>
         ) : (
@@ -123,14 +144,14 @@ export function Riddles() {
               className="w-full py-5 text-xl font-black text-white rounded-2xl shadow-lg active:scale-95"
               style={{ background: GRAD }}
             >
-              こたえを みる 👀
+              こたえを みる
             </button>
             {!showHint && (
               <button
                 onClick={() => setShowHint(true)}
                 className="w-full py-3 text-base font-bold bg-orange-100 text-orange-600 rounded-2xl active:scale-95"
               >
-                ヒントをみる 💡
+                ヒントをみる
               </button>
             )}
           </div>

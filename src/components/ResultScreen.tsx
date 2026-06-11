@@ -14,6 +14,7 @@ const NEXT_GAMES = [
   { path: '/maze',     icon: 'maze',     name: 'すうじめいろ',        color: '#C8352A' },
   { path: '/scramble', icon: 'scramble', name: 'もじならべ',          color: '#2558C4' },
   { path: '/search',   icon: 'search',   name: 'ひらがなさがし',      color: '#2558C4' },
+  { path: '/riddles',  icon: 'riddles',  name: 'なぞなぞ',            color: '#2558C4' },
   { path: '/dots',     icon: 'dots',     name: 'ドットつなぎ',        color: '#6B3FC0' },
 ]
 

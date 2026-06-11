@@ -79,6 +79,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://study-apps.com/densha_asobi/riddles/</loc>
+    <lastmod>2026-06-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://study-apps.com/densha_asobi/about/</loc>
     <lastmod>2026-06-11</lastmod>
     <changefreq>monthly</changefreq>

@@ -15,6 +15,7 @@ import { WordScramble } from './games/WordScramble'
 import { HiraganaSearch } from './games/HiraganaSearch'
 import { DotConnect } from './games/DotConnect'
 import { Simon } from './games/Simon'
+import { Riddles } from './games/Riddles'
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
         <Route path="/search" element={<HiraganaSearch />} />
         <Route path="/dots" element={<DotConnect />} />
         <Route path="/simon" element={<Simon />} />
+        <Route path="/riddles" element={<Riddles />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="*" element={<NotFound />} />
