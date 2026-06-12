@@ -1,4 +1,5 @@
 // OGP画像 (1200x630) をSVGで生成 → public/ogp.svg
+// ※SNSはog:imageのSVG非対応が多いため、SVG更新後は public/ogp.png も再レンダリングすること（Playwrightで1200x630スクショ）
 import { writeFileSync } from 'node:fs'
 
 const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
@@ -60,7 +61,7 @@ const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630">
   <!-- サブテキスト -->
   <text x="100" y="400" font-family="'Helvetica Neue', Arial, sans-serif"
     font-size="36" fill="white" opacity="0.7">
-    電車でこどもが楽しめる 12このゲーム
+    電車でこどもが楽しめる 13このゲーム
   </text>
 
   <!-- バッジ -->
