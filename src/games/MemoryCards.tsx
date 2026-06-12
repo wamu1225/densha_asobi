@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { GameLayout } from '../components/GameLayout'
+import { GameIcon } from '../components/GameIcons'
 import { ResultScreen } from '../components/ResultScreen'
 
 const GRAD = 'linear-gradient(135deg, #2dd4bf, #14b8a6)'
@@ -8,7 +9,7 @@ const CATEGORIES: Record<string, string[]> = {
   どうぶつ: ['🐶','🐱','🐭','🐰','🐻','🐼','🦊','🐸','🐯','🦁','🐮','🐷'],
   たべもの: ['🍎','🍊','🍋','🍇','🍓','🍑','🍕','🍜','🍦','🍩','🍫','🍭'],
   のりもの: ['🚗','🚌','🚃','🚁','✈️','🚢','🏍️','🚒','🚑','🚂','🚜','🛵'],
-  かず:     ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟','🅰️','🅱️'],
+  かず:     ['1','2','3','4','5','6','7','8','9','10','11','12'],  // キーキャップ絵文字は機種差が大きいためプレーン数字に
 }
 type Cat = keyof typeof CATEGORIES
 interface Size { pairs: number; cols: number; label: string }
@@ -131,10 +132,10 @@ export function MemoryCards() {
             <div key={i} onClick={() => flip(i)} className="flip-card aspect-square cursor-pointer">
               <div className={`flip-card-inner w-full h-full ${card.flipped || card.matched ? 'flipped' : ''}`}>
                 <div className="flip-card-front rounded-xl flex items-center justify-center shadow" style={{ background: GRAD }}>
-                  <span className="text-2xl">🎴</span>
+                  <span className="text-white"><GameIcon id="bingo" size={26} /></span>
                 </div>
                 <div className={`flip-card-back rounded-xl flex items-center justify-center shadow ${card.matched ? 'border-2 border-teal-400' : 'border-2 border-teal-200'}`} style={{ background: card.matched ? '#ccfbf1' : 'white' }}>
-                  <span className="text-3xl">{card.emoji}</span>
+                  <span className="text-3xl font-black text-teal-700">{card.emoji}</span>
                 </div>
               </div>
             </div>

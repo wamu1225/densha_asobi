@@ -203,7 +203,7 @@ export function WhatsNext() {
     <GameLayout title="つぎはどれ？" gradient={GRAD} isPlaying={phase === 'play'}>
       <div className="flex flex-col items-center gap-4">
         <div className="flex justify-between w-full">
-          <span className="text-xl font-bold text-gray-700">⭐ {score}</span>
+          <span className="text-xl font-bold text-gray-700">★ {score}</span>
           <span className="text-xl font-bold text-gray-700">{qNum} / {TOTAL}</span>
         </div>
         <GameFeedback flash={flash} />
@@ -220,7 +220,7 @@ export function WhatsNext() {
         </div>
         {showExp && (
           <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-2 w-full bounce-in">
-            <p className="text-sm text-blue-600 text-center font-bold">💡 {lastExp}</p>
+            <p className="text-sm text-blue-600 text-center font-bold">{lastExp}</p>
           </div>
         )}
         <div className="grid grid-cols-2 gap-3 w-full">
