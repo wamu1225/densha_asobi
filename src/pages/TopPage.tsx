@@ -169,15 +169,16 @@ export function TopPage() {
                 {allGames.map(g => {
                   const earned = played.has(g.path)
                   return (
-                    <button key={g.path} onClick={() => navigate(g.path)} aria-label={g.title}
+                    <button key={g.path} onClick={() => navigate(g.path)}
+                      aria-label={earned ? `${g.title}（クリア）` : `${g.title}（まだ）`}
                       className="rounded-full flex items-center justify-center active:scale-90 transition-transform"
                       style={{
-                        width: 38, height: 38,
+                        width: 44, height: 44,
                         background: earned ? CAT[g.cat].border : '#f4f2ec',
-                        color: earned ? 'white' : '#cfccc2',
-                        border: earned ? 'none' : '1.5px dashed #d8d4c8',
+                        color: earned ? 'white' : '#9a9486',
+                        border: earned ? 'none' : '1.5px dashed #c4bfb0',
                       }}>
-                      <GameIcon id={g.icon} size={21} />
+                      <GameIcon id={g.icon} size={22} />
                     </button>
                   )
                 })}

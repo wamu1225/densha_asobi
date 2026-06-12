@@ -27,7 +27,7 @@ export function AdBanner({ slot, height = 100, className = '' }: AdBannerProps) 
 
   return (
     <div className={className}>
-      <p style={{ fontSize: 10, color: '#9ca3af', textAlign: 'center', marginBottom: 2, letterSpacing: '0.15em' }}>こうこく</p>
+      <p style={{ fontSize: 10, color: '#6b7280', textAlign: 'center', marginBottom: 2, letterSpacing: '0.15em' }}>こうこく</p>
       <div className="overflow-hidden" style={{ height }}>
         <ins
           className="adsbygoogle"
