@@ -6,7 +6,7 @@
   "homepage": "https://wamu1225.github.io/densha_asobi/",
   "scripts": {
     "dev": "vite",
-    "validate": "tsc -b --force",
+    "validate": "tsc -b --force && eslint src",
     "build": "tsc -b && vite build && node scripts/generate-game-pages.js",
     "lint": "eslint .",
     "preview": "vite preview",

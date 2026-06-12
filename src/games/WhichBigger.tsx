@@ -14,7 +14,7 @@ function saveBest(key: string, val: number) { const b = getBest(); if (!b[key] |
 
 function makePair(level: Level) {
   const [lo, hi] = level === 1 ? [10, 99] : level === 2 ? [100, 999] : [1000, 9999]
-  let a = Math.floor(Math.random() * (hi - lo + 1)) + lo
+  const a = Math.floor(Math.random() * (hi - lo + 1)) + lo
   let b = Math.floor(Math.random() * (hi - lo + 1)) + lo
   while (a === b) b = Math.floor(Math.random() * (hi - lo + 1)) + lo
   return { a, b }

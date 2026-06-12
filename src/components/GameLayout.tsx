@@ -34,10 +34,13 @@ export function GameLayout({ title, gradient, isPlaying = false, hideAd = false,
   }, [title])
 
   useEffect(() => {
-    if (!isPlaying || !('wakeLock' in navigator)) return
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let wl: { release: () => Promise<void> } | null = null
-    ;(navigator as any).wakeLock.request('screen').then((lock: any) => { wl = lock }).catch(() => {})
+    if (!isPlaying) return
+    interface WakeLockSentinelLike { release: () => Promise<void> }
+    interface WakeLockNavigator { wakeLock?: { request: (type: 'screen') => Promise<WakeLockSentinelLike> } }
+    const wakeLock = (navigator as Navigator & WakeLockNavigator).wakeLock
+    if (!wakeLock) return
+    let wl: WakeLockSentinelLike | null = null
+    wakeLock.request('screen').then(lock => { wl = lock }).catch(() => {})
     return () => { wl?.release().catch(() => {}) }
   }, [isPlaying])
 

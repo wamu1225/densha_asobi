@@ -48,6 +48,7 @@ function Confetti({ active }: { active: boolean }) {
       color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
       size: Math.random() * 7 + 5,
       rotate: Math.random() * 360,
+      tall: Math.random() > 0.5,
     }))
   )
   if (!active) return null
@@ -60,7 +61,7 @@ function Confetti({ active }: { active: boolean }) {
           style={{
             left: `${p.left}%`,
             width: p.size,
-            height: p.size * (Math.random() > 0.5 ? 1 : 2.5),
+            height: p.size * (p.tall ? 2.5 : 1),
             background: p.color,
             transform: `rotate(${p.rotate}deg)`,
             animationDuration: `${p.duration}s`,
@@ -87,11 +88,13 @@ export function ResultScreen({ score, total, scoreLabel, scoreSuffix, timeStr, e
   const navigate = useNavigate()
   const location = useLocation()
 
-  // 現在のゲームを除外してランダムに2個選ぶ
-  const suggestions = NEXT_GAMES
-    .filter(g => g.path !== location.pathname)
-    .sort(() => Math.random() - 0.5)
-    .slice(0, 2)
+  // 現在のゲームを除外してランダムに2個選ぶ（マウント時に一度だけ抽選し再レンダリングでシャッフルしない）
+  const [suggestions] = useState(() =>
+    NEXT_GAMES
+      .filter(g => g.path !== location.pathname)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 2)
+  )
   const [showConfetti, setShowConfetti] = useState(false)
   const pct = total != null && score != null ? score / total : null
   const isPerfect = pct === 1.0
