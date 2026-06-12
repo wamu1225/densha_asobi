@@ -21,6 +21,28 @@ function makeGrid(size: Size): number[] {
   return Array.from({ length: size * size }, (_, i) => i + 1).sort(() => Math.random() - 0.5)
 }
 
+// 選択画面用ミニグリッド（モードごとの見え方を予告）
+function MiniGrid({ variant }: { variant: Variant }) {
+  const order = [3, 7, 1, 5, 9, 2, 8, 4, 6]  // バラバラ感を出す固定配置
+  return (
+    <svg width={58} height={58} viewBox="0 0 60 60" aria-hidden="true" className="shrink-0">
+      {order.map((n, i) => {
+        const x = (i % 3) * 20 + 1, y = Math.floor(i / 3) * 20 + 1
+        const hidden = variant === 'memory' && i % 2 === 1
+        const label = variant === 'reverse' ? String(10 - n) : String(n)
+        return (
+          <g key={i}>
+            <rect x={x} y={y} width={18} height={18} rx={3}
+              fill={hidden ? '#f3e8ff' : 'white'} stroke="#fca5a5" strokeWidth="1" />
+            <text x={x + 9} y={y + 13} textAnchor="middle" fontSize="9" fontWeight="800"
+              fill={hidden ? '#c4b5fd' : '#374151'}>{hidden ? '?' : label}</text>
+          </g>
+        )
+      })}
+    </svg>
+  )
+}
+
 export function NumberMaze() {
   const [phase, setPhase]       = useState<Phase>('select')
   const [size, setSize]         = useState<Size>(4)
@@ -130,10 +152,11 @@ export function NumberMaze() {
             <button key={v} onClick={() => start(size, v)}
               className="bg-white rounded-2xl border-2 p-4 text-left shadow-md active:scale-95 transition-all"
               style={{ borderColor: info.color + '66' }}>
-              <div className="flex items-start justify-between">
-                <div>
+              <div className="flex items-center gap-3">
+                <MiniGrid variant={v} />
+                <div className="flex-1">
                   <p className="font-black text-lg" style={{ color: info.color }}>
-                    {info.emoji} {info.label}
+                    {info.label}
                   </p>
                   <p className="text-sm mt-1 whitespace-pre-line" style={{ color: 'var(--ink-sub)' }}>
                     {info.desc}

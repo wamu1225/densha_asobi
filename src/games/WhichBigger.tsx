@@ -90,6 +90,15 @@ export function WhichBigger() {
         {([1, 2, 3] as Level[]).map(lv => (
           <div key={lv} className="bg-white rounded-2xl border-2 border-blue-200 p-4" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
             <p className="font-bold text-gray-700 mb-1">レベル{lv}：{LEVEL_LABEL[lv]}</p>
+            {/* 桁数のサンプルを見せるミニプレビュー */}
+            <div className="flex items-center gap-2 mb-2" aria-hidden="true">
+              {(lv === 1 ? [74, 29] : lv === 2 ? [374, 829] : [2461, 9753]).map((n, i) => (
+                <span key={i} className="px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 font-black text-gray-700 text-sm">
+                  {n.toLocaleString()}
+                </span>
+              ))}
+              <span className="text-xs text-gray-400 font-bold">どっちが おおきい？</span>
+            </div>
             {/* ④修正: タイムモードのbestも表示 */}
             <div className="flex gap-3 text-xs text-gray-400 mb-2">
               {best[`${lv}_q`] != null && <span>ベスト {best[`${lv}_q`]}/{TOTAL}せいかい</span>}

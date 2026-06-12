@@ -87,9 +87,18 @@ export function MemoryCards() {
   if (phase === 'select') return (
     <GameLayout title="しんけいすいじゃく" gradient={GRAD}>
       <div className="flex flex-col gap-4 pt-4">
-        <div className="bg-teal-50 border-2 border-teal-200 rounded-2xl p-3 text-center">
-          <p className="text-base font-black text-teal-700">カードをめくって おなじえを 2まい みつけよう！</p>
-          <p className="text-xs text-teal-600 mt-1">すくない てかずで クリアしよう</p>
+        <div className="bg-teal-50 border-2 border-teal-200 rounded-2xl p-3 flex items-center gap-3">
+          {/* カードの裏表ミニプレビュー */}
+          <div className="flex gap-1 shrink-0" aria-hidden="true">
+            <span className="w-9 h-9 rounded-lg flex items-center justify-center text-white shadow" style={{ background: GRAD }}>
+              <GameIcon id="bingo" size={16} />
+            </span>
+            <span className="w-9 h-9 rounded-lg flex items-center justify-center text-lg bg-white border-2 border-teal-200 shadow">🐶</span>
+          </div>
+          <div className="text-left flex-1">
+            <p className="text-sm font-black text-teal-700">カードをめくって おなじえを 2まい みつけよう！</p>
+            <p className="text-xs text-teal-600 mt-0.5">すくない てかずで クリアしよう</p>
+          </div>
         </div>
         <p className="text-center text-xl font-bold text-gray-700">カテゴリをえらんでね</p>
         <div className="grid grid-cols-2 gap-2">
