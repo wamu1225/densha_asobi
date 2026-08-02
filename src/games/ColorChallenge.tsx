@@ -63,7 +63,7 @@ export function ColorChallenge() {
     setTimeout(() => setFindCooldown(false), 300)
     setFlash(true)
     const ns = streak + 1; setStreak(ns); setMaxStreak(m => Math.max(m, ns)); setCount(c => c + 1)
-    setTimeout(() => setFlash(false), 200)
+    setTimeout(() => setFlash(false), 800)
     // 毎回かならず別のお題へ（「つぎはコレ！」のテンポを作る）
     const pool = isShape ? SHAPES : COLORS
     let ni = Math.floor(Math.random() * pool.length)

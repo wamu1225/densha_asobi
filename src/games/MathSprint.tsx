@@ -68,7 +68,7 @@ export function MathSprint() {
       setCombo(0); setFlash('ng')
       if (gameMode === 'survival') { const nl = lives - 1; setLives(nl); if (nl <= 0) { setMode('over'); return } }
     }
-    setTimeout(() => { setFlash(null); setComboFlash(false); setLocked(false); next(level) }, 380)
+    setTimeout(() => { setFlash(null); setComboFlash(false); setLocked(false); next(level) }, 800)
   }
 
   function start(lv: Level, gm: GameMode) {

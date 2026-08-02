@@ -161,7 +161,7 @@ export function WhatsNext() {
     else { setFlash('ng'); setLastExp(pattern.explanation); setShowExp(true) }
 
     // ⑬修正: stale closure を排除し、正誤で遅延を直接決定
-    const delay = isCorrect ? 400 : 1200
+    const delay = isCorrect ? 900 : 1400
     setTimeout(() => {
       setFlash(null); setLocked(false)
       if (qNum >= TOTAL) { setPhase('over') } else { setQNum(n => n + 1); setPattern(makePattern(diff)) }
