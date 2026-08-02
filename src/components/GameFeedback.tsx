@@ -1,5 +1,8 @@
 // 全ゲーム共通の正解・不正解フィードバックバナー
-// 不正解は「おしい！もういちど！」で発達的に健全な表現に統一
+// 不正解は「おしい！」＋（あれば）正解の表示。やわらかい言い方は保ちつつ、
+// やり直せると誤解させない（2026-08-02 ユーザー指摘＝「もういちど」と言いながら
+// 自動で次へ進んでいた。この部品を使う4ゲーム〔ClockReading/MathSprint/WhatsNext/
+// WhichBigger〕は全て不正解でも次へ進み、正解や解説を見せる設計。表示の方が誤りだった）
 
 interface GameFeedbackProps {
   flash: 'ok' | 'ng' | null
@@ -28,7 +31,7 @@ export function GameFeedback({ flash, wrongHint }: GameFeedbackProps) {
   return (
     <div className="w-full bg-amber-50 border border-amber-200 rounded-xl py-1.5 text-center">
       <span className="text-sm font-bold text-amber-600">
-        おしい！もういちど！
+        おしい！
         {wrongHint && <span className="block text-xs mt-0.5 text-amber-500">{wrongHint}</span>}
       </span>
     </div>
