@@ -174,9 +174,10 @@ export function TopPage() {
                       className="rounded-full flex items-center justify-center active:scale-90 transition-transform"
                       style={{
                         width: 44, height: 44,
-                        background: earned ? CAT[g.cat].border : '#f4f2ec',
-                        color: earned ? 'white' : '#9a9486',
-                        border: earned ? 'none' : '1.5px dashed #c4bfb0',
+                        background: earned ? CAT[g.cat].border : CAT[g.cat].bg,
+                        color: earned ? 'white' : CAT[g.cat].text,
+                        opacity: earned ? 1 : 0.55,
+                        border: earned ? 'none' : `1.5px dashed ${CAT[g.cat].border}`,
                       }}>
                       <GameIcon id={g.icon} size={22} />
                     </button>
