@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GameLayout } from '../components/GameLayout'
+import { Confetti } from '../components/Confetti'
 
 const GRAD = 'linear-gradient(135deg, #67e8f9, #06b6d4)'
 
@@ -386,6 +387,12 @@ export function HiraganaSearch() {
   })
   const puzzle = PUZZLES[pIdx]
 
+  // 完成時に紙吹雪（ResultScreen経由のゲームと演出言語を統一・2026-08-06）
+  const [showConfetti, setShowConfetti] = useState(false)
+  useEffect(() => {
+    if (done) { setShowConfetti(true); const t = setTimeout(() => setShowConfetti(false), 2500); return () => clearTimeout(t) }
+  }, [done])
+
   function getFoundCells(): Set<CellKey> {
     const s = new Set<CellKey>()
     found.forEach(cells => cells.forEach(([r, c]) => s.add(key(r, c))))
@@ -443,6 +450,7 @@ export function HiraganaSearch() {
   return (
     <GameLayout title="ひらがなさがし" gradient={GRAD} isPlaying={found.size > 0 && !done} hideAd={!done}>
       <div className="flex flex-col items-center gap-3">
+        <Confetti active={showConfetti} />
         <div className="flex justify-between w-full">
           <span className="text-base font-bold text-gray-700">
             {pIdx + 1}/{PUZZLES.length}：{puzzle.title}

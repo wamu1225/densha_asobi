@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { GameLayout } from '../components/GameLayout'
+import { Confetti } from '../components/Confetti'
 
 const GRAD = 'linear-gradient(135deg, #bef264, #84cc16)'
 
@@ -65,6 +66,12 @@ export function DotConnect() {
   const pattern = PATTERNS[pIdx]
   const n = pattern.dots.length
 
+  // 完成時に紙吹雪（ResultScreen経由のゲームと演出言語を統一・2026-08-06）
+  const [showConfetti, setShowConfetti] = useState(false)
+  useEffect(() => {
+    if (done) { setShowConfetti(true); const t = setTimeout(() => setShowConfetti(false), 2500); return () => clearTimeout(t) }
+  }, [done])
+
   function tap(i: number) {
     if (i === connected) {
       const nx = connected + 1
@@ -94,6 +101,7 @@ export function DotConnect() {
   return (
     <GameLayout title="ドットつなぎ" gradient={GRAD} isPlaying={connected > 0 && !done} hideAd={!done}>
       <div className="flex flex-col items-center gap-3">
+        <Confetti active={showConfetti} />
         <div className="flex justify-between w-full">
           <span className="text-base font-bold text-gray-700">
             {pIdx + 1} / {PATTERNS.length}
