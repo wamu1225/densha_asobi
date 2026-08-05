@@ -271,7 +271,7 @@ export function WordScramble() {
 
   return (
     <GameLayout title="もじならべ" gradient={GRAD} isPlaying={phase === 'play'}>
-      <div className={`flex flex-col items-center gap-4 rounded-3xl p-3 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50' : ''}`}>
+      <div className={`flex flex-col items-center gap-4 rounded-3xl p-3 transition-colors ${flash === 'ok' ? 'bg-green-50' : flash === 'ng' ? 'bg-red-50 shake' : ''}`}>
         <div className="flex justify-between w-full items-center">
           <div>
             <span className="text-xl font-bold text-gray-700">★ {score}</span>
