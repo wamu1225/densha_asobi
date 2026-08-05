@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GameLayout } from '../components/GameLayout'
+import { Confetti } from '../components/Confetti'
 
 const GRAD = 'linear-gradient(135deg, #4ade80, #22c55e)'
 
@@ -69,6 +70,12 @@ export function TrainBingo() {
 
   const isComplete = theme != null && marked.size === gridSize
 
+  // 全マスコンプリート時に紙吹雪（他ゲームのResultScreenと同じ演出言語で統一・2026-08-06）
+  const [showConfetti, setShowConfetti] = useState(false)
+  useEffect(() => {
+    if (isComplete) { setShowConfetti(true); const t = setTimeout(() => setShowConfetti(false), 2500); return () => clearTimeout(t) }
+  }, [isComplete])
+
   const bingoSet = new Set(bingoLines.flat())
 
   // あと1個でビンゴになるセルを検出（ビンゴ未成立ラインで未マークが1つ — ダブルビンゴ後も継続）
@@ -116,6 +123,7 @@ export function TrainBingo() {
   return (
     <GameLayout title="でんしゃビンゴ" gradient={GRAD} isPlaying={marked.size > 0} hideAd>
       <div className="flex flex-col items-center gap-3">
+        <Confetti active={showConfetti} />
         {/* 全マス達成: ビンゴ演出より優先して次の1枚へ誘導（dead-end解消） */}
         {isComplete ? (
           <div className="w-full rounded-2xl px-5 py-4 text-center bounce-in shadow-lg"

@@ -23,6 +23,10 @@ body {
   margin: 0;
   font-family: var(--font-rounded);
   background: var(--cream);
+  /* 紙吹雪（.confetti-piece）はposition:fixed+left:0〜100%のためランダムに
+     画面右端をわずかに超えることがあり、そのぶん横スクロールが発生していた
+     （2026-08-06・でんしゃビンゴのコンプリート演出追加時に発見）。 */
+  overflow-x: hidden;
 }
 
 /* 全体にかすかなノイズ粒子感 */

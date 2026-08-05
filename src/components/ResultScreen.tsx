@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { GameIcon } from './GameIcons'
+import { Confetti } from './Confetti'
 
 const NEXT_GAMES = [
   { path: '/math',     icon: 'math',     name: 'けいさんスプリント',  color: '#C8352A' },
@@ -34,43 +35,6 @@ interface ResultScreenProps {
   onChangeMode?: () => void
   isNewBest?: boolean         // ベスト更新時 true
   accentColor?: string
-}
-
-const CONFETTI_COLORS = ['#f97316','#3b82f6','#22c55e','#a855f7','#eab308','#ec4899','#14b8a6','#ef4444']
-
-function Confetti({ active }: { active: boolean }) {
-  const [pieces] = useState(() =>
-    Array.from({ length: 28 }, (_, i) => ({
-      id: i,
-      left: Math.random() * 100,
-      delay: Math.random() * 0.8,
-      duration: 1.2 + Math.random() * 0.8,
-      color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
-      size: Math.random() * 7 + 5,
-      rotate: Math.random() * 360,
-      tall: Math.random() > 0.5,
-    }))
-  )
-  if (!active) return null
-  return (
-    <>
-      {pieces.map(p => (
-        <div
-          key={p.id}
-          className="confetti-piece"
-          style={{
-            left: `${p.left}%`,
-            width: p.size,
-            height: p.size * (p.tall ? 2.5 : 1),
-            background: p.color,
-            transform: `rotate(${p.rotate}deg)`,
-            animationDuration: `${p.duration}s`,
-            animationDelay: `${p.delay}s`,
-          }}
-        />
-      ))}
-    </>
-  )
 }
 
 function Star({ filled, size = 38, delay = 0 }: { filled: boolean; size?: number; delay?: number }) {
