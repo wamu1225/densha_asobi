@@ -152,44 +152,64 @@ export function TopPage() {
           <span>4〜9さい</span>
         </div>
 
-        {/* でんしゃスタンプラリー（遊んだゲームのスタンプが貯まる台紙） */}
+        {/* でんしゃろせんず（4カテゴリ＝4つの路線・ゲーム＝えき。あそぶとえきに停車したことになる）
+            2026-08-06: 平置きのスタンプ台紙から路線図モチーフへ刷新（O-3-6「電車らしさが見出しだけ」への対応） */}
         {(() => {
           const allGames = SECTIONS.flatMap(s => s.games.map(g => ({ ...g, cat: s.cat })))
           const stamped = allGames.filter(g => played.has(g.path)).length
+          const lastEarnedIdx = allGames.reduce((last, g, i) => (played.has(g.path) ? i : last), -1)
+          const stationW = 60
           return (
             <div className="rounded-2xl px-4 py-3 mb-2"
               style={{ background: 'white', boxShadow: '2px 3px 0 rgba(0,0,0,0.06)' }}>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-black" style={{ color: 'var(--ink)' }}>でんしゃスタンプラリー</span>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-black" style={{ color: 'var(--ink)' }}>でんしゃろせんず</span>
                 <span className="text-xs font-bold" style={{ color: stamped === allGames.length ? '#b45309' : 'var(--ink-sub)' }}>
-                  {stamped} / {allGames.length}
+                  {stamped} / {allGames.length} えき
                 </span>
               </div>
-              <div className="flex flex-wrap gap-1.5">
-                {allGames.map(g => {
-                  const earned = played.has(g.path)
-                  return (
-                    <button key={g.path} onClick={() => navigate(g.path)}
-                      aria-label={earned ? `${g.title}（クリア）` : `${g.title}（まだ）`}
-                      className="rounded-full flex items-center justify-center active:scale-90 transition-transform"
-                      style={{
-                        width: 44, height: 44,
-                        background: earned ? CAT[g.cat].border : CAT[g.cat].bg,
-                        color: earned ? 'white' : CAT[g.cat].text,
-                        opacity: earned ? 1 : 0.55,
-                        border: earned ? 'none' : `1.5px dashed ${CAT[g.cat].border}`,
-                      }}>
-                      <GameIcon id={g.icon} size={22} />
-                    </button>
-                  )
-                })}
+              <div className="overflow-x-auto -mx-1 px-1" style={{ WebkitOverflowScrolling: 'touch' }}>
+                <div className="relative flex" style={{ minWidth: allGames.length * stationW, paddingTop: 22, paddingBottom: 6 }}>
+                  {/* 路線（カテゴリごとに色分け＝実在の路線図と同じ発想） */}
+                  <div className="absolute flex" style={{ top: 22 + 19, left: 0, right: 0, height: 5 }}>
+                    {SECTIONS.map(section => (
+                      <div key={section.label}
+                        style={{ width: section.games.length * stationW, background: CAT[section.cat].border, borderRadius: 2 }} />
+                    ))}
+                  </div>
+                  {allGames.map((g, i) => {
+                    const earned = played.has(g.path)
+                    const isTrainHere = i === lastEarnedIdx
+                    return (
+                      <div key={g.path} className="relative flex flex-col items-center shrink-0" style={{ width: stationW }}>
+                        {isTrainHere && (
+                          <div className="absolute" style={{ top: -4, color: '#1C2B40' }} aria-hidden="true">
+                            <TrainSide height={16} />
+                          </div>
+                        )}
+                        <button onClick={() => navigate(g.path)}
+                          aria-label={earned ? `${g.title}（このえきにとうちゃくずみ）` : `${g.title}（まだ）`}
+                          className="rounded-full flex items-center justify-center active:scale-90 transition-transform relative z-10"
+                          style={{
+                            width: 40, height: 40,
+                            background: earned ? CAT[g.cat].border : 'white',
+                            color: earned ? 'white' : CAT[g.cat].text,
+                            opacity: earned ? 1 : 0.6,
+                            border: earned ? `2px solid ${CAT[g.cat].border}` : `1.5px dashed ${CAT[g.cat].border}`,
+                          }}>
+                          <GameIcon id={g.icon} size={20} />
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
               {stamped === allGames.length ? (
-                <p className="text-xs font-black mt-2" style={{ color: '#b45309' }}>ぜんぶ あつめた！すごい！</p>
+                <p className="text-xs font-black mt-1" style={{ color: '#b45309' }}>ぜんぶの えきに とうちゃく！すごい！</p>
               ) : stamped > 0 ? (
-                <p className="text-[10px] font-bold mt-2" style={{ color: 'var(--ink-sub)' }}>あそんだ ゲームの スタンプが たまるよ</p>
+                <p className="text-[10px] font-bold mt-1" style={{ color: 'var(--ink-sub)' }}>でんしゃが とまった えきが いろつきに なるよ</p>
               ) : (
-                <p className="text-[10px] font-bold mt-2" style={{ color: 'var(--ink-sub)' }}>ゲームで あそぶと スタンプが たまるよ</p>
+                <p className="text-[10px] font-bold mt-1" style={{ color: 'var(--ink-sub)' }}>ゲームで あそぶと そのえきに でんしゃが とまるよ</p>
               )}
             </div>
           )
