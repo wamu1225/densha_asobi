@@ -17,13 +17,25 @@ const COLORS = [
   { name: 'ピンク', bg: '#ec4899', label: 'ピンクのもの' },
   { name: 'みずいろ', bg: '#0ea5e9', label: '水色のもの' },
 ]
+// ちいさい/おおきいは「顕微鏡」「競技場」等の絵文字だと具体物に見えて概念(サイズ)から外れる
+// （2026-08-07発見: 4歳児には顕微鏡・競技場自体の認知度が低く、探す対象を誤解させうる）ため
+// 自作SVG（基準わく＋対比する丸）で大小そのものを見せる方式に変更
+function SizeIcon({ big }: { big: boolean }) {
+  return (
+    <svg width={100} height={100} viewBox="0 0 140 140" aria-hidden="true">
+      <rect x="18" y="18" width="104" height="104" rx="10" fill="none" stroke="#d1d5db" strokeWidth="4" strokeDasharray="7 7" />
+      <circle cx="70" cy="70" r={big ? 54 : 18} fill="#fde68a" stroke="#f59e0b" strokeWidth="4" />
+    </svg>
+  )
+}
+
 const SHAPES = [
-  { name: 'まるいもの', emoji: '⭕', label: '丸い形' },
-  { name: 'しかくいもの', emoji: '🟥', label: '四角い形' },
-  { name: 'さんかくのもの', emoji: '🔺', label: '三角の形' },
-  { name: 'ながいもの', emoji: '📏', label: '細長いもの' },
-  { name: 'ちいさいもの', emoji: '🔬', label: '小さいもの' },
-  { name: 'おおきいもの', emoji: '🏟️', label: '大きいもの' },
+  { name: 'まるいもの', emoji: '⭕' as string | null, icon: null as 'small' | 'big' | null, label: '丸い形' },
+  { name: 'しかくいもの', emoji: '🟥' as string | null, icon: null as 'small' | 'big' | null, label: '四角い形' },
+  { name: 'さんかくのもの', emoji: '🔺' as string | null, icon: null as 'small' | 'big' | null, label: '三角の形' },
+  { name: 'ながいもの', emoji: '📏' as string | null, icon: null as 'small' | 'big' | null, label: '細長いもの' },
+  { name: 'ちいさいもの', emoji: null as string | null, icon: 'small' as 'small' | 'big' | null, label: '小さいもの' },
+  { name: 'おおきいもの', emoji: null as string | null, icon: 'big' as 'small' | 'big' | null, label: '大きいもの' },
 ]
 
 const BEST_KEY = 'densha_color_best'
@@ -142,7 +154,9 @@ export function ColorChallenge() {
           )}
           {shapeItem && (
             <>
-              <div className="text-8xl mx-auto transition-all" style={{ opacity: flash ? 0.5 : 1, transform: flash ? 'scale(0.93)' : 'scale(1)' }}>{shapeItem.emoji}</div>
+              <div className="mx-auto transition-all" style={{ width: 100, opacity: flash ? 0.5 : 1, transform: flash ? 'scale(0.93)' : 'scale(1)' }}>
+                {shapeItem.icon ? <SizeIcon big={shapeItem.icon === 'big'} /> : <div className="text-8xl">{shapeItem.emoji}</div>}
+              </div>
               <p className="text-4xl font-black text-gray-800 mt-2">{shapeItem.name}</p>
               <p className="text-base text-gray-500">{shapeItem.label}</p>
             </>
