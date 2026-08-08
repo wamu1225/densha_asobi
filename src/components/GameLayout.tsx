@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AdBanner } from './AdBanner'
+import { TrainSide } from './GameIcons'
 
 interface GameLayoutProps {
   title: string
@@ -94,6 +95,12 @@ export function GameLayout({ title, gradient, isPlaying = false, hideAd = false,
           ←
         </button>
         <h1 className="text-lg font-black tracking-tight truncate">{title}</h1>
+        {/* ゲーム個別の電車要素（O-3-6「電車らしさが見出しだけ」への対応の続き・2026-08-07）
+            全13ゲーム共通のGameLayoutにさりげなく電車シルエットを常設し、
+            トップだけでなくプレイ中も「でんしゃの中にいる」感を持たせる */}
+        <span className="ml-auto shrink-0 opacity-40" style={{ color: 'white' }} aria-hidden="true">
+          <TrainSide height={18} windowFill={headerBg} />
+        </span>
       </header>
 
       {/* レールライン */}
