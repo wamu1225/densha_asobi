@@ -104,20 +104,24 @@ export function Riddles() {
   return (
     <GameLayout title="なぞなぞ" gradient={GRAD}>
       <div className="flex flex-col items-center gap-4 pt-2">
-        {/* フィルタ */}
-        <div className="flex gap-2 w-full overflow-x-auto pb-1">
-          {(['all', 'easy', 'normal', 'hard'] as (Level | 'all')[]).map(f => (
-            <button
-              key={f}
-              onClick={() => changeFilter(f)}
-              className={`flex-shrink-0 px-3 py-2 rounded-xl text-sm font-bold border-2 transition-all active:scale-95 ${
-                filter === f ? 'text-white border-transparent' : 'bg-white text-gray-600 border-gray-200'
-              }`}
-              style={filter === f ? { background: GRAD } : {}}
-            >
-              {f === 'all' ? 'ぜんぶ' : LEVEL_LABELS[f]}
-            </button>
-          ))}
+        {/* フィルタ（4つ目が390px幅で見切れ、横スクロール可能と気づきにくかったため
+            右端にフェードを重ねて「まだ続きがある」ことを示す・2026-08-09発見） */}
+        <div className="relative w-full">
+          <div className="flex gap-2 w-full overflow-x-auto pb-1 pr-6">
+            {(['all', 'easy', 'normal', 'hard'] as (Level | 'all')[]).map(f => (
+              <button
+                key={f}
+                onClick={() => changeFilter(f)}
+                className={`flex-shrink-0 px-3 py-2 rounded-xl text-sm font-bold border-2 transition-all active:scale-95 ${
+                  filter === f ? 'text-white border-transparent' : 'bg-white text-gray-600 border-gray-200'
+                }`}
+                style={filter === f ? { background: GRAD } : {}}
+              >
+                {f === 'all' ? 'ぜんぶ' : LEVEL_LABELS[f]}
+              </button>
+            ))}
+          </div>
+          <div className="absolute right-0 top-0 pointer-events-none" style={{ bottom: 4, width: 28, background: 'linear-gradient(to right, transparent, var(--cream))' }} />
         </div>
 
         <div className="flex items-center gap-3">
