@@ -10,7 +10,7 @@
     "build": "tsc -b && vite build && node scripts/generate-game-pages.js",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
+    "predeploy": "node ../_pipeline/tmp-tools/predeploy-guard.mjs && npm run build",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
