@@ -41,13 +41,37 @@ function Celebration({ count }: { count: number }) {
 const COMPLETE_KEY = 'densha_bingo_complete'
 function getCompleteCount(): number { try { return parseInt(localStorage.getItem(COMPLETE_KEY) || '0') || 0 } catch { return 0 } }
 
+// 中断復帰: 電車を降りる・アプリを閉じるなどでリロードされても、遊びかけの盤面を残す（O-3-29）
+const PROGRESS_KEY = 'densha_bingo_progress'
+interface BingoProgress { theme: ThemeKey; gridSize: GridSize; card: string[]; marked: number[] }
+function loadProgress(): BingoProgress | null {
+  try {
+    const raw = localStorage.getItem(PROGRESS_KEY)
+    if (!raw) return null
+    const p = JSON.parse(raw)
+    if (!p || !(p.theme in THEMES) || !Array.isArray(p.card) || !Array.isArray(p.marked)) return null
+    return p as BingoProgress
+  } catch { return null }
+}
+function saveProgress(theme: ThemeKey, gridSize: GridSize, card: string[], marked: Set<number>) {
+  try { localStorage.setItem(PROGRESS_KEY, JSON.stringify({ theme, gridSize, card, marked: [...marked] })) } catch { /* 保存できなくても遊びは続けられる */ }
+}
+function clearProgress() { try { localStorage.removeItem(PROGRESS_KEY) } catch { /* noop */ } }
+
 export function TrainBingo() {
-  const [theme, setTheme] = useState<ThemeKey | null>(null)
-  const [gridSize, setGridSize] = useState<GridSize>(9)
-  const [card, setCard] = useState<string[]>([])
-  const [marked, setMarked] = useState(new Set<number>())
-  const [bingoLines, setBingoLines] = useState<number[][]>([])
+  const saved = loadProgress()
+  const [theme, setTheme] = useState<ThemeKey | null>(saved?.theme ?? null)
+  const [gridSize, setGridSize] = useState<GridSize>(saved?.gridSize ?? 9)
+  const [card, setCard] = useState<string[]>(saved?.card ?? [])
+  const [marked, setMarked] = useState(new Set<number>(saved?.marked ?? []))
+  const [bingoLines, setBingoLines] = useState<number[][]>(saved ? checkBingo(new Set(saved.marked), saved.gridSize) : [])
   const [completeCount, setCompleteCount] = useState(getCompleteCount)
+
+  useEffect(() => {
+    if (theme) saveProgress(theme, gridSize, card, marked)
+  }, [theme, gridSize, card, marked])
+
+  function backToThemes() { clearProgress(); setTheme(null) }
 
   function start(t: ThemeKey, gs: GridSize) {
     setTheme(t); setGridSize(gs); setCard(shuffle(THEMES[t]).slice(0, gs)); setMarked(new Set()); setBingoLines([])
@@ -166,7 +190,7 @@ export function TrainBingo() {
         </div>
         <div className="flex gap-2 w-full">
           <button onClick={() => start(theme, gridSize)} className="flex-1 py-3 text-sm font-bold bg-white text-green-700 rounded-xl shadow border border-green-200 active:scale-95">カードをかえる</button>
-          <button onClick={() => setTheme(null)} className="flex-1 py-3 text-sm font-bold bg-white text-gray-600 rounded-xl shadow border border-gray-200 active:scale-95">テーマをかえる</button>
+          <button onClick={backToThemes} className="flex-1 py-3 text-sm font-bold bg-white text-gray-600 rounded-xl shadow border border-gray-200 active:scale-95">テーマをかえる</button>
         </div>
       </div>
     </GameLayout>
