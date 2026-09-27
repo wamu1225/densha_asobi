@@ -459,6 +459,34 @@ export function HiraganaSearch() {
           <span className="text-sm font-bold text-gray-600">{found.size}/{puzzle.words.length}</span>
         </div>
 
+        {/* ずかん: クリア済みはタイトルを見せて何を集めたか見返せる（未クリアは番号のまま） */}
+        <div className="grid grid-cols-10 gap-1 w-full">
+          {PUZZLES.map((p, i) => (
+            <button key={p.title}
+              onClick={() => {
+                setPIdx(i)
+                if (cleared[p.title]) {
+                  // クリア済みは全部見つかった状態ですぐ見返せる
+                  const allFound = new Map(p.words.map(w => [w.word, w.cells]))
+                  setFound(allFound); setStartCell(null); setDone(true)
+                } else {
+                  setFound(new Map()); setStartCell(null); setDone(false)
+                }
+              }}
+              aria-label={cleared[p.title] ? `${p.title}（クリアずみ）` : `${i + 1}ばんめ（みクリア）`}
+              className="aspect-square rounded-md font-bold border transition-colors flex items-center justify-center text-center leading-none px-0.5 overflow-hidden"
+              style={{
+                background: cleared[p.title] ? '#06b6d4' : 'white',
+                color: cleared[p.title] ? 'white' : '#9ca3af',
+                borderColor: i === pIdx ? '#0891b2' : '#e5e7eb',
+                borderWidth: i === pIdx ? 2 : 1,
+                fontSize: cleared[p.title] ? 7 : 10,
+              }}>
+              {cleared[p.title] ? p.title : i + 1}
+            </button>
+          ))}
+        </div>
+
         {/* 固定高さのメッセージエリア — 表示/非表示でグリッドが動かないよう高さを確保 */}
         <div className="w-full" style={{ minHeight: 52 }}>
           {done ? (
@@ -528,7 +556,7 @@ export function HiraganaSearch() {
         </div>
 
         <p className="text-xs font-bold" style={{ color: 'var(--ink-sub)' }}>
-          クリアした パズル：{PUZZLES.filter(p => cleared[p.title]).length} / {PUZZLES.length}
+          しゅうしゅうずかん：{PUZZLES.filter(p => cleared[p.title]).length} / {PUZZLES.length}（うえの　いろが　ついた　マスを　タップすると　もういちど　みられるよ）
         </p>
       </div>
     </GameLayout>

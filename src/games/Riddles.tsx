@@ -11,7 +11,7 @@ const RIDDLES: Riddle[] = [
   { q: 'は（歯）を もっているのに、なにも たべられないのは なに？', a: 'くし', why: 'くしの ほそい ぎざぎざを「は（歯）」と よぶんだ。かむための はでは ないから、たべられないんだよ。', hint: 'かみをとくどうぐ', level: 'easy' },
   { q: 'くろいのに、かくと しろくなるのは なに？', a: 'こくばん（黒板）', why: 'こくばんは くろい いた。そこに しろい チョークで かくから、かいたところが しろくなるよ。', hint: 'がっこうにある', level: 'easy' },
   { q: 'あしが 4ほん あるのに、あるけないのは なに？', a: 'いす・つくえ', why: 'いすや つくえの あしは、ささえるための あし。うごかす きんにくが ないから あるけないんだ。', hint: 'すわるもの', level: 'easy' },
-  { q: 'さわると きえてしまうのは なに？', a: 'あわ（泡）', why: 'あわは うすい みずの まく。ゆびで さわると まくが やぶれて、ぱちんと きえてしまうよ。', hint: 'おふろにある', level: 'easy' },
+  { q: 'おふろで ゆびで つんと つつくと、ぱちんと きえてしまう しろい つぶつぶは なに？', a: 'あわ（泡）', why: 'あわは うすい みずの まく。ゆびで さわると まくが やぶれて、ぱちんと きえてしまうよ。', hint: 'おふろに たくさん うかんでいる', level: 'easy' },
   { q: 'おふろに はいるほど、ちいさくなるのは なに？', a: 'せっけん', why: 'せっけんは からだを あらうたびに すこしずつ とけて へっていくから、つかうほど ちいさくなるよ。', hint: 'からだをあらうもの', level: 'easy' },
   { q: 'ひるは ねていて、よるは ひかるのは なに？', a: 'ほし（星）', why: 'ほしは ひるも そらに あるけれど、たいようが あかるすぎて みえない。よるに なると みえるんだ。', hint: 'そらにある', level: 'easy' },
   { q: 'まえからよんでも うしろからよんでも おなじ ことばは なに？（5もじ）', a: 'しんぶんし（新聞紙）', why: '「し・ん・ぶ・ん・し」を うしろから よむと「し・ん・ぶ・ん・し」。おなじに なるね。こういう ことばを かいぶん と いうよ。', hint: 'さかさまによんでみよう', level: 'easy' },
@@ -25,13 +25,13 @@ const RIDDLES: Riddle[] = [
   { q: 'はしればはしるほど、みじかくなるのは なに？', a: 'いき（息）', why: 'はしると たくさん さんそが いるから、はあはあと はやく いきを する。ひといきが みじかくなるよ。', hint: 'からだからでる', level: 'normal' },
   { q: 'たくさんあるほど、かるくなるものは なに？', a: 'あな（穴）', why: 'あなは「なにも ない ところ」。あなが ふえるほど もの が へるから、ぜんたいは かるくなるんだ。', hint: 'なにもないもの', level: 'normal' },
   { q: 'みずのなかにいるのに、ぬれないものは なに？', a: 'かげ（影）', why: 'かげは ひかりが さえぎられて できる くらい ところ。ものでは ないから、みずに はいっても ぬれないよ。', hint: 'ひかりでできる', level: 'normal' },
-  { q: 'おこるほど おおきくなるのは なに？', a: 'こえ（声）', why: 'おこると いきを つよく はきだすので、こえが おおきくなるよ。', hint: 'のどからでる', level: 'normal' },
+  { q: 'おこると、のどから でる おとが どんどん おおきくなるのは なに？', a: 'こえ（声）', why: 'おこると いきを つよく はきだすので、こえが おおきくなるよ。', hint: 'のどからでる', level: 'normal' },
   { q: 'つかえば つかうほど みじかくなるものは なに？', a: 'えんぴつ', why: 'えんぴつは かくたびに しんが すこしずつ へって、けずるたびに みじかくなっていくよ。', hint: 'かくどうぐ', level: 'normal' },
   { q: 'あるけばあるくほど ながくなるのは なに？', a: 'あしあと', why: 'あるくたびに あしあとが ひとつずつ ふえていく。だから うしろに のこる あしあとの れつが ながくなるんだ。', hint: 'すなはまでみえる', level: 'normal' },
   // ── むずかしい ──
   { q: 'まいにちやってくるのに、だれも みたことがないのは なに？', a: 'あした（明日）', why: 'あしたが きたら、その ひは「きょう」に なる。だから「あした」そのものには ずっと あえないんだよ。', hint: 'きょうのつぎ', level: 'hard' },
   { q: 'じぶんの ものなのに、ほかのひとの ほうが よく つかうものは なに？', a: 'なまえ（名前）', why: 'じぶんの なまえを よぶのは たいてい まわりの ひと。じぶんで じぶんを よぶことは あまり ないね。', hint: 'よばれるもの', level: 'hard' },
-  { q: 'どんなに おいかけても、ぜったいに つかまえられないのは なに？', a: 'じかん（時間）', why: 'じかんは とまらずに すすみつづける。てで つかむことも できないから、おいつけないんだ。', hint: 'めにみえない', level: 'hard' },
+  { q: 'とけいの なかで ずっと うごきつづけていて、どんなに はしっても おいつけないのは なに？', a: 'じかん（時間）', why: 'じかんは とまらずに すすみつづける。てで つかむことも できないから、おいつけないんだ。', hint: 'とけいが しめしているよ', level: 'hard' },
   { q: 'こどものときは よつあし、おとなは ふたあし、としよりは みつあしの いきものは なに？', a: 'にんげん（人間）', why: 'あかちゃんは ハイハイで よつあし、おおきくなると ふたあし、としを とると つえを ついて みつあし。ギリシャの ゆうめいな なぞなぞだよ。', hint: 'わたしたちのこと', level: 'hard' },
   { q: 'いつも みんなを かこんでいるのに、だれも きづかないのは なに？', a: 'くうき（空気）', why: 'くうきは いろも かたちも ないので めに みえない。でも いつも わたしたちの まわりに あって、いきを するのに つかっているよ。', hint: 'いきをするもの', level: 'hard' },
   { q: 'つくりばなし なのに、みんなが よろこんで きくものは なに？', a: 'えほん（おはなし）', why: 'えほんの おはなしは つくりばなし（ほんとうでは ない はなし）。でも たのしいから みんな よろこんで きくんだね。', hint: 'ねるまえに よんでもらう', level: 'hard' },
@@ -58,7 +58,7 @@ const RIDDLES: Riddle[] = [
   { q: '365にち やすまず うごきつづけている、からだの なかに ある ものは？', a: 'しんぞう（心臓）', why: 'しんぞうは ねている あいだも どきどきと うごいて、からだじゅうに ちを おくりつづけているよ。', hint: 'むねに てを あててみよう', level: 'hard' },
   { q: 'たんじょうびの たびに ふえるのに、めに みえない ものは？', a: 'とし（ねんれい）', why: 'たんじょうびが くるたびに ねんれいが ひとつ ふえる。でも かたちが ないから めには みえないね。', hint: 'ろうそくの かずと おなじ', level: 'hard' },
   { q: 'みんなには みえるのに、じぶんの めでは ぜったいに みえない ものは？', a: 'じぶんの かお', why: 'じぶんの かおは、かがみや しゃしんに うつさないと みられない。めは かおに ついているからだよ。', hint: 'かがみが ないと みえない', level: 'hard' },
-  { q: 'おしても ひいても うごかないのに、じかんが たつと うごいている ものは？', a: 'かげ（影）', why: 'かげは てで うごかせない。でも たいようの いちが かわると、かげの むきや ながさが かわっていくよ。', hint: 'たいようが うごかすよ', level: 'hard' },
+  { q: 'くらい ところでは おおきく ひらいて、あかるい ところでは ちいさく なる、かおの ぶぶんは どこ？', a: 'ひとみ（め）', why: 'めの なかの くろい ぶぶん「ひとみ」は、くらい ところでは すこしの ひかりも あつめようと おおきく ひらく。あかるい ところでは ぎゃくに ちいさく なるよ。', hint: 'めの なかに あるよ', level: 'hard' },
   { q: 'こわすひとは いないのに、まいあさ かならず「あける」ものは？', a: 'よる（夜）', why: '「よるが あける」という いいかたが あるね。とを あけるのとは ちがう「あける」だよ。', hint: 'あさに なると おわるもの', level: 'hard' },
 ]
 
@@ -76,28 +76,65 @@ function bumpSeen(): number {
   return n
 }
 
+// 出題順の固定を解消（O-3-31 B）: リロードしても常に「たまご」から01→02…と
+// 同じ順で始まっていた。RIDDLES配列のインデックスを一度だけシャッフルして
+// densha_riddles_order へ保存し、現在位置も densha_riddles_pos へ保存して
+// リロード後も続きから（＝電車で2度目に開いても前と同じ問題からにならない）
+const ORDER_KEY = 'densha_riddles_order'
+const POS_KEY = 'densha_riddles_pos'
+
+function shuffledIndices(n: number): number[] {
+  const arr = Array.from({ length: n }, (_, i) => i)
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
+}
+
+function loadOrder(): number[] {
+  try {
+    const raw = localStorage.getItem(ORDER_KEY)
+    if (raw) {
+      const arr = JSON.parse(raw)
+      if (Array.isArray(arr) && arr.length === RIDDLES.length && arr.every((n) => Number.isInteger(n) && n >= 0 && n < RIDDLES.length)) {
+        return arr
+      }
+    }
+  } catch { /* 壊れていたら作り直す */ }
+  const fresh = shuffledIndices(RIDDLES.length)
+  try { localStorage.setItem(ORDER_KEY, JSON.stringify(fresh)) } catch { /* 保存できなくても遊べる */ }
+  return fresh
+}
+
+function loadPos(): number {
+  try { return parseInt(localStorage.getItem(POS_KEY) || '0') || 0 } catch { return 0 }
+}
+function savePos(p: number) { try { localStorage.setItem(POS_KEY, String(p)) } catch { /* noop */ } }
+
 export function Riddles() {
   const [filter, setFilter] = useState<Level | 'all'>('all')
-  const [idx, setIdx] = useState(0)
+  const [order] = useState<number[]>(loadOrder)
+  const [pos, setPos] = useState<number>(loadPos)
   const [revealed, setRevealed] = useState(false)
   const [showHint, setShowHint] = useState(false)
   const [seenCount, setSeenCount] = useState(0)
 
   const filtered = useMemo(
-    () => (filter === 'all' ? RIDDLES : RIDDLES.filter(r => r.level === filter)),
-    [filter],
+    () => (filter === 'all' ? order.map((i) => RIDDLES[i]) : order.map((i) => RIDDLES[i]).filter((r) => r.level === filter)),
+    [filter, order],
   )
-  const riddle = filtered[idx % filtered.length]
+  const riddle = filtered[pos % filtered.length]
 
   function changeFilter(f: Level | 'all') {
-    setFilter(f); setIdx(0); setRevealed(false); setShowHint(false)
+    setFilter(f); setPos(0); savePos(0); setRevealed(false); setShowHint(false)
   }
   function next() {
-    setIdx(i => (i + 1) % filtered.length)
+    setPos((i) => { const nx = (i + 1) % filtered.length; savePos(nx); return nx })
     setRevealed(false); setShowHint(false); setSeenCount(c => c + 1); bumpSeen()
   }
   function prev() {
-    setIdx(i => (i - 1 + filtered.length) % filtered.length)
+    setPos((i) => { const nx = (i - 1 + filtered.length) % filtered.length; savePos(nx); return nx })
     setRevealed(false); setShowHint(false)
   }
 
@@ -128,7 +165,7 @@ export function Riddles() {
           <span className={`rounded-full px-3 py-1 text-xs font-bold ${LEVEL_BG[riddle.level]}`}>
             {LEVEL_LABELS[riddle.level]}
           </span>
-          <span className="text-sm text-gray-400">{(idx % filtered.length) + 1} / {filtered.length}</span>
+          <span className="text-sm text-gray-400">{(pos % filtered.length) + 1} / {filtered.length}</span>
         </div>
 
         {/* 問題 */}

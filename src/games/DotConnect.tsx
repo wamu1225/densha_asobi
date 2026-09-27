@@ -110,20 +110,26 @@ export function DotConnect() {
           <span className="text-sm text-gray-500">{connected}/{n}</span>
         </div>
 
-        {/* パターン選択（クリア済みは塗りつぶし） */}
+        {/* ずかん: クリア済みは絵を見せて何を集めたか見返せる（未クリアは番号のまま＝ネタバレしない） */}
         <div className="grid grid-cols-10 gap-1 w-full">
           {PATTERNS.map((p, i) => (
             <button key={p.name}
-              onClick={() => { setPIdx(i); setConnected(0); setDone(false) }}
-              aria-label={`${i + 1}ばんめのパターン`}
-              className="aspect-square rounded-md text-[10px] font-bold border transition-colors"
+              onClick={() => {
+                setPIdx(i)
+                // クリア済みは完成した絵をすぐ見返せるように（見返す＝もう一度最初から繋がせるのではない）
+                if (cleared[p.name]) { setConnected(p.dots.length); setDone(true) }
+                else { setConnected(0); setDone(false) }
+              }}
+              aria-label={cleared[p.name] ? `${p.name}（かんせいずみ）` : `${i + 1}ばんめのパターン（みかんせい）`}
+              className="aspect-square rounded-md text-[13px] font-bold border transition-colors"
               style={{
                 background: cleared[p.name] ? '#84cc16' : 'white',
                 color: cleared[p.name] ? 'white' : '#9ca3af',
                 borderColor: i === pIdx ? '#65a30d' : '#e5e7eb',
                 borderWidth: i === pIdx ? 2 : 1,
+                fontSize: cleared[p.name] ? 14 : 10,
               }}>
-              {i + 1}
+              {cleared[p.name] ? p.emoji : i + 1}
             </button>
           ))}
         </div>
@@ -182,7 +188,7 @@ export function DotConnect() {
         </div>
 
         <p className="text-xs font-bold" style={{ color: 'var(--ink-sub)' }}>
-          かんせいした え：{PATTERNS.filter(p => cleared[p.name]).length} / {PATTERNS.length}
+          しゅうしゅうずかん：{PATTERNS.filter(p => cleared[p.name]).length} / {PATTERNS.length}（うえの　いろが　ついた　マスを　タップすると　もういちど　みられるよ）
         </p>
       </div>
     </GameLayout>
