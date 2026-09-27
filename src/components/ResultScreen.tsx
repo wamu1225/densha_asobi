@@ -63,8 +63,8 @@ export function ResultScreen({ score, total, scoreLabel, scoreSuffix, timeStr, e
   const pct = total != null && score != null ? score / total : null
   const isPerfect = pct === 1.0
   // 割合が出ないクリア型ゲーム（Simonの途中失敗・タイムアタックの0点など）は
-  // scoreの有無で判定する。0点/未計測を「great」扱いしない（2026-09-27・⑤の指摘で発覚：
-  // 失敗して終わったSimonでも常に「クリア！」＋紙吹雪が出ていた）
+  // scoreの有無で判定（0点/未計測は「great」扱いにしません・2026-09-27 ⑤の指摘で発覚：
+  // 失敗して終わったSimonでも常に「クリア！」＋紙吹雪が出ていました）
   const isGreat   = pct != null ? pct >= 0.8 : (score ?? 0) > 0
 
   useEffect(() => {
