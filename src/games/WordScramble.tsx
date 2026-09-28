@@ -8,6 +8,16 @@ const TA_BEST_KEY = 'densha_scramble_best'
 function getTaBest(cat: string): number { try { return parseInt(localStorage.getItem(`${TA_BEST_KEY}_${cat}`) ?? '0') } catch { return 0 } }
 function saveTaBest(cat: string, v: number) { if (v > getTaBest(cat)) localStorage.setItem(`${TA_BEST_KEY}_${cat}`, String(v)) }
 
+// 122語のうちどれを解いたか（O-3-33 A-2）: 入口が「ぜんぶで35ご」と総数を出すのに
+// 分子が無かった。なぞなぞ（O-3-31 B）と同じ「見返せる記録」の考え方を流用。
+const CLEARED_KEY = 'densha_scramble_cleared'
+function loadCleared(): Record<string, Record<string, boolean>> {
+  try { return JSON.parse(localStorage.getItem(CLEARED_KEY) || '{}') } catch { return {} }
+}
+function saveCleared(all: Record<string, Record<string, boolean>>) {
+  try { localStorage.setItem(CLEARED_KEY, JSON.stringify(all)) } catch { /* noop */ }
+}
+
 // 2026-06-11 P5d: 絵文字だけでは何か分からない問題を解消するため、全語にひらがな説明（clue）を付与。
 // 語彙 40→122（長音「ー」は並べ替え対象として不自然なため不採用）
 interface WordEntry { word: string; hint: string; clue: string }
@@ -175,6 +185,7 @@ export function WordScramble() {
   const [flash, setFlash] = useState<'ok' | 'ng' | null>(null)
   const [showHint, setShowHint] = useState(false)
   const [timeLeft, setTimeLeft] = useState(90)
+  const [cleared, setCleared] = useState<Record<string, Record<string, boolean>>>(loadCleared)
 
   const word = words[idx] ?? { word: '', hint: '', clue: '' }
 
@@ -191,7 +202,13 @@ export function WordScramble() {
   }, [timeMode, phase])
 
   function startGame(c: Cat, tm: boolean) {
-    const shuffled = [...CATEGORIES[c]].sort(() => Math.random() - 0.5)
+    // まだ集めていない語を先に出す（なぞなぞ O-3-31 B と同じ考え方）。
+    // タイムアタックは全語彙を繰り返し循環するモードなので対象外。
+    const catCleared = loadCleared()[c] || {}
+    const pool = tm
+      ? CATEGORIES[c]
+      : [...CATEGORIES[c]].sort((a, b) => Number(!!catCleared[a.word]) - Number(!!catCleared[b.word]) || Math.random() - 0.5)
+    const shuffled = tm ? [...pool].sort(() => Math.random() - 0.5) : pool
     // ふつう: 10問を抽選（2文字語はならべ替えが自明なので最大3問まで）。タイムアタックは全語彙を循環
     const list = tm ? shuffled : (() => {
       const short = shuffled.filter(w => w.word.length <= 2).slice(0, 3)
@@ -210,6 +227,12 @@ export function WordScramble() {
     if (current.length === word.word.length) {
       if (current === word.word) {
         setFlash('ok'); setScore(s => s + 1)
+        setCleared((prev) => {
+          if (prev[cat]?.[word.word]) return prev
+          const next = { ...prev, [cat]: { ...(prev[cat] || {}), [word.word]: true } }
+          saveCleared(next)
+          return next
+        })
         setTimeout(() => {
           if (timeMode) {
             // ⑳修正: タイムアタックは全問解いたら最初から繰り返す
@@ -237,6 +260,9 @@ export function WordScramble() {
           <div key={c} className="bg-white rounded-2xl border-2 border-amber-200 p-4" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
             <p className="font-bold text-gray-700 mb-2">
               {c}<span className="text-xs text-gray-400 ml-2">ぜんぶで {CATEGORIES[c].length}ご</span>
+              <span className="text-xs font-bold ml-2" style={{ color: '#f59e0b' }}>
+                あつめた：{Object.keys(cleared[c] || {}).length} / {CATEGORIES[c].length}
+              </span>
             </p>
             <div className="flex gap-2">
               <button onClick={() => startGame(c, false)} className="flex-1 py-3 text-sm font-bold text-white rounded-xl shadow active:scale-95" style={{ background: GRAD }}>ふつう（10もん）</button>
