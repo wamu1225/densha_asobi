@@ -114,7 +114,7 @@ function savePos(p: number) { try { localStorage.setItem(POS_KEY, String(p)) } c
 
 export function Riddles() {
   const [filter, setFilter] = useState<Level | 'all'>('all')
-  const [order] = useState<number[]>(loadOrder)
+  const [order, setOrder] = useState<number[]>(loadOrder)
   const [pos, setPos] = useState<number>(loadPos)
   const [revealed, setRevealed] = useState(false)
   const [showHint, setShowHint] = useState(false)
@@ -130,7 +130,14 @@ export function Riddles() {
     setFilter(f); setPos(0); savePos(0); setRevealed(false); setShowHint(false)
   }
   function next() {
-    setPos((i) => { const nx = (i + 1) % filtered.length; savePos(nx); return nx })
+    if (pos + 1 >= filtered.length) {
+      // 1周見終わった: 同じ並びを繰り返さないよう作り直す（2026-09-28・⑤4回目レビュー）
+      const fresh = shuffledIndices(RIDDLES.length)
+      try { localStorage.setItem(ORDER_KEY, JSON.stringify(fresh)) } catch { /* noop */ }
+      setOrder(fresh); setPos(0); savePos(0)
+    } else {
+      setPos((i) => { const nx = i + 1; savePos(nx); return nx })
+    }
     setRevealed(false); setShowHint(false); setSeenCount(c => c + 1); bumpSeen()
   }
   function prev() {

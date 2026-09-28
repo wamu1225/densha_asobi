@@ -460,7 +460,7 @@ export function HiraganaSearch() {
         </div>
 
         {/* ずかん: クリア済みはタイトルを見せて何を集めたか見返せる（未クリアは番号のまま） */}
-        <div className="grid grid-cols-10 gap-1 w-full">
+        <div className="grid grid-cols-5 gap-1 w-full">
           {PUZZLES.map((p, i) => (
             <button key={p.title}
               onClick={() => {
@@ -474,13 +474,13 @@ export function HiraganaSearch() {
                 }
               }}
               aria-label={cleared[p.title] ? `${p.title}（クリアずみ）` : `${i + 1}ばんめ（みクリア）`}
-              className="aspect-square rounded-md font-bold border transition-colors flex items-center justify-center text-center leading-none px-0.5 overflow-hidden"
+              className="aspect-square rounded-md font-bold border transition-colors flex items-center justify-center text-center leading-tight px-0.5 overflow-hidden"
               style={{
                 background: cleared[p.title] ? '#06b6d4' : 'white',
                 color: cleared[p.title] ? 'white' : '#9ca3af',
                 borderColor: i === pIdx ? '#0891b2' : '#e5e7eb',
                 borderWidth: i === pIdx ? 2 : 1,
-                fontSize: cleared[p.title] ? 7 : 10,
+                fontSize: cleared[p.title] ? 11 : 12,
               }}>
               {cleared[p.title] ? p.title : i + 1}
             </button>
@@ -556,7 +556,7 @@ export function HiraganaSearch() {
         </div>
 
         <p className="text-xs font-bold" style={{ color: 'var(--ink-sub)' }}>
-          しゅうしゅうずかん：{PUZZLES.filter(p => cleared[p.title]).length} / {PUZZLES.length}（うえの　いろが　ついた　マスを　タップすると　もういちど　みられるよ）
+          クリアした　パズル：{PUZZLES.filter(p => cleared[p.title]).length} / {PUZZLES.length}
         </p>
       </div>
     </GameLayout>

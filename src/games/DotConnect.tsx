@@ -127,7 +127,7 @@ export function DotConnect() {
                 color: cleared[p.name] ? 'white' : '#9ca3af',
                 borderColor: i === pIdx ? '#65a30d' : '#e5e7eb',
                 borderWidth: i === pIdx ? 2 : 1,
-                fontSize: cleared[p.name] ? 14 : 10,
+                fontSize: cleared[p.name] ? 14 : 12,
               }}>
               {cleared[p.name] ? p.emoji : i + 1}
             </button>
@@ -188,7 +188,7 @@ export function DotConnect() {
         </div>
 
         <p className="text-xs font-bold" style={{ color: 'var(--ink-sub)' }}>
-          しゅうしゅうずかん：{PATTERNS.filter(p => cleared[p.name]).length} / {PATTERNS.length}（うえの　いろが　ついた　マスを　タップすると　もういちど　みられるよ）
+          あつめた　え：{PATTERNS.filter(p => cleared[p.name]).length} / {PATTERNS.length}
         </p>
       </div>
     </GameLayout>
