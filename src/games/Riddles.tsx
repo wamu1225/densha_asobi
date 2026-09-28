@@ -112,13 +112,22 @@ function loadPos(): number {
 }
 function savePos(p: number) { try { localStorage.setItem(POS_KEY, String(p)) } catch { /* noop */ } }
 
+// ふたりで遊ぶ（O-3-35）: トップのカードが既に「おやこで かんがえよう」と約束しているのに
+// 導線は1人用のみだった。読み上げる人が正誤をその場でタップする形にして、連続正解を記録する
+const BEST_STREAK_KEY = 'densha_riddles_best_streak'
+function getBestStreak(): number { try { return parseInt(localStorage.getItem(BEST_STREAK_KEY) || '0') || 0 } catch { return 0 } }
+function saveBestStreak(v: number) { if (v > getBestStreak()) localStorage.setItem(BEST_STREAK_KEY, String(v)) }
+
 export function Riddles() {
   const [filter, setFilter] = useState<Level | 'all'>('all')
   const [order, setOrder] = useState<number[]>(loadOrder)
   const [pos, setPos] = useState<number>(loadPos)
   const [revealed, setRevealed] = useState(false)
   const [showHint, setShowHint] = useState(false)
-  const [seenCount, setSeenCount] = useState(0)
+  const [answeredCount, setAnsweredCount] = useState(0)
+  const [correctCount, setCorrectCount] = useState(0)
+  const [streak, setStreak] = useState(0)
+  const [bestStreak, setBestStreak] = useState(getBestStreak)
 
   const filtered = useMemo(
     () => (filter === 'all' ? order.map((i) => RIDDLES[i]) : order.map((i) => RIDDLES[i]).filter((r) => r.level === filter)),
@@ -138,11 +147,26 @@ export function Riddles() {
     } else {
       setPos((i) => { const nx = i + 1; savePos(nx); return nx })
     }
-    setRevealed(false); setShowHint(false); setSeenCount(c => c + 1); bumpSeen()
+    setRevealed(false); setShowHint(false); bumpSeen()
   }
   function prev() {
     setPos((i) => { const nx = (i - 1 + filtered.length) % filtered.length; savePos(nx); return nx })
     setRevealed(false); setShowHint(false)
+  }
+  function answer(correct: boolean) {
+    setRevealed(true)
+    setAnsweredCount((c) => c + 1)
+    bumpSeen()
+    if (correct) {
+      setCorrectCount((c) => c + 1)
+      setStreak((s) => {
+        const ns = s + 1
+        if (ns > bestStreak) { saveBestStreak(ns); setBestStreak(ns) }
+        return ns
+      })
+    } else {
+      setStreak(0)
+    }
   }
 
   return (
@@ -200,13 +224,23 @@ export function Riddles() {
           </div>
         ) : (
           <div className="flex flex-col gap-2 w-full">
-            <button
-              onClick={() => { setRevealed(true); setSeenCount(c => c + 1); bumpSeen() }}
-              className="w-full py-5 text-xl font-black text-white rounded-2xl shadow-lg active:scale-95"
-              style={{ background: GRAD }}
-            >
-              こたえを みる
-            </button>
+            <p className="text-sm font-bold text-center" style={{ color: 'var(--ink-sub)' }}>
+              よみあげて、こたえてもらおう！　あっていたら タップ
+            </p>
+            <div className="flex gap-2 w-full">
+              <button
+                onClick={() => answer(true)}
+                className="flex-1 py-5 text-lg font-black text-white rounded-2xl shadow-lg active:scale-95 bg-green-500"
+              >
+                せいかい！
+              </button>
+              <button
+                onClick={() => answer(false)}
+                className="flex-1 py-5 text-lg font-black text-white rounded-2xl shadow-lg active:scale-95 bg-amber-500"
+              >
+                おしい…
+              </button>
+            </div>
             {!showHint && (
               <button
                 onClick={() => setShowHint(true)}
@@ -222,7 +256,10 @@ export function Riddles() {
           <button onClick={prev} className="flex-1 py-4 text-lg font-bold bg-white text-gray-600 rounded-2xl shadow border border-gray-200 active:scale-95">← まえ</button>
           <button onClick={next} className="flex-1 py-4 text-lg font-bold text-white rounded-2xl shadow-lg active:scale-95" style={{ background: GRAD }}>つぎ →</button>
         </div>
-        <p className="text-xs text-gray-400">みたもんだい：{seenCount}もん</p>
+        <p className="text-xs text-gray-400">
+          せいかい：{correctCount} / {answeredCount}もん　れんぞく さいこう：{bestStreak}もん
+          {streak > 1 && `（いま ${streak}れんぞく！）`}
+        </p>
       </div>
     </GameLayout>
   )
