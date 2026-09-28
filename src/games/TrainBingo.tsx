@@ -41,6 +41,21 @@ function Celebration({ count }: { count: number }) {
 const COMPLETE_KEY = 'densha_bingo_complete'
 function getCompleteCount(): number { try { return parseInt(localStorage.getItem(COMPLETE_KEY) || '0') || 0 } catch { return 0 } }
 
+// テーマ別の達成回数（O-3-33 A-3）: 入口は4テーマ×2サイズ＝8通りあるのに、
+// 記録は通算の回数だけだった。次の乗車で別テーマを選ぶ理由になるよう、
+// 組み合わせごとの達成回数を別キーで積む（既存のCOMPLETE_KEYは変えない）
+const BY_THEME_KEY = 'densha_bingo_complete_by_theme'
+function loadByTheme(): Record<string, number> {
+  try { return JSON.parse(localStorage.getItem(BY_THEME_KEY) || '{}') } catch { return {} }
+}
+function bumpByTheme(theme: ThemeKey, gridSize: GridSize): Record<string, number> {
+  const all = loadByTheme()
+  const key = `${theme}_${gridSize}`
+  all[key] = (all[key] || 0) + 1
+  try { localStorage.setItem(BY_THEME_KEY, JSON.stringify(all)) } catch { /* noop */ }
+  return all
+}
+
 // 中断復帰: 電車を降りる・アプリを閉じるなどでリロードされても、遊びかけの盤面を残す（O-3-29）
 const PROGRESS_KEY = 'densha_bingo_progress'
 interface BingoProgress { theme: ThemeKey; gridSize: GridSize; card: string[]; marked: number[] }
@@ -66,6 +81,7 @@ export function TrainBingo() {
   const [marked, setMarked] = useState(new Set<number>(saved?.marked ?? []))
   const [bingoLines, setBingoLines] = useState<number[][]>(saved ? checkBingo(new Set(saved.marked), saved.gridSize) : [])
   const [completeCount, setCompleteCount] = useState(getCompleteCount)
+  const [byTheme, setByTheme] = useState<Record<string, number>>(loadByTheme)
 
   useEffect(() => {
     if (theme) saveProgress(theme, gridSize, card, marked)
@@ -89,6 +105,7 @@ export function TrainBingo() {
       const c = getCompleteCount() + 1
       localStorage.setItem(COMPLETE_KEY, String(c))
       setCompleteCount(c)
+      setByTheme(bumpByTheme(theme!, gridSize))
     }
   }
 
@@ -129,17 +146,25 @@ export function TrainBingo() {
             コンプリートした カード：{completeCount}まい
           </p>
         )}
-        {(Object.keys(THEMES) as ThemeKey[]).map(t => (
-          <div key={t} className="bg-white rounded-2xl border-2 border-green-200 p-4 w-full" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
-            <p className="font-bold text-gray-700 mb-2">
-              {t}
-            </p>
-            <div className="flex gap-2">
-              <button onClick={() => start(t, 9)} className="flex-1 py-3 text-sm font-bold text-white rounded-xl shadow active:scale-95" style={{ background: GRAD }}>3×3（かんたん）</button>
-              <button onClick={() => start(t, 16)} className="flex-1 py-3 text-sm font-bold bg-emerald-600 text-white rounded-xl shadow active:scale-95">4×4（むずかしい）</button>
+        {(Object.keys(THEMES) as ThemeKey[]).map(t => {
+          const done9 = byTheme[`${t}_9`] || 0
+          const done16 = byTheme[`${t}_16`] || 0
+          return (
+            <div key={t} className="bg-white rounded-2xl border-2 border-green-200 p-4 w-full" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
+              <p className="font-bold text-gray-700 mb-2">
+                {t}
+              </p>
+              <div className="flex gap-2">
+                <button onClick={() => start(t, 9)} className="flex-1 py-3 text-sm font-bold text-white rounded-xl shadow active:scale-95 relative" style={{ background: GRAD }}>
+                  3×3（かんたん）{done9 > 0 && <span className="block text-[10px] font-bold text-white/90">たっせい ×{done9}</span>}
+                </button>
+                <button onClick={() => start(t, 16)} className="flex-1 py-3 text-sm font-bold bg-emerald-600 text-white rounded-xl shadow active:scale-95 relative">
+                  4×4（むずかしい）{done16 > 0 && <span className="block text-[10px] font-bold text-white/90">たっせい ×{done16}</span>}
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </GameLayout>
   )
