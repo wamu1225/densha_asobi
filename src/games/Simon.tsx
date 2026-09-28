@@ -4,17 +4,21 @@ import { ResultScreen } from '../components/ResultScreen'
 
 const GRAD = 'linear-gradient(135deg, #7c3aed, #5b21b6)'
 const BEST_KEY = 'densha_simon_best'
-function getBest(): number { try { return parseInt(localStorage.getItem(BEST_KEY) ?? '0') } catch { return 0 } }
-function saveBest(v: number) { if (v > getBest()) localStorage.setItem(BEST_KEY, String(v)) }
+// O-3-33 A-4: 色数でベストを分ける（6色は4色より難しく、同じ数字で比べると誤解を招くため）
+function getBest(numColors: NumColors): number { try { return parseInt(localStorage.getItem(`${BEST_KEY}_${numColors}`) ?? '0') } catch { return 0 } }
+function saveBest(numColors: NumColors, v: number) { if (v > getBest(numColors)) localStorage.setItem(`${BEST_KEY}_${numColors}`, String(v)) }
 
-// ── 4色パネルの定義 ──────────────────────────────────────
+// ── 色パネルの定義（最大6色。O-3-33 A-4で4→6を選べるように拡張） ──
 // dark: 消灯時の暗い色  bright: 点灯時の明るい色  glow: 光のにじみ色
 const PANELS = [
   { id: 0, label: 'あか',   emoji: '🍎', dark: '#7F1D1D', bright: '#FF3B30', glow: '#FF3B30' },
   { id: 1, label: 'あお',   emoji: '💎', dark: '#1E3A8A', bright: '#007AFF', glow: '#60A5FA' },
   { id: 2, label: 'きいろ', emoji: '⭐', dark: '#78350F', bright: '#FFD60A', glow: '#FDE68A' },
   { id: 3, label: 'みどり', emoji: '🌿', dark: '#14532D', bright: '#30D158', glow: '#86EFAC' },
+  { id: 4, label: 'むらさき', emoji: '🍇', dark: '#4C1D95', bright: '#A855F7', glow: '#D8B4FE' },
+  { id: 5, label: 'オレンジ', emoji: '🍊', dark: '#7C2D12', bright: '#FB923C', glow: '#FED7AA' },
 ]
+type NumColors = 4 | 6
 
 // ラウンドが上がるほど自動的にスピードアップ
 function getTiming(round: number): { flash: number; gap: number; label: string } {
@@ -28,9 +32,9 @@ function getTiming(round: number): { flash: number; gap: number; label: string }
 function delay(ms: number) { return new Promise<void>(r => setTimeout(r, ms)) }
 
 // 直前と同じ色が連続しないようランダムに1色選ぶ
-function pick(last: number): number {
+function pick(last: number, numColors: NumColors): number {
   let n: number
-  do { n = Math.floor(Math.random() * 4) } while (n === last)
+  do { n = Math.floor(Math.random() * numColors) } while (n === last)
   return n
 }
 
@@ -48,6 +52,7 @@ export function Simon() {
   // ユーザーがタップしたときの視覚フィードバック用（showing の lit とは別）
   const [tapLit, setTapLit] = useState<number | null>(null)
   const [showingStep, setShowingStep] = useState(0)
+  const [numColors, setNumColors] = useState<NumColors>(4)
 
   // ── シーケンス表示 (showing フェーズ) ──────────────────
   useEffect(() => {
@@ -83,13 +88,13 @@ export function Simon() {
     if (phase !== 'correct') return
     const t = setTimeout(() => {
       const last = sequence[sequence.length - 1]
-      const newSeq = [...sequence, pick(last)]
+      const newSeq = [...sequence, pick(last, numColors)]
       setSeq(newSeq)
       setRound(r => r + 1)
       setPhase('showing')
     }, 700)
     return () => clearTimeout(t)
-  }, [phase, sequence])
+  }, [phase, sequence, numColors])
 
   // ── ミスアニメーション ──────────────────────────────────
   useEffect(() => {
@@ -101,8 +106,9 @@ export function Simon() {
     return () => clearTimeout(t)
   }, [phase])
 
-  function startGame() {
-    const first = Math.floor(Math.random() * 4)
+  function startGame(nc: NumColors = numColors) {
+    const first = Math.floor(Math.random() * nc)
+    setNumColors(nc)
     setSeq([first]); setRound(1); setInput(0)
     setLit(null); setWrongId(null); setTapLit(null); setPhase('showing')
   }
@@ -124,14 +130,14 @@ export function Simon() {
     } else {
       setWrongId(id)
       setCorrectHintId(sequence[inputIdx])  // 正解のパネルを緑で表示
-      saveBest(round - 1)
+      saveBest(numColors, round - 1)
       setTimeout(() => { setPhase('wrong'); setCorrectHintId(null) }, 900)
     }
   }
 
   // ── 結果画面 ────────────────────────────────────────────
   if (phase === 'over') {
-    const best = getBest()
+    const best = getBest(numColors)
     return (
       <GameLayout title="いろきおく" gradient={GRAD}>
         <ResultScreen
@@ -139,8 +145,8 @@ export function Simon() {
           scoreLabel="クリアしたラウンド"
           scoreSuffix="ラウンド"
           bestStr={best > 0 ? `${best}ラウンド` : undefined}
-          bestLabel="ベスト"
-          onRetry={startGame}
+          bestLabel={`ベスト（${numColors}しょく）`}
+          onRetry={() => startGame()}
           onChangeMode={() => setPhase('select')}
           accentColor="text-purple-600"
         />
@@ -150,35 +156,42 @@ export function Simon() {
 
   // ── 選択画面 ────────────────────────────────────────────
   if (phase === 'select') {
-    const best = getBest()
+    const best4 = getBest(4)
+    const best6 = getBest(6)
     return (
       <GameLayout title="いろきおく" gradient={GRAD}>
         <div className="flex flex-col items-center gap-5 pt-6">
           <p className="text-lg font-bold text-center" style={{ color: 'var(--ink)' }}>
             いろが ひかる！<br/>おなじ じゅんばんで タップ！
           </p>
-          {best > 0 && (
-            <p className="text-sm font-bold px-4 py-1 rounded-full bg-purple-100 text-purple-700">
-              ベスト {best} ラウンド
-            </p>
-          )}
 
-          {/* プレビューパネル */}
-          <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
-            {PANELS.map(p => (
-              <div key={p.id} className="aspect-square rounded-2xl flex flex-col items-center justify-center gap-2"
-                style={{ background: p.dark }}>
-                <span style={{ fontSize: 40 }}>{p.emoji}</span>
-                <span className="text-sm font-black text-white/50">{p.label}</span>
+          {/* いろかず選択（O-3-33 A-4）: 4しょく=いつものむずかしさ／6しょく=もっとむずかしい */}
+          {([4, 6] as NumColors[]).map((nc) => {
+            const best = nc === 4 ? best4 : best6
+            return (
+              <div key={nc} className="bg-white rounded-2xl border-2 border-purple-200 p-4 w-full" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-bold text-gray-700">{nc}しょく {nc === 6 && <span className="text-xs text-purple-500">むずかしい</span>}</p>
+                  {best > 0 && (
+                    <span className="text-xs font-bold px-2 py-1 rounded-full bg-purple-100 text-purple-700">ベスト {best}</span>
+                  )}
+                </div>
+                <div className="grid grid-cols-3 gap-2 mb-3">
+                  {PANELS.slice(0, nc).map(p => (
+                    <div key={p.id} className="aspect-square rounded-xl flex items-center justify-center"
+                      style={{ background: p.dark }}>
+                      <span style={{ fontSize: 22 }}>{p.emoji}</span>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => startGame(nc)}
+                  className="w-full py-3 text-base font-black text-white rounded-xl active:scale-95 transition-transform"
+                  style={{ background: GRAD, boxShadow: '3px 4px 0 rgba(0,0,0,0.15)' }}>
+                  {nc}しょくで はじめる！
+                </button>
               </div>
-            ))}
-          </div>
-
-          <button onClick={startGame}
-            className="px-12 py-5 text-2xl font-black text-white rounded-2xl active:scale-95 transition-transform"
-            style={{ background: GRAD, boxShadow: '4px 5px 0 rgba(0,0,0,0.2)' }}>
-            はじめる！
-          </button>
+            )
+          })}
           <p className="text-xs" style={{ color: 'var(--ink-sub)' }}>
             ラウンドが進むほどはやくなるよ！
           </p>
@@ -217,9 +230,9 @@ export function Simon() {
           {phase === 'wrong'   && '× ちがう！'}
         </div>
 
-        {/* 4色パネル ── ここが一番重要。光の差を最大化 */}
-        <div className="grid grid-cols-2 gap-4 w-full">
-          {PANELS.map(p => {
+        {/* 色パネル（4 or 6色）── ここが一番重要。光の差を最大化 */}
+        <div className={`grid gap-4 w-full ${numColors === 6 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+          {PANELS.slice(0, numColors).map(p => {
             const isLit        = lit === p.id || tapLit === p.id
             const isWrong      = wrongId === p.id
             const isCorrectHint = correctHintId === p.id  // 正解ヒント（緑で点灯）
