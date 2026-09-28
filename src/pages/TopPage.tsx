@@ -21,6 +21,23 @@ const BEST_KEYS: Record<string, string[]> = {
   '/riddles': ['densha_riddles_seen'],
 }
 
+// 「とちゅう」がトップから見えない（O-3-34）: 中断復帰のデータは保存されているのに、
+// トップに戻ると通算実績しか出ず、どのゲームが途中かは1本ずつ開かないと分からなかった
+interface BingoProgress { marked: number[]; gridSize: number }
+function getBingoInProgress(): { marked: number; total: number } | null {
+  try {
+    const raw = localStorage.getItem('densha_bingo_progress')
+    if (!raw) return null
+    const p = JSON.parse(raw) as Partial<BingoProgress>
+    if (!p || !Array.isArray(p.marked) || !p.gridSize) return null
+    if (p.marked.length === 0 || p.marked.length >= p.gridSize) return null // 未着手・完成済みは「とちゅう」ではない
+    return { marked: p.marked.length, total: p.gridSize }
+  } catch { return null }
+}
+function getRiddlesInProgress(): boolean {
+  try { return (parseInt(localStorage.getItem('densha_riddles_pos') || '0') || 0) > 0 } catch { return false }
+}
+
 function hasPlayed(path: string): boolean {
   const keys = BEST_KEYS[path]
   if (!keys) return false
@@ -85,10 +102,14 @@ export function TopPage() {
   const navigate = useNavigate()
   const [played, setPlayed] = useState<Set<string>>(new Set())
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const [bingoProgress, setBingoProgress] = useState<{ marked: number; total: number } | null>(null)
+  const [riddlesInProgress, setRiddlesInProgress] = useState(false)
 
   useEffect(() => {
     const paths = SECTIONS.flatMap(s => s.games.map(g => g.path))
     setPlayed(new Set(paths.filter(p => hasPlayed(p))))
+    setBingoProgress(getBingoInProgress())
+    setRiddlesInProgress(getRiddlesInProgress())
     const handler = (e: Event) => { e.preventDefault(); setInstallPrompt(e as BeforeInstallPromptEvent) }
     window.addEventListener('beforeinstallprompt', handler)
     return () => window.removeEventListener('beforeinstallprompt', handler)
@@ -250,6 +271,12 @@ export function TopPage() {
                           style={{ fontSize: 9, background: 'white', color: c.text, border: `1px solid ${c.border}33` }}>
                           {game.age}
                         </span>
+                        {game.path === '/bingo' && bingoProgress && (
+                          <span className="inline-block mt-1.5 ml-1 px-2 py-0.5 rounded-full font-bold"
+                            style={{ fontSize: 9, background: '#fef3c7', color: '#92400e' }}>
+                            {bingoProgress.marked}/{bingoProgress.total} とちゅう
+                          </span>
+                        )}
                       </div>
                     </button>
                   ))}
@@ -275,6 +302,12 @@ export function TopPage() {
                         <span className="mt-0.5 leading-tight" style={{ fontSize: 9.5, color: c.text + '99' }}>
                           {game.sub}
                         </span>
+                        {game.path === '/riddles' && riddlesInProgress && (
+                          <span className="inline-block mt-1 px-1.5 py-0.5 rounded-full font-bold"
+                            style={{ fontSize: 8, background: '#fef3c7', color: '#92400e' }}>
+                            つづきから
+                          </span>
+                        )}
                       </div>
                     </button>
                   ))}
