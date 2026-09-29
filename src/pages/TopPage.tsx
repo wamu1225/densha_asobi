@@ -384,6 +384,10 @@ export function TopPage() {
                         <span className="mt-0.5 leading-tight" style={{ fontSize: 9.5, color: c.text + '99' }}>
                           {game.sub}
                         </span>
+                        <span className="inline-block mt-1 px-1.5 py-0.5 rounded-full font-bold"
+                          style={{ fontSize: 8, background: 'white', color: c.text, border: `1px solid ${c.border}33` }}>
+                          {game.age}
+                        </span>
                         {game.path === '/riddles' && riddlesInProgress && (
                           <span className="inline-block mt-1 px-1.5 py-0.5 rounded-full font-bold"
                             style={{ fontSize: 8, background: '#fef3c7', color: '#92400e' }}>
