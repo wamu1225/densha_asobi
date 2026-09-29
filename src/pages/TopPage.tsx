@@ -38,6 +38,85 @@ function getRiddlesInProgress(): boolean {
   try { return (parseInt(localStorage.getItem('densha_riddles_pos') || '0') || 0) > 0 } catch { return false }
 }
 
+// あと何分？＝乗車1回を単位にする（O-3-35の2）。時刻表は使わず、親が分数を1つ選ぶだけ。
+// 「でんしゃろせんず」（通算実績）とは別物＝この乗車がどれだけ進んだかを表す
+const RIDE_KEY = 'densha_ride_session'
+const RIDE_MINUTES = [5, 10, 15, 20, 30] as const
+interface RideSession { startedAt: number; durationMin: number }
+
+function loadRide(): RideSession | null {
+  try {
+    const raw = localStorage.getItem(RIDE_KEY)
+    if (!raw) return null
+    const s = JSON.parse(raw)
+    if (!s || typeof s.startedAt !== 'number' || typeof s.durationMin !== 'number') return null
+    if (Date.now() - s.startedAt >= s.durationMin * 60000) { localStorage.removeItem(RIDE_KEY); return null }
+    return s
+  } catch { return null }
+}
+function startRide(min: number) {
+  const s: RideSession = { startedAt: Date.now(), durationMin: min }
+  try { localStorage.setItem(RIDE_KEY, JSON.stringify(s)) } catch { /* noop */ }
+  return s
+}
+function endRide() { try { localStorage.removeItem(RIDE_KEY) } catch { /* noop */ } }
+
+function RideTimer() {
+  const [session, setSession] = useState<RideSession | null>(loadRide)
+  const [now, setNow] = useState(() => Date.now())
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      const n = Date.now()
+      setNow(n)
+      // 期限切れなら自動的に選択画面へ戻す
+      if (session && n - session.startedAt >= session.durationMin * 60000) {
+        endRide()
+        setSession(null)
+      }
+    }, 15000)
+    return () => clearInterval(t)
+  }, [session])
+
+  if (!session) {
+    return (
+      <div className="rounded-2xl px-4 py-3 mb-2" style={{ background: 'white', boxShadow: '2px 3px 0 rgba(0,0,0,0.06)' }}>
+        <p className="text-xs font-black mb-2" style={{ color: 'var(--ink)' }}>こんかいは なんぷん のりますか？</p>
+        <div className="flex gap-1.5">
+          {RIDE_MINUTES.map((m) => (
+            <button key={m} onClick={() => { setSession(startRide(m)); setNow(Date.now()) }}
+              className="flex-1 py-2 text-xs font-black text-white rounded-xl active:scale-95"
+              style={{ background: '#1C2B40' }}>
+              {m}ふん
+            </button>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  const elapsedMs = now - session.startedAt
+  const totalMs = session.durationMin * 60000
+  const remainMin = Math.max(0, Math.ceil((totalMs - elapsedMs) / 60000))
+  const pct = Math.min(100, Math.max(0, (elapsedMs / totalMs) * 100))
+
+  return (
+    <div className="rounded-2xl px-4 py-3 mb-2" style={{ background: 'white', boxShadow: '2px 3px 0 rgba(0,0,0,0.06)' }}>
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-xs font-black" style={{ color: 'var(--ink)' }}>こんかいの のりもの</span>
+        <span className="text-xs font-bold" style={{ color: '#b45309' }}>あと {remainMin}ふん</span>
+      </div>
+      <div className="w-full rounded-full h-2.5 overflow-hidden" style={{ background: '#f3e8d8' }}>
+        <div className="h-2.5 rounded-full transition-all" style={{ width: `${pct}%`, background: '#1C2B40' }} />
+      </div>
+      <button onClick={() => { endRide(); setSession(null) }}
+        className="mt-2 text-[10px] font-bold underline" style={{ color: 'var(--ink-sub)' }}>
+        おわる
+      </button>
+    </div>
+  )
+}
+
 function hasPlayed(path: string): boolean {
   const keys = BEST_KEYS[path]
   if (!keys) return false
@@ -172,6 +251,9 @@ export function TopPage() {
           <span style={{ color: '#d1d5db' }}>・</span>
           <span>4〜9さい</span>
         </div>
+
+        {/* あと何分？＝乗車1回の進み具合（O-3-35の2）。通算実績のでんしゃろせんずとは別 */}
+        <RideTimer />
 
         {/* でんしゃろせんず（4カテゴリ＝4つの路線・ゲーム＝えき。あそぶとえきに停車したことになる）
             2026-08-06: 平置きのスタンプ台紙から路線図モチーフへ刷新（O-3-6「電車らしさが見出しだけ」への対応） */}
