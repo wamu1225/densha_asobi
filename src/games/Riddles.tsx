@@ -112,11 +112,24 @@ function loadPos(): number {
 }
 function savePos(p: number) { try { localStorage.setItem(POS_KEY, String(p)) } catch { /* noop */ } }
 
-// ふたりで遊ぶ（O-3-35）: トップのカードが既に「おやこで かんがえよう」と約束しているのに
-// 導線は1人用のみだった。読み上げる人が正誤をその場でタップする形にして、連続正解を記録する
+// ふたりで遊ぶ（O-3-35→O-3-37で差し戻し・作り直し）:
+// 最初の実装は「読み上げて、こたえてもらおう！」だった＝(1)声を出す前提で about/トップの
+// 「おとがでない」約束と矛盾 (2)答えはボタンを押すまで隠れており、押す本人（判定役）が
+// 正解を知らないまま「せいかい／おしい」を選ばされていた＝判定が成立しない欠陥。
+// 作り直し＝声も人の判定も要らない3択タップにした（案C＝声を出さない共遊の具体化）。
+// アプリ自身が正誤を知っているので、指さしで選ぶだけでふたりでも1人でも成立する
 const BEST_STREAK_KEY = 'densha_riddles_best_streak'
 function getBestStreak(): number { try { return parseInt(localStorage.getItem(BEST_STREAK_KEY) || '0') || 0 } catch { return 0 } }
 function saveBestStreak(v: number) { if (v > getBestStreak()) localStorage.setItem(BEST_STREAK_KEY, String(v)) }
+
+function shuffleArr<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
 
 export function Riddles() {
   const [filter, setFilter] = useState<Level | 'all'>('all')
@@ -128,6 +141,7 @@ export function Riddles() {
   const [correctCount, setCorrectCount] = useState(0)
   const [streak, setStreak] = useState(0)
   const [bestStreak, setBestStreak] = useState(getBestStreak)
+  const [selected, setSelected] = useState<string | null>(null)
 
   const filtered = useMemo(
     () => (filter === 'all' ? order.map((i) => RIDDLES[i]) : order.map((i) => RIDDLES[i]).filter((r) => r.level === filter)),
@@ -135,8 +149,14 @@ export function Riddles() {
   )
   const riddle = filtered[pos % filtered.length]
 
+  // 3択（正解1＋おとり2）。riddleが変わるたびに作り直す。声を出さず、タップだけで成立する
+  const choices = useMemo(() => {
+    const distractors = shuffleArr(RIDDLES.map((r) => r.a).filter((a) => a !== riddle.a)).slice(0, 2)
+    return shuffleArr([riddle.a, ...distractors])
+  }, [riddle])
+
   function changeFilter(f: Level | 'all') {
-    setFilter(f); setPos(0); savePos(0); setRevealed(false); setShowHint(false)
+    setFilter(f); setPos(0); savePos(0); setRevealed(false); setShowHint(false); setSelected(null)
   }
   function next() {
     if (pos + 1 >= filtered.length) {
@@ -147,17 +167,19 @@ export function Riddles() {
     } else {
       setPos((i) => { const nx = i + 1; savePos(nx); return nx })
     }
-    setRevealed(false); setShowHint(false); bumpSeen()
+    setRevealed(false); setShowHint(false); setSelected(null); bumpSeen()
   }
   function prev() {
     setPos((i) => { const nx = (i - 1 + filtered.length) % filtered.length; savePos(nx); return nx })
-    setRevealed(false); setShowHint(false)
+    setRevealed(false); setShowHint(false); setSelected(null)
   }
-  function answer(correct: boolean) {
+  function selectChoice(choice: string) {
+    if (revealed) return
+    setSelected(choice)
     setRevealed(true)
     setAnsweredCount((c) => c + 1)
     bumpSeen()
-    if (correct) {
+    if (choice === riddle.a) {
       setCorrectCount((c) => c + 1)
       setStreak((s) => {
         const ns = s + 1
@@ -204,50 +226,67 @@ export function Riddles() {
           <p className="text-2xl font-bold text-gray-800 leading-relaxed text-center">{riddle.q}</p>
         </div>
 
-        {showHint && (
+        {showHint && !revealed && (
           <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl px-5 py-3 w-full bounce-in">
             <p className="text-lg text-orange-600 text-center font-bold">ヒント：{riddle.hint}</p>
           </div>
         )}
 
-        {/* 答え */}
-        {revealed ? (
+        {!revealed && (
+          <p className="text-sm font-bold text-center" style={{ color: 'var(--ink-sub)' }}>
+            こたえだと おもう ものを タップ！
+          </p>
+        )}
+
+        {/* 3択（声を出さず、指さし・タップだけで判定はアプリが行う） */}
+        <div className="flex flex-col gap-2 w-full">
+          {choices.map((c) => {
+            const isCorrect = c === riddle.a
+            const isPicked = c === selected
+            const showResult = revealed
+            return (
+              <button
+                key={c}
+                onClick={() => selectChoice(c)}
+                disabled={revealed}
+                className="w-full py-4 text-lg font-black rounded-2xl shadow-lg active:scale-95 text-center transition-colors"
+                style={
+                  showResult
+                    ? isCorrect
+                      ? { background: '#22c55e', color: 'white' }
+                      : isPicked
+                        ? { background: '#ef4444', color: 'white' }
+                        : { background: '#f3f4f6', color: '#9ca3af' }
+                    : { background: 'white', color: '#78350f', border: '2px solid #fde68a' }
+                }
+              >
+                {c}
+                {showResult && isCorrect && '　○'}
+                {showResult && isPicked && !isCorrect && '　×'}
+              </button>
+            )
+          })}
+        </div>
+
+        {!revealed && !showHint && (
+          <button
+            onClick={() => setShowHint(true)}
+            className="w-full py-3 text-base font-bold bg-orange-100 text-orange-600 rounded-2xl active:scale-95"
+          >
+            ヒントをみる
+          </button>
+        )}
+
+        {/* こたえの説明（回答後に表示） */}
+        {revealed && (
           <div className="bg-green-50 border-2 border-green-300 rounded-3xl p-5 w-full shadow bounce-in">
-            <p className="text-base text-gray-500 text-center mb-1">こたえ</p>
+            <p className="text-base text-gray-500 text-center mb-1">{selected === riddle.a ? 'せいかい！' : 'ざんねん…こたえは'}</p>
             <p className="text-2xl font-black text-green-600 text-center">{riddle.a}</p>
             {riddle.why && (
               <div className="mt-3 pt-3 border-t border-green-200">
                 <p className="text-sm font-bold text-green-700 mb-1">どうして？</p>
                 <p className="text-base text-gray-700 leading-relaxed">{riddle.why}</p>
               </div>
-            )}
-          </div>
-        ) : (
-          <div className="flex flex-col gap-2 w-full">
-            <p className="text-sm font-bold text-center" style={{ color: 'var(--ink-sub)' }}>
-              よみあげて、こたえてもらおう！　あっていたら タップ
-            </p>
-            <div className="flex gap-2 w-full">
-              <button
-                onClick={() => answer(true)}
-                className="flex-1 py-5 text-lg font-black text-white rounded-2xl shadow-lg active:scale-95 bg-green-500"
-              >
-                せいかい！
-              </button>
-              <button
-                onClick={() => answer(false)}
-                className="flex-1 py-5 text-lg font-black text-white rounded-2xl shadow-lg active:scale-95 bg-amber-500"
-              >
-                おしい…
-              </button>
-            </div>
-            {!showHint && (
-              <button
-                onClick={() => setShowHint(true)}
-                className="w-full py-3 text-base font-bold bg-orange-100 text-orange-600 rounded-2xl active:scale-95"
-              >
-                ヒントをみる
-              </button>
             )}
           </div>
         )}
@@ -257,7 +296,7 @@ export function Riddles() {
           <button onClick={next} className="flex-1 py-4 text-lg font-bold text-white rounded-2xl shadow-lg active:scale-95" style={{ background: GRAD }}>つぎ →</button>
         </div>
         <p className="text-xs text-gray-400">
-          せいかい：{correctCount} / {answeredCount}もん　れんぞく さいこう：{bestStreak}もん
+          せいかい {correctCount}もん（ぜんぶで {answeredCount}もん こたえた）　れんぞくの さいこう {bestStreak}もん
           {streak > 1 && `（いま ${streak}れんぞく！）`}
         </p>
       </div>
