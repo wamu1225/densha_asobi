@@ -19,6 +19,7 @@ const BEST_KEYS: Record<string, string[]> = {
   '/bingo':   ['densha_bingo_complete'],
   '/next':    ['densha_next_best'],
   '/riddles': ['densha_riddles_seen'],
+  '/numberguess': ['densha_numberguess_best'],
 }
 
 // 「とちゅう」がトップから見えない（O-3-34）: 中断復帰のデータは保存されているのに、
@@ -156,6 +157,7 @@ const SECTIONS: { label: string; tagline?: string; cat: keyof typeof CAT; featur
       { path: '/bigger', icon: 'bigger', title: 'どっちが おおきい？', sub: 'かずのくらべっこ',   age: '6さい〜' },
       { path: '/clock',  icon: 'clock',  title: 'とけいよみ',        sub: 'なんじなんぷん？',   age: '6さい〜' },
       { path: '/maze',   icon: 'maze',   title: 'すうじめいろ',      sub: 'じゅんばんにタップ', age: '5さい〜' },
+      { path: '/numberguess', icon: 'numberguess', title: 'かずあて', sub: 'アプリが かずを あてるよ', age: '4さい〜' },
     ],
   },
   {

@@ -127,6 +127,14 @@ export function GameIcon({ id, size = 32 }: GameIconProps) {
           <circle cx="19" cy="17.2" r="1.9" fill="currentColor" stroke="none" />
         </svg>
       )
+    case 'numberguess': // おおきい・ちいさいの矢印が中央の点にせばまる
+      return (
+        <svg {...p}>
+          <path d="M12 4v5.3" /><path d="M9.4 7.7L12 4l2.6 3.7" />
+          <path d="M12 20v-5.3" /><path d="M9.4 16.3L12 20l2.6-3.7" />
+          <circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none" />
+        </svg>
+      )
     default:
       return null
   }
