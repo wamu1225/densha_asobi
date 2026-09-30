@@ -173,6 +173,12 @@ export function Riddles() {
     setPos((i) => { const nx = (i - 1 + filtered.length) % filtered.length; savePos(nx); return nx })
     setRevealed(false); setShowHint(false); setSelected(null)
   }
+  function revealOnly() {
+    // 4〜5歳は3択の文字が読めないことがある（O-3-38）。「親が読み上げる→子が口で答える→
+    // これで確かめる」という元の遊び方を残す。正誤にはカウントしない
+    setRevealed(true)
+    bumpSeen()
+  }
   function selectChoice(choice: string) {
     if (revealed) return
     setSelected(choice)
@@ -268,19 +274,31 @@ export function Riddles() {
           })}
         </div>
 
-        {!revealed && !showHint && (
-          <button
-            onClick={() => setShowHint(true)}
-            className="w-full py-3 text-base font-bold bg-orange-100 text-orange-600 rounded-2xl active:scale-95"
-          >
-            ヒントをみる
-          </button>
+        {!revealed && (
+          <div className="flex gap-2 w-full">
+            {!showHint && (
+              <button
+                onClick={() => setShowHint(true)}
+                className="flex-1 py-3 text-base font-bold bg-orange-100 text-orange-600 rounded-2xl active:scale-95"
+              >
+                ヒントをみる
+              </button>
+            )}
+            <button
+              onClick={revealOnly}
+              className="flex-1 py-3 text-base font-bold bg-white text-amber-700 rounded-2xl active:scale-95 border-2 border-amber-200"
+            >
+              こたえを みる
+            </button>
+          </div>
         )}
 
         {/* こたえの説明（回答後に表示） */}
         {revealed && (
           <div className="bg-green-50 border-2 border-green-300 rounded-3xl p-5 w-full shadow bounce-in">
-            <p className="text-base text-gray-500 text-center mb-1">{selected === riddle.a ? 'せいかい！' : 'ざんねん…こたえは'}</p>
+            <p className="text-base text-gray-500 text-center mb-1">
+              {selected === null ? 'こたえは' : selected === riddle.a ? 'せいかい！' : 'ざんねん…こたえは'}
+            </p>
             <p className="text-2xl font-black text-green-600 text-center">{riddle.a}</p>
             {riddle.why && (
               <div className="mt-3 pt-3 border-t border-green-200">
