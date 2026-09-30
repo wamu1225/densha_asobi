@@ -4,7 +4,7 @@ import { GameFeedback } from '../components/GameFeedback'
 import { ResultScreen } from '../components/ResultScreen'
 
 type Mode = 'select' | 'play' | 'over'
-type Level = 1 | 2 | 3
+type Level = 1 | 2 | 3 | 4
 type GameMode = 'normal' | 'survival'
 
 const GRAD = 'linear-gradient(135deg, #ff9a5c, #f97316)'
@@ -15,6 +15,13 @@ function getBest(): Record<string, number> { try { return JSON.parse(localStorag
 function saveBest(key: string, val: number) { const b = getBest(); if (!b[key] || val > b[key]) { b[key] = val; localStorage.setItem(BEST_KEY, JSON.stringify(b)) } }
 
 function makeQuestion(level: Level) {
+  if (level === 4) {
+    // 九九ぜんぶ（1〜9のだん）とわりざん（あまりが出ない組み合わせのみ）
+    const x = Math.floor(Math.random() * 9) + 1
+    const y = Math.floor(Math.random() * 9) + 1
+    if (Math.random() > 0.5) return { a: x, b: y, op: '×', answer: x * y }
+    return { a: x * y, b: x, op: '÷', answer: y }
+  }
   if (level === 3) { const a = Math.floor(Math.random() * 5) + 2; const b = Math.floor(Math.random() * 9) + 1; return { a, b, op: '×', answer: a * b } }
   const max = level === 1 ? 9 : 19; const isAdd = Math.random() > 0.5
   let a = Math.floor(Math.random() * max) + 1; let b = Math.floor(Math.random() * max) + 1
@@ -30,8 +37,8 @@ function makeChoices(answer: number): number[] {
 
 function makeQAndChoices(level: Level) { const q = makeQuestion(level); return { q, choices: makeChoices(q.answer) } }
 
-const LEVEL_LABELS: Record<Level, string> = { 1: '★☆☆ 1けた +−', 2: '★★☆ 2けた +−', 3: '★★★ かけざん 2〜6のだん' }
-const LEVEL_TIME: Record<Level, number> = { 1: 30, 2: 30, 3: 45 }
+const LEVEL_LABELS: Record<Level, string> = { 1: '★☆☆ 1けた +−', 2: '★★☆ 2けた +−', 3: '★★★ かけざん 2〜6のだん', 4: '★★★★ 九九ぜんぶ・わりざん' }
+const LEVEL_TIME: Record<Level, number> = { 1: 30, 2: 30, 3: 45, 4: 45 }
 
 export function MathSprint() {
   // 前回の設定を記憶
@@ -86,7 +93,7 @@ export function MathSprint() {
       <div className="flex flex-col gap-4 pt-4">
         <p className="text-center text-xl font-bold text-gray-700">レベルをえらんでね</p>
         <p className="text-center text-xs" style={{ color: 'var(--ink-sub)' }}>5れんぞく せいかいで ボーナスてん！</p>
-        {([1, 2, 3] as Level[]).map(lv => (
+        {([1, 2, 3, 4] as Level[]).map(lv => (
           <div key={lv} className="bg-white rounded-2xl border-2 border-orange-200 p-4" style={{ boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}>
             <p className="font-bold text-gray-700 mb-2">{LEVEL_LABELS[lv]}</p>
             <div className="flex gap-2 text-xs text-gray-400 mb-2">
