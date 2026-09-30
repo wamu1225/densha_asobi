@@ -16,27 +16,42 @@ export function NumberGuess() {
   const [tries, setTries] = useState(0)
   const [best, setBest] = useState(getBest)
   const [showConfetti, setShowConfetti] = useState(false)
+  // 自分から「◯◯でしょ！」と言い切って終わったか（子がタップした「あたり！」との区別に使う）
+  const [declaredSelf, setDeclaredSelf] = useState(false)
 
   const guess = Math.round((low + high) / 2)
 
   function start() {
-    setLow(1); setHigh(100); setTries(0); setPhase('play')
+    setLow(1); setHigh(100); setTries(0); setDeclaredSelf(false); setPhase('play')
+  }
+
+  function finish(usedTries: number, declared: boolean) {
+    setTries(usedTries)
+    setDeclaredSelf(declared)
+    const isNewBest = best === 0 || usedTries < best
+    if (isNewBest) { saveBest(usedTries); setBest(usedTries) }
+    setShowConfetti(true)
+    setTimeout(() => setShowConfetti(false), 2500)
+    setPhase('over')
   }
 
   function answer(kind: 'bigger' | 'smaller' | 'correct') {
     if (kind === 'correct') {
-      const usedTries = tries + 1
-      setTries(usedTries)
-      const isNewBest = best === 0 || usedTries < best
-      if (isNewBest) { saveBest(usedTries); setBest(usedTries) }
-      setShowConfetti(true)
-      setTimeout(() => setShowConfetti(false), 2500)
-      setPhase('over')
+      finish(tries + 1, false)
       return
     }
-    setTries((t) => t + 1)
-    if (kind === 'bigger') setLow(guess + 1)
-    else setHigh(guess - 1)
+    const usedTries = tries + 1
+    // 範囲内にクランプ（矛盾した連打でも範囲が壊れない）＝O-3-35差し戻し対応
+    const newLow = kind === 'bigger' ? Math.min(guess + 1, high) : low
+    const newHigh = kind === 'bigger' ? high : Math.max(guess - 1, low)
+    if (newLow >= newHigh) {
+      // 候補が1つに絞れた時点で、こちらから「◯◯でしょ！」と言い切って終わる
+      setLow(newLow); setHigh(newLow)
+      finish(usedTries, true)
+      return
+    }
+    setTries(usedTries)
+    setLow(newLow); setHigh(newHigh)
   }
 
   if (phase === 'intro') return (
@@ -71,9 +86,13 @@ export function NumberGuess() {
         <Confetti active={showConfetti} />
         <div className="w-full rounded-2xl px-5 py-4 text-center bounce-in shadow-lg"
           style={{ background: 'linear-gradient(135deg,#38bdf8,#0284c7)' }}>
-          <p className="text-2xl font-black text-white">
-            {tries <= 3 ? 'かんぺき！！' : tries <= 5 ? 'やったね！' : 'あてたよ！'}
-          </p>
+          {declaredSelf ? (
+            <p className="text-2xl font-black text-white">きめた かずは「{guess}」でしょ！</p>
+          ) : (
+            <p className="text-2xl font-black text-white">
+              {tries <= 3 ? 'かんぺき！！' : tries <= 5 ? 'やったね！' : 'あてたよ！'}
+            </p>
+          )}
           <p className="text-sm font-bold text-white/90 mt-1">{tries}かいで あてたよ</p>
         </div>
         {best > 0 && (
