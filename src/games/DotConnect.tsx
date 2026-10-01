@@ -189,6 +189,10 @@ export function DotConnect() {
 
         <p className="text-xs font-bold" style={{ color: 'var(--ink-sub)' }}>
           あつめた　え：{PATTERNS.filter(p => cleared[p.name]).length} / {PATTERNS.length}
+          {(() => {
+            const remaining = PATTERNS.length - PATTERNS.filter(p => cleared[p.name]).length
+            return remaining > 0 ? `（あと ${remaining}こ！）` : '　ぜんぶ あつめたね！'
+          })()}
         </p>
       </div>
     </GameLayout>

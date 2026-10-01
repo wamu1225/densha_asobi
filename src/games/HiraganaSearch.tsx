@@ -557,6 +557,10 @@ export function HiraganaSearch() {
 
         <p className="text-xs font-bold" style={{ color: 'var(--ink-sub)' }}>
           クリアした　パズル：{PUZZLES.filter(p => cleared[p.title]).length} / {PUZZLES.length}
+          {(() => {
+            const remaining = PUZZLES.length - PUZZLES.filter(p => cleared[p.title]).length
+            return remaining > 0 ? `（あと ${remaining}こ！）` : '　ぜんぶ クリアしたね！'
+          })()}
         </p>
       </div>
     </GameLayout>
