@@ -163,7 +163,7 @@ const SECTIONS: { label: string; tagline?: string; cat: keyof typeof CAT; featur
     label: 'まどのそと', tagline: 'でんしゃならではの あそび', cat: 'green', featured: true,
     games: [
       { path: '/bingo', icon: 'bingo', title: 'でんしゃビンゴ', sub: 'まどのそとで みつけてビンゴ！', age: '4さい〜' },
-      { path: '/color', icon: 'color', title: 'いろさがし',     sub: 'おだいの いろを そとでさがそう', age: '4さい〜' },
+      { path: '/color', icon: 'color', title: 'いろさがし',     sub: 'いろも かたちも そとでさがそう', age: '4さい〜' },
     ],
   },
   {
@@ -172,14 +172,14 @@ const SECTIONS: { label: string; tagline?: string; cat: keyof typeof CAT; featur
       { path: '/math',   icon: 'math',   title: 'けいさん',          sub: 'たしざん・ひきざん', age: '5さい〜' },
       { path: '/bigger', icon: 'bigger', title: 'どっちが おおきい？', sub: 'かずのくらべっこ',   age: '6さい〜' },
       { path: '/clock',  icon: 'clock',  title: 'とけいよみ',        sub: 'なんじなんぷん？',   age: '6さい〜' },
-      { path: '/maze',   icon: 'maze',   title: 'すうじめいろ',      sub: 'じゅんばんにタップ', age: '5さい〜' },
+      { path: '/maze',   icon: 'maze',   title: 'すうじめいろ',      sub: 'おぼえて タップも あるよ', age: '5さい〜' },
       { path: '/numberguess', icon: 'numberguess', title: 'かずあて', sub: 'アプリが かずを あてるよ', age: '4さい〜' },
     ],
   },
   {
     label: 'ことば', cat: 'blue',
     games: [
-      { path: '/scramble', icon: 'scramble', title: 'もじならべ',     sub: 'ことばをつくろう',   age: '5さい〜' },
+      { path: '/scramble', icon: 'scramble', title: 'もじならべ',     sub: 'ことばを つくろう・テーマいろいろ', age: '5さい〜' },
       { path: '/search',   icon: 'search',   title: 'ひらがなさがし', sub: 'かくれたことばは？', age: '6さい〜' },
       { path: '/riddles',  icon: 'riddles',  title: 'なぞなぞ',       sub: 'おやこで かんがえよう', age: '4さい〜' },
     ],
@@ -187,7 +187,7 @@ const SECTIONS: { label: string; tagline?: string; cat: keyof typeof CAT; featur
   {
     label: 'きおく・パズル', cat: 'purple',
     games: [
-      { path: '/memory', icon: 'memory', title: 'しんけいすいじゃく', sub: 'えあわせ',           age: '4さい〜' },
+      { path: '/memory', icon: 'memory', title: 'しんけいすいじゃく', sub: 'えあわせ・いろいろ えらべる', age: '4さい〜' },
       { path: '/next',   icon: 'next',   title: 'つぎはどれ？',      sub: 'パターンをさがせ',   age: '5さい〜' },
       { path: '/simon',  icon: 'simon',  title: 'いろきおく',        sub: 'ひかりをおぼえよう', age: '5さい〜' },
       { path: '/dots',   icon: 'dots',   title: 'ドットつなぎ',      sub: 'なにができるかな？', age: '4さい〜' },
