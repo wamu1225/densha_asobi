@@ -135,6 +135,13 @@ export function GameIcon({ id, size = 32 }: GameIconProps) {
           <circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none" />
         </svg>
       )
+    case 'trap': // 六角形のマスを さくで かこむ
+      return (
+        <svg {...p}>
+          <path d="M12 3.2l7.6 4.4v8.8L12 20.8l-7.6-4.4V7.6z" strokeDasharray="3 2.2" />
+          <circle cx="12" cy="12" r="2.6" fill="currentColor" stroke="none" />
+        </svg>
+      )
     default:
       return null
   }

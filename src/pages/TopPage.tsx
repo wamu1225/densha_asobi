@@ -20,6 +20,7 @@ const BEST_KEYS: Record<string, string[]> = {
   '/next':    ['densha_next_best'],
   '/riddles': ['densha_riddles_seen'],
   '/numberguess': ['densha_numberguess_best'],
+  '/trap':    ['densha_trap_cleared'],
 }
 
 // 「とちゅう」がトップから見えない（O-3-34）: 中断復帰のデータは保存されているのに、
@@ -191,6 +192,7 @@ const SECTIONS: { label: string; tagline?: string; cat: keyof typeof CAT; featur
       { path: '/next',   icon: 'next',   title: 'つぎはどれ？',      sub: 'パターンをさがせ',   age: '5さい〜' },
       { path: '/simon',  icon: 'simon',  title: 'いろきおく',        sub: 'ひかりをおぼえよう', age: '5さい〜' },
       { path: '/dots',   icon: 'dots',   title: 'ドットつなぎ',      sub: 'なにができるかな？', age: '4さい〜' },
+      { path: '/trap',   icon: 'trap',   title: 'トロッコ とおせんぼ', sub: 'さくで かこんで つかまえよう', age: '6さい〜' },
     ],
   },
 ]

@@ -17,6 +17,7 @@ import { DotConnect } from './games/DotConnect'
 import { Simon } from './games/Simon'
 import { Riddles } from './games/Riddles'
 import { NumberGuess } from './games/NumberGuess'
+import { TrapCart } from './games/TrapCart'
 
 export default function App() {
   return (
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/simon" element={<Simon />} />
         <Route path="/riddles" element={<Riddles />} />
         <Route path="/numberguess" element={<NumberGuess />} />
+        <Route path="/trap" element={<TrapCart />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="*" element={<NotFound />} />
