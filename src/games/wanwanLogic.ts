@@ -140,18 +140,42 @@ function search(s: State, depth: number, alpha: number, beta: number, side: Side
   return best
 }
 
-// つよさ：やさしい＝1手先だけ見て半分は でたらめ／ふつう＝2手先／つよい＝4手先。数値は、ねらわれた いぬが光る 手助けを使う こども（2手先・4回に1回まちがえる）が やさしい 7割・ふつう 4割前後・つよい 1割前後 かつように 試算で決めた
+// つよさ：mistake の わりあいで「シバを すぐ とられない手」の中から きままに えらび、それ以外は depth 手先まで よむ。
+// どの つよさも シバを ほうちしない（11-06 ユーザー指摘「つよい が王手放置をする」）。
+// その場で かてる手は かならず さす。数値は試算で決めた：てだすけを つかう こども（2手先・4回に1回 でたらめ）が やさしい 4わり・ふつう 2わり半・つよい 1わり かつ
+// （シバを ほうちしない かぎり、いちばん よわくしても こどもの かちは 4わり ほど）
 export const LEVELS = [
-  { name: 'やさしい', depth: 1, mistake: 0.5 },
-  { name: 'ふつう', depth: 2, mistake: 0.2 },
-  { name: 'つよい', depth: 4, mistake: 0.05 },
+  { name: 'やさしい', depth: 2, mistake: 1 },
+  { name: 'ふつう', depth: 2, mistake: 0.5 },
+  { name: 'つよい', depth: 3, mistake: 0.2 },
 ]
 
 type Rand = () => number
+
+// うごいた あと、あいてが つぎの1手で すぐ かてない手（シバを とられない・いぬごやで まけない）
+function safeMoves(s: State): Move[] {
+  const me = s.turn
+  return legalMoves(s).filter((m) => {
+    const t = apply(s, m)
+    const r = result(t)
+    if (r === me) return true
+    if (r !== null) return false
+    return !legalMoves(t).some((o) => result(apply(t, o)) === 1 - me)
+  })
+}
+
 export function chooseMove(s: State, level: number, rand: Rand = Math.random): Move {
   const L = LEVELS[level]
   const moves = legalMoves(s)
-  if (rand() < L.mistake) return moves[Math.floor(rand() * moves.length)]
+  // その場で かてる手（シバを つかまえる など）が あれば、どの つよさでも かならず さす
+  const win = moves.find((m) => result(apply(s, m)) === s.turn)
+  if (win) return win
+  // 弱める「まちがい」は、シバを すぐ とられない手の中からだけ えらぶ（つよい あいてが リーダーを ほうちすると おかしいので）
+  if (rand() < L.mistake) {
+    const safe = safeMoves(s)
+    const pool = safe.length ? safe : moves
+    return pool[Math.floor(rand() * pool.length)]
+  }
   let best = -Infinity, picks: Move[] = []
   for (const m of moves) {
     const v = search(apply(s, m), L.depth - 1, -Infinity, Infinity, s.turn)
