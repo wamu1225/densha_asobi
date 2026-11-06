@@ -18,6 +18,9 @@ import { Simon } from './games/Simon'
 import { Riddles } from './games/Riddles'
 import { NumberGuess } from './games/NumberGuess'
 import { TrapCart } from './games/TrapCart'
+import { RailConnect } from './games/RailConnect'
+import { PointSwitch } from './games/PointSwitch'
+import { ShuntYard } from './games/ShuntYard'
 
 export default function App() {
   return (
@@ -39,6 +42,9 @@ export default function App() {
         <Route path="/riddles" element={<Riddles />} />
         <Route path="/numberguess" element={<NumberGuess />} />
         <Route path="/trap" element={<TrapCart />} />
+        <Route path="/rail" element={<RailConnect />} />
+        <Route path="/switch" element={<PointSwitch />} />
+        <Route path="/shunt" element={<ShuntYard />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="*" element={<NotFound />} />

@@ -142,6 +142,29 @@ export function GameIcon({ id, size = 32 }: GameIconProps) {
           <circle cx="12" cy="12" r="2.6" fill="currentColor" stroke="none" />
         </svg>
       )
+    case 'rail': // まがった せんろの マス
+      return (
+        <svg {...p}>
+          <rect x="3.5" y="3.5" width="17" height="17" rx="3" />
+          <path d="M9 3.5a11.5 11.5 0 0 0 11.5 11.5" />
+          <path d="M15 3.5a5.5 5.5 0 0 0 5.5 5.5" />
+        </svg>
+      )
+    case 'switch': // 1本の せんろが 2本に わかれる ポイント
+      return (
+        <svg {...p}>
+          <path d="M12 3v7.5" /><path d="M12 10.5L5.5 19" /><path d="M12 10.5L18.5 19" strokeDasharray="2.4 2" />
+          <circle cx="12" cy="10.5" r="2.2" fill="currentColor" stroke="none" />
+        </svg>
+      )
+    case 'shunt': // ならんだ しゃりょうと、上に のびる ひきこみせん
+      return (
+        <svg {...p}>
+          <path d="M2.5 17.5h19" /><path d="M13 17.5L19 9.5h2.5" />
+          <rect x="3.5" y="11.5" width="4.5" height="4.5" rx="1" />
+          <rect x="9" y="11.5" width="4.5" height="4.5" rx="1" />
+        </svg>
+      )
     default:
       return null
   }

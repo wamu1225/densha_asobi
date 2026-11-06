@@ -21,6 +21,9 @@ const BEST_KEYS: Record<string, string[]> = {
   '/riddles': ['densha_riddles_seen'],
   '/numberguess': ['densha_numberguess_best'],
   '/trap':    ['densha_trap_cleared'],
+  '/rail':    ['densha_rail_cleared'],
+  '/switch':  ['densha_switch_best'],
+  '/shunt':   ['densha_shunt_cleared'],
 }
 
 // 「とちゅう」がトップから見えない（O-3-34）: 中断復帰のデータは保存されているのに、
@@ -193,6 +196,9 @@ const SECTIONS: { label: string; tagline?: string; cat: keyof typeof CAT; featur
       { path: '/simon',  icon: 'simon',  title: 'いろきおく',        sub: 'ひかりをおぼえよう', age: '5さい〜' },
       { path: '/dots',   icon: 'dots',   title: 'ドットつなぎ',      sub: 'なにができるかな？', age: '4さい〜' },
       { path: '/trap',   icon: 'trap',   title: 'トロッコ とおせんぼ', sub: 'さくで かこんで つかまえよう', age: '6さい〜' },
+      { path: '/rail',   icon: 'rail',   title: 'せんろ つなぎ',     sub: 'まわして えきまで つなごう', age: '5さい〜' },
+      { path: '/switch', icon: 'switch', title: 'ポイント きりかえ', sub: 'でんしゃを えきへ とどけよう', age: '4さい〜' },
+      { path: '/shunt',  icon: 'shunt',  title: 'れっしゃ いれかえ', sub: '1・2・3の じゅんに ならべよう', age: '6さい〜' },
     ],
   },
 ]
