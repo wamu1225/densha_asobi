@@ -7,7 +7,8 @@ const GRAD = 'linear-gradient(135deg, #f97316, #c2410c)'
 const TITLE = 'わんわん つかまえっこ'
 const SAVE_KEY = 'densha_wanwan_wins' // { "つよさの番号": かった かず }
 
-const NAME: Record<Kind, string> = { ou: 'リーダー', hi: 'ダックス', kaku: 'プードル', fu: 'こいぬ', kin: 'おとな' }
+// なまえは ぜんぶ いぬの しゅるい。リーダー（王冠）と ★（むこうまで いった パグ）は しるしで 見せる
+const NAME: Record<Kind, string> = { ou: 'シバ', hi: 'ダックス', kaku: 'プードル', fu: 'パグ', kin: 'パグ★' }
 const TEAM = [
   { name: 'あか', collar: '#dc2626', ring: '#fecaca' },  // こちら
   { name: 'あお', collar: '#2563eb', ring: '#bfdbfe' },  // あいて
@@ -55,8 +56,8 @@ export function WanwanTag() {
     if (rr === null) return
     const caught = !ns.board.some((p) => p && p.kind === 'ou' && p.side === (rr === 0 ? 1 : 0))
     setWhy(rr === 'draw' ? 'ながく つづいたので ひきわけ'
-      : caught ? (rr === 0 ? 'あいての リーダーを つかまえた' : 'リーダーが つかまっちゃった')
-      : (rr === 0 ? 'リーダーが あいての いぬごやに ついた' : 'あいての リーダーが いぬごやに ついた'))
+      : caught ? (rr === 0 ? 'あいての リーダーの シバを つかまえた' : 'リーダーの シバが つかまっちゃった')
+      : (rr === 0 ? 'シバが あいての いぬごやに ついた' : 'あいての シバが いぬごやに ついた'))
     if (rr === 0) {
       const nw = { ...wins, [String(level)]: (wins[String(level)] ?? 0) + 1 }
       setWins(nw); saveWins(nw)
@@ -112,13 +113,13 @@ export function WanwanTag() {
           ))}
         </div>
         <p className="text-xl font-black text-center text-gray-700 leading-snug">
-          こうえんで つかまえっこ！<br />あいての リーダーを つかまえよう
+          こうえんで つかまえっこ！<br />あいての シバを つかまえよう
         </p>
         <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl p-4 w-full text-sm font-bold text-orange-900 leading-relaxed">
           <p>いぬを タップすると、いける ところに みどりの まるが でるよ。いぬの まわりの あしあとの ほうへ 1マス すすめるよ。</p>
           <p>あいての いぬの ところへ いくと つかまえられるよ。つかまえた いぬは きみの なかまに なって、あいている ところから だせるよ。</p>
-          <p>こいぬは いちばん むこうまで いくと おとなに なって、いける ほうこうが ふえるよ。</p>
-          <p>あいての リーダーを つかまえるか、じぶんの リーダーが あいての いぬごやの れつまで いって つかまらなければ かち！</p>
+          <p>おうかんの シバが チームの リーダー。パグは いちばん むこうまで いくと ★が ついて、いける ほうこうが ふえるよ。</p>
+          <p>あいての シバを つかまえるか、じぶんの シバが あいての いぬごやの れつまで いって つかまらなければ かち！</p>
           <p>あかく ひかった いぬは、あいてに ねらわれて いるよ。</p>
         </div>
         <p className="text-sm font-bold text-gray-500 self-start">あいての つよさを えらんでね</p>
@@ -243,18 +244,20 @@ function DogHouse({ x, y, color }: { x: number; y: number; color: string }) {
 // いぬの かお。まわりの あしあとが いける むき。くびわの いろで チームを 見分ける（あいても さかさまに しない）
 function Dog({ kind, side, small = false }: { kind: Kind; side: Side; small?: boolean }) {
   const team = TEAM[side]
-  const fur = kind === 'ou' ? '#f59e0b' : kind === 'hi' ? '#92400e' : kind === 'kaku' ? '#f5f5f4' : kind === 'kin' ? '#fbbf24' : '#fde68a'
-  const ear = kind === 'ou' ? '#d97706' : kind === 'hi' ? '#78350f' : kind === 'kaku' ? '#d6d3d1' : '#f59e0b'
+  const fur = kind === 'ou' ? '#f59e0b' : kind === 'hi' ? '#92400e' : kind === 'kaku' ? '#f5f5f4' : '#e7d3b0'
+  const ear = kind === 'ou' ? '#d97706' : kind === 'hi' ? '#78350f' : kind === 'kaku' ? '#d6d3d1' : '#292524'
   const face = (
     <g>
       {/* みみ */}
       {kind === 'ou' && <><path d="M-24 -14 L-20 -34 L-8 -22 Z" fill={ear} /><path d="M24 -14 L20 -34 L8 -22 Z" fill={ear} /></>}
       {kind === 'hi' && <><ellipse cx={-24} cy={-2} rx={8} ry={17} fill={ear} /><ellipse cx={24} cy={-2} rx={8} ry={17} fill={ear} /></>}
       {kind === 'kaku' && [[-20, -22], [0, -28], [20, -22], [-27, -6], [27, -6]].map(([cx, cy], k) => <circle key={k} cx={cx} cy={cy} r={9} fill={ear} />)}
-      {(kind === 'fu' || kind === 'kin') && <><ellipse cx={-19} cy={-19} rx={7} ry={9} fill={ear} /><ellipse cx={19} cy={-19} rx={7} ry={9} fill={ear} /></>}
+      {/* パグ：ちいさな たれみみ */}
+      {(kind === 'fu' || kind === 'kin') && <><path d="M-21 -16 Q-30 -12 -24 -2 Q-18 -8 -14 -18 Z" fill={ear} /><path d="M21 -16 Q30 -12 24 -2 Q18 -8 14 -18 Z" fill={ear} /></>}
       {/* あたま */}
-      <circle r={kind === 'fu' ? 19 : 22} fill={fur} stroke="#78350f" strokeWidth={2} />
-      <ellipse cx={0} cy={8} rx={11} ry={8} fill="#fffbeb" />
+      <circle r={22} fill={fur} stroke="#78350f" strokeWidth={2} />
+      {/* はなまわり（パグは くろい おめん） */}
+      <ellipse cx={0} cy={8} rx={11} ry={8} fill={kind === 'fu' || kind === 'kin' ? '#44403c' : '#fffbeb'} />
       <circle cx={-8} cy={-4} r={3} fill="#1c1917" />
       <circle cx={8} cy={-4} r={3} fill="#1c1917" />
       <ellipse cx={0} cy={4} rx={4} ry={3} fill="#1c1917" />

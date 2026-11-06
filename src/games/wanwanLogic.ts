@@ -1,7 +1,7 @@
 // わんわん つかまえっこ のルールと相手の考え方（画面から切り離して試算できるようにしている）
 // こうえんは よこ3×たて4。こちら（下）と あいて（上）が 4ひきずつ。つかまえた いぬは なかまに なって、あいている ところから だせる。
-// かち：あいての リーダーを つかまえる／じぶんの リーダーが あいての いぬごやの だんに着いて、つぎに つかまらない
-// 中の名前（ou・hi・kaku・fu・kin）は動き方の種類：ou＝リーダー（8ほうこう） hi＝ダックス（たて・よこ） kaku＝プードル（ななめ） fu＝こいぬ（まえ） kin＝おとなに なった こいぬ
+// かち：あいての シバ（リーダー）を つかまえる／じぶんの シバが あいての いぬごやの だんに着いて、つぎに つかまらない
+// 中の名前（ou・hi・kaku・fu・kin）は動き方の種類：ou＝シバ（リーダー・8ほうこう） hi＝ダックス（たて・よこ） kaku＝プードル（ななめ） fu＝パグ（まえ） kin＝★が ついた パグ
 
 export const COLS = 3
 export const ROWS = 4
@@ -11,7 +11,7 @@ export type Side = 0 | 1 // 0＝こちら（下から上へ進む） 1＝あい�
 export interface Piece { kind: Kind; side: Side }
 export interface State {
   board: (Piece | null)[]   // r * COLS + c。r=0 が いちばん上
-  hand: [Kind[], Kind[]]     // なかまに なった いぬ（おとなは こいぬに もどる）
+  hand: [Kind[], Kind[]]     // なかまに なった いぬ（★の パグは ★が とれる）
   turn: Side
   ply: number
 }
@@ -55,7 +55,7 @@ export function legalMoves(s: State): Move[] {
       out.push({ from: i, to: nr * COLS + nc })
     }
   })
-  // なかまを だす（こいぬは いちばん むこうの だんには だせない）
+  // なかまを だす（パグは いちばん むこうの だんには だせない）
   for (const kind of new Set(s.hand[me])) {
     s.board.forEach((p, i) => {
       if (p) return
@@ -89,7 +89,7 @@ export function apply(s: State, m: Move): State {
 export function result(s: State): Side | 'draw' | null {
   const kings = s.board.map((p, i) => (p && p.kind === 'ou' ? { side: p.side, i } : null)).filter(Boolean) as { side: Side; i: number }[]
   for (const side of [0, 1] as Side[]) if (!kings.some((k) => k.side === side)) return (1 - side) as Side
-  // リーダーが むこうの だんに着き、あいての番で つかまらずに じぶんの番が もどってきたら かち
+  // シバが むこうの だんに着き、あいての番で つかまらずに じぶんの番が もどってきたら かち
   for (const k of kings) {
     if (k.side === s.turn && Math.floor(k.i / COLS) === farRow(k.side)) return k.side
   }
@@ -106,7 +106,7 @@ function evaluate(s: State, side: Side): number {
     if (!p) return
     const sign = p.side === side ? 1 : -1
     v += sign * VALUE[p.kind]
-    if (p.kind === 'ou') { // リーダーが むこうへ進むほど すこし よい（いぬごやを ねらう）
+    if (p.kind === 'ou') { // シバが むこうへ進むほど すこし よい（いぬごやを ねらう）
       const r = Math.floor(i / COLS)
       v += sign * 0.3 * (p.side === 0 ? ROWS - 1 - r : r)
     }
