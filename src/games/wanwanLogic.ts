@@ -1,16 +1,17 @@
-// ミニしょうぎ のルールと相手の考え方（画面から切り離して試算できるようにしている）
-// 盤は よこ3×たて4。こちら（下）と あいて（上）が 4こずつ。とった こまは じぶんの こまとして 打てる。
-// かち：あいての おうを とる／じぶんの おうが いちばん むこうの だんに着いて、つぎに とられない
+// わんわん つかまえっこ のルールと相手の考え方（画面から切り離して試算できるようにしている）
+// こうえんは よこ3×たて4。こちら（下）と あいて（上）が 4ひきずつ。つかまえた いぬは なかまに なって、あいている ところから だせる。
+// かち：あいての リーダーを つかまえる／じぶんの リーダーが あいての いぬごやの だんに着いて、つぎに つかまらない
+// 中の名前（ou・hi・kaku・fu・kin）は動き方の種類：ou＝リーダー（8ほうこう） hi＝ダックス（たて・よこ） kaku＝プードル（ななめ） fu＝こいぬ（まえ） kin＝おとなに なった こいぬ
 
 export const COLS = 3
 export const ROWS = 4
 
-export type Kind = 'ou' | 'hi' | 'kaku' | 'fu' | 'kin' // おう・たて（よこ・たてに1）・なな（ななめに1）・ふ・ふが なった こま
+export type Kind = 'ou' | 'hi' | 'kaku' | 'fu' | 'kin'
 export type Side = 0 | 1 // 0＝こちら（下から上へ進む） 1＝あいて
 export interface Piece { kind: Kind; side: Side }
 export interface State {
   board: (Piece | null)[]   // r * COLS + c。r=0 が いちばん上
-  hand: [Kind[], Kind[]]     // もちごま（なった こまは もとに もどして持つ）
+  hand: [Kind[], Kind[]]     // なかまに なった いぬ（おとなは こいぬに もどる）
   turn: Side
   ply: number
 }
@@ -18,7 +19,7 @@ export type Move = { from: number; to: number } | { drop: Kind; to: number }
 
 export const MAX_PLY = 80 // これより長いと ひきわけ
 
-// こまが進める むき（こちら側から見て。dr<0 が まえ）
+// いぬが進める むき（こちら側から見て。dr<0 が まえ）
 const STEPS: Record<Kind, [number, number][]> = {
   ou: [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]],
   hi: [[-1, 0], [1, 0], [0, -1], [0, 1]],
@@ -54,7 +55,7 @@ export function legalMoves(s: State): Move[] {
       out.push({ from: i, to: nr * COLS + nc })
     }
   })
-  // もちごまを打つ（ふは いちばん むこうの だんには 打てない）
+  // なかまを だす（こいぬは いちばん むこうの だんには だせない）
   for (const kind of new Set(s.hand[me])) {
     s.board.forEach((p, i) => {
       if (p) return
@@ -88,7 +89,7 @@ export function apply(s: State, m: Move): State {
 export function result(s: State): Side | 'draw' | null {
   const kings = s.board.map((p, i) => (p && p.kind === 'ou' ? { side: p.side, i } : null)).filter(Boolean) as { side: Side; i: number }[]
   for (const side of [0, 1] as Side[]) if (!kings.some((k) => k.side === side)) return (1 - side) as Side
-  // おうが むこうの だんに着き、あいての番で とられずに じぶんの番が もどってきたら かち
+  // リーダーが むこうの だんに着き、あいての番で つかまらずに じぶんの番が もどってきたら かち
   for (const k of kings) {
     if (k.side === s.turn && Math.floor(k.i / COLS) === farRow(k.side)) return k.side
   }
@@ -105,7 +106,7 @@ function evaluate(s: State, side: Side): number {
     if (!p) return
     const sign = p.side === side ? 1 : -1
     v += sign * VALUE[p.kind]
-    if (p.kind === 'ou') { // おうが むこうへ進むほど すこし よい（トライを ねらう）
+    if (p.kind === 'ou') { // リーダーが むこうへ進むほど すこし よい（いぬごやを ねらう）
       const r = Math.floor(i / COLS)
       v += sign * 0.3 * (p.side === 0 ? ROWS - 1 - r : r)
     }
@@ -139,7 +140,7 @@ function search(s: State, depth: number, alpha: number, beta: number, side: Side
   return best
 }
 
-// つよさ：やさしい＝1手先だけ見て半分は でたらめ／ふつう＝2手先／つよい＝4手先。数値は、ねらわれた こまが光る 手助けを使う こども（2手先・4回に1回まちがえる）が やさしい 7割・ふつう 4割前後・つよい 1割前後 かつように 試算で決めた
+// つよさ：やさしい＝1手先だけ見て半分は でたらめ／ふつう＝2手先／つよい＝4手先。数値は、ねらわれた いぬが光る 手助けを使う こども（2手先・4回に1回まちがえる）が やさしい 7割・ふつう 4割前後・つよい 1割前後 かつように 試算で決めた
 export const LEVELS = [
   { name: 'やさしい', depth: 1, mistake: 0.5 },
   { name: 'ふつう', depth: 2, mistake: 0.2 },

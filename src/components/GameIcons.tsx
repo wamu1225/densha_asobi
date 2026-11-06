@@ -150,11 +150,12 @@ export function GameIcon({ id, size = 32 }: GameIconProps) {
           <path d="M15 3.5a5.5 5.5 0 0 0 5.5 5.5" />
         </svg>
       )
-    case 'shogi': // しょうぎの こま（五角形）
+    case 'wanwan': // いぬの かお
       return (
         <svg {...p}>
-          <path d="M12 3l6 2.8 1.3 14.7H4.7L6 5.8z" />
-          <path d="M9.5 11.5h5" /><path d="M12 9v6.5" />
+          <circle cx="12" cy="13" r="6.5" />
+          <path d="M6.3 10.5L5 4.5l4.2 3.3" /><path d="M17.7 10.5L19 4.5l-4.2 3.3" />
+          <circle cx="12" cy="14.5" r="1.3" fill="currentColor" stroke="none" />
         </svg>
       )
     case 'shunt': // ならんだ しゃりょうと、上に のびる ひきこみせん
