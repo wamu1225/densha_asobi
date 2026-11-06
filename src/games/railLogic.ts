@@ -15,7 +15,7 @@ export interface StageDef {
   minLen: number    // 道の長さの下限（長いほど くねくね曲がる）
 }
 
-// 横は5マスまで（390px の画面でマスが56px以上になる）。縦に長くして難しくする。数値は試算で決めた（scripts の試算で、どのステージも必ず解ける・はじめから解けている盤が無いことを確かめた）
+// 横は5マスまで（390px の画面でマスが56px以上になる）。難しさは縦の長さで出す。数値は試算で決めた（scripts の試算で、どのステージも必ず解ける・はじめから解けている盤が無いことを確かめた）
 export const STAGES: StageDef[] = [
   { cols: 3, rows: 3, decoys: false, locked: 1, minLen: 4 },
   { cols: 4, rows: 3, decoys: false, locked: 1, minLen: 6 },
