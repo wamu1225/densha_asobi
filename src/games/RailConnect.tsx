@@ -95,9 +95,7 @@ export function RailConnect() {
           せんろを まわして<br />えきと えきを つなごう
         </p>
         <div className="bg-sky-50 border-2 border-sky-200 rounded-2xl p-4 w-full text-sm font-bold text-sky-900 leading-relaxed">
-          <p>マスを タップすると せんろが くるっと まわるよ。</p>
-          <p>ひだりの えきから みぎの えきまで、せんろが ひとつに つながったら でんしゃが はしるよ。</p>
-          <p>ねじの ついた マスは うごかないよ。ヒントに してね。</p>
+          <p>マスを タップすると、せんろが くるっと まわるよ。</p>
         </div>
         <p className="text-sm font-bold text-gray-500 self-start">ステージを えらんでね</p>
         <div className="grid grid-cols-4 gap-2 w-full">
@@ -118,9 +116,6 @@ export function RailConnect() {
             )
           })}
         </div>
-        <p className="text-xs font-bold text-gray-500 text-center">
-          クリアすると つぎの ステージが あくよ。すくない かいすうで つなげたら きろくに のこるよ。
-        </p>
       </div>
     </GameLayout>
   )

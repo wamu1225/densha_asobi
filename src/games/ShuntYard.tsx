@@ -90,9 +90,7 @@ export function ShuntYard() {
           しゃりょうを 1・2・3…の<br />じゅんばんに ならべよう
         </p>
         <div className="bg-violet-50 border-2 border-violet-200 rounded-2xl p-4 w-full text-sm font-bold text-violet-900 leading-relaxed">
-          <p>みぎから しゃりょうが ばらばらの じゅんばんで くるよ。</p>
-          <p>ホームには 1ばんから じゅんばんに いれてね。</p>
-          <p>まだ いれられない しゃりょうは「ひきこみせん」で まってもらおう。ひきこみせんは いきどまりだから、さいごに いれた しゃりょうから でてくるよ。</p>
+          <p>ひきこみせんは、さいごに いれた しゃりょうから でるよ。</p>
         </div>
         <p className="text-sm font-bold text-gray-500 self-start">ステージを えらんでね</p>
         <div className="grid grid-cols-4 gap-2 w-full">

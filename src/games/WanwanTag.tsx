@@ -116,11 +116,7 @@ export function WanwanTag() {
           こうえんで つかまえっこ！<br />あいての シバを つかまえよう
         </p>
         <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl p-4 w-full text-sm font-bold text-orange-900 leading-relaxed">
-          <p>いぬを タップすると、いける ところに みどりの まるが でるよ。いぬの まわりの あしあとの ほうへ 1マス すすめるよ。</p>
-          <p>あいての いぬの ところへ いくと つかまえられるよ。つかまえた いぬは きみの なかまに なって、あいている ところから だせるよ。</p>
-          <p>おうかんの シバが チームの リーダー。パグは いちばん むこうまで いくと ★が ついて、いける ほうこうが ふえるよ。</p>
-          <p>あいての シバを つかまえるか、じぶんの シバが あいての いぬごやの れつまで いって つかまらなければ かち！</p>
-          <p>あかく ひかった いぬは、あいてに ねらわれて いるよ。</p>
+          <p>つかまえた いぬは、きみの なかまに なるよ。</p>
         </div>
         <p className="text-sm font-bold text-gray-500 self-start">あいての つよさを えらんでね</p>
         <div className="grid grid-cols-3 gap-2 w-full">
@@ -133,7 +129,6 @@ export function WanwanTag() {
             </button>
           ))}
         </div>
-        <p className="text-xs font-bold text-gray-500 text-center">きみは あかい くびわの チーム。さきに うごくのは きみだよ。</p>
       </div>
     </GameLayout>
   )
