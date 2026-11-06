@@ -22,7 +22,7 @@ const BEST_KEYS: Record<string, string[]> = {
   '/numberguess': ['densha_numberguess_best'],
   '/trap':    ['densha_trap_cleared'],
   '/rail':    ['densha_rail_cleared'],
-  '/switch':  ['densha_switch_best'],
+  '/shogi':   ['densha_shogi_wins'],
   '/shunt':   ['densha_shunt_cleared'],
 }
 
@@ -197,7 +197,7 @@ const SECTIONS: { label: string; tagline?: string; cat: keyof typeof CAT; featur
       { path: '/dots',   icon: 'dots',   title: 'ドットつなぎ',      sub: 'なにができるかな？', age: '4さい〜' },
       { path: '/trap',   icon: 'trap',   title: 'トロッコ とおせんぼ', sub: 'さくで かこんで つかまえよう', age: '6さい〜' },
       { path: '/rail',   icon: 'rail',   title: 'せんろ つなぎ',     sub: 'まわして えきまで つなごう', age: '5さい〜' },
-      { path: '/switch', icon: 'switch', title: 'ポイント きりかえ', sub: 'でんしゃを えきへ とどけよう', age: '4さい〜' },
+      { path: '/shogi',  icon: 'shogi',  title: 'ミニしょうぎ',     sub: 'とった こまを つかって たたかおう', age: '6さい〜' },
       { path: '/shunt',  icon: 'shunt',  title: 'れっしゃ いれかえ', sub: '1・2・3の じゅんに ならべよう', age: '6さい〜' },
     ],
   },

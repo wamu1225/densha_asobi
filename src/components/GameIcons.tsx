@@ -150,11 +150,11 @@ export function GameIcon({ id, size = 32 }: GameIconProps) {
           <path d="M15 3.5a5.5 5.5 0 0 0 5.5 5.5" />
         </svg>
       )
-    case 'switch': // 1本の せんろが 2本に わかれる ポイント
+    case 'shogi': // しょうぎの こま（五角形）
       return (
         <svg {...p}>
-          <path d="M12 3v7.5" /><path d="M12 10.5L5.5 19" /><path d="M12 10.5L18.5 19" strokeDasharray="2.4 2" />
-          <circle cx="12" cy="10.5" r="2.2" fill="currentColor" stroke="none" />
+          <path d="M12 3l6 2.8 1.3 14.7H4.7L6 5.8z" />
+          <path d="M9.5 11.5h5" /><path d="M12 9v6.5" />
         </svg>
       )
     case 'shunt': // ならんだ しゃりょうと、上に のびる ひきこみせん

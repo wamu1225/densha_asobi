@@ -19,7 +19,7 @@ import { Riddles } from './games/Riddles'
 import { NumberGuess } from './games/NumberGuess'
 import { TrapCart } from './games/TrapCart'
 import { RailConnect } from './games/RailConnect'
-import { PointSwitch } from './games/PointSwitch'
+import { MiniShogi } from './games/MiniShogi'
 import { ShuntYard } from './games/ShuntYard'
 
 export default function App() {
@@ -43,7 +43,7 @@ export default function App() {
         <Route path="/numberguess" element={<NumberGuess />} />
         <Route path="/trap" element={<TrapCart />} />
         <Route path="/rail" element={<RailConnect />} />
-        <Route path="/switch" element={<PointSwitch />} />
+        <Route path="/shogi" element={<MiniShogi />} />
         <Route path="/shunt" element={<ShuntYard />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
