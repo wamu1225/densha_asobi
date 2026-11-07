@@ -29,13 +29,20 @@ function makeQuestion(level: Level) {
   return { a, b, op: isAdd ? '+' : '−', answer: isAdd ? a + b : a - b }
 }
 
-function makeChoices(answer: number): number[] {
+// まちがえの選択肢は、子どもが よく する まちがいから えらぶ（1ずれ・10ずれ＝くりあがりの わすれ・たすと ひくの とりちがえ・となりの だん）。たりなければ ちかい かず
+function makeChoices(q: { a: number; b: number; op: string; answer: number }): number[] {
+  const { a, b, op, answer } = q
+  const likely = op === '+' ? [answer - 1, answer + 1, answer - 10, Math.abs(a - b)]
+    : op === '−' ? [answer - 1, answer + 1, answer + 10, a + b]
+    : op === '×' ? [answer + a, answer - a, answer + b, answer - b]
+    : [answer - 1, answer + 1, a - b]
   const set = new Set([answer])
+  for (const c of likely.sort(() => Math.random() - 0.5)) if (set.size < 4 && c >= 0 && c !== answer) set.add(c)
   while (set.size < 4) { const d = Math.floor(Math.random() * 6) + 1; const c = answer + (Math.random() > 0.5 ? d : -d); if (c >= 0) set.add(c) }
   return [...set].sort(() => Math.random() - 0.5)
 }
 
-function makeQAndChoices(level: Level) { const q = makeQuestion(level); return { q, choices: makeChoices(q.answer) } }
+function makeQAndChoices(level: Level) { const q = makeQuestion(level); return { q, choices: makeChoices(q) } }
 
 const LEVEL_LABELS: Record<Level, string> = { 1: '★☆☆ 1けた +−', 2: '★★☆ 2けた +−', 3: '★★★ かけざん 2〜6のだん', 4: '★★★★ 九九ぜんぶ・わりざん' }
 const LEVEL_TIME: Record<Level, number> = { 1: 30, 2: 30, 3: 45, 4: 45 }
