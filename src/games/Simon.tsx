@@ -5,8 +5,10 @@ import { ResultScreen } from '../components/ResultScreen'
 const GRAD = 'linear-gradient(135deg, #7c3aed, #5b21b6)'
 const BEST_KEY = 'densha_simon_best'
 // O-3-33 A-4: 色数でベストを分ける（6色は4色より難しく、同じ数字で比べると誤解を招くため）
-function getBest(numColors: NumColors): number { try { return parseInt(localStorage.getItem(`${BEST_KEY}_${numColors}`) ?? '0') } catch { return 0 } }
-function saveBest(numColors: NumColors, v: number) { if (v > getBest(numColors)) localStorage.setItem(`${BEST_KEY}_${numColors}`, String(v)) }
+// ぎゃくから（さいごに ひかった いろから タップ）は べつの ベスト（2026-11-07）
+const bestKeyOf = (numColors: NumColors, rev = false) => `${BEST_KEY}_${numColors}${rev ? '_rev' : ''}`
+function getBest(numColors: NumColors, rev = false): number { try { return parseInt(localStorage.getItem(bestKeyOf(numColors, rev)) ?? '0') || 0 } catch { return 0 } }
+function saveBest(numColors: NumColors, v: number, rev = false) { try { if (v > getBest(numColors, rev)) localStorage.setItem(bestKeyOf(numColors, rev), String(v)) } catch { /* 保存できなくても遊べる */ } }
 
 // ── 色パネルの定義（最大6色。O-3-33 A-4で4→6を選べるように拡張） ──
 // dark: 消灯時の暗い色  bright: 点灯時の明るい色  glow: 光のにじみ色
@@ -53,6 +55,7 @@ export function Simon() {
   const [tapLit, setTapLit] = useState<number | null>(null)
   const [showingStep, setShowingStep] = useState(0)
   const [numColors, setNumColors] = useState<NumColors>(4)
+  const [rev, setRev] = useState(false)
 
   // ── シーケンス表示 (showing フェーズ) ──────────────────
   useEffect(() => {
@@ -106,9 +109,9 @@ export function Simon() {
     return () => clearTimeout(t)
   }, [phase])
 
-  function startGame(nc: NumColors = numColors) {
+  function startGame(nc: NumColors = numColors, r: boolean = rev) {
     const first = Math.floor(Math.random() * nc)
-    setNumColors(nc)
+    setNumColors(nc); setRev(r)
     setSeq([first]); setRound(1); setInput(0)
     setLit(null); setWrongId(null); setTapLit(null); setPhase('showing')
   }
@@ -120,7 +123,8 @@ export function Simon() {
     setTapLit(id)
     setTimeout(() => setTapLit(null), 220)
 
-    if (id === sequence[inputIdx]) {
+    const want = rev ? sequence[sequence.length - 1 - inputIdx] : sequence[inputIdx]
+    if (id === want) {
       if (inputIdx + 1 === sequence.length) {
         // 最後の正解 — 少し余裕を持たせてから correct へ
         setTimeout(() => setPhase('correct'), 120)
@@ -129,15 +133,15 @@ export function Simon() {
       }
     } else {
       setWrongId(id)
-      setCorrectHintId(sequence[inputIdx])  // 正解のパネルを緑で表示
-      saveBest(numColors, round - 1)
+      setCorrectHintId(want)  // 正解のパネルを緑で表示
+      saveBest(numColors, round - 1, rev)
       setTimeout(() => { setPhase('wrong'); setCorrectHintId(null) }, 900)
     }
   }
 
   // ── 結果画面 ────────────────────────────────────────────
   if (phase === 'over') {
-    const best = getBest(numColors)
+    const best = getBest(numColors, rev)
     return (
       <GameLayout title="いろきおく" gradient={GRAD}>
         <ResultScreen
@@ -145,7 +149,7 @@ export function Simon() {
           scoreLabel="クリアしたラウンド"
           scoreSuffix="ラウンド"
           bestStr={best > 0 ? `${best}ラウンド` : undefined}
-          bestLabel={`ベスト（${numColors}しょく）`}
+          bestLabel={`ベスト（${numColors}しょく${rev ? '・ぎゃくから' : ''}）`}
           onRetry={() => startGame()}
           onChangeMode={() => setPhase('select')}
           accentColor="text-purple-600"
@@ -184,7 +188,7 @@ export function Simon() {
                     </div>
                   ))}
                 </div>
-                <button onClick={() => startGame(nc)}
+                <button onClick={() => startGame(nc, false)}
                   className="w-full py-3 text-base font-black text-white rounded-xl active:scale-95 transition-transform"
                   style={{ background: GRAD, boxShadow: '3px 4px 0 rgba(0,0,0,0.15)' }}>
                   {nc}しょくで はじめる！
@@ -192,6 +196,11 @@ export function Simon() {
               </div>
             )
           })}
+          <button onClick={() => startGame(4, true)}
+            className="w-full py-3 rounded-2xl font-black text-purple-700 bg-white border-2 border-dashed border-purple-400 active:scale-95">
+            <span className="block text-base">🔁 ぎゃくから</span>
+            <span className="block text-xs mt-0.5">さいごに ひかった いろから タップ{getBest(4, true) > 0 ? `・ベスト ${getBest(4, true)}` : ''}</span>
+          </button>
           <p className="text-xs" style={{ color: 'var(--ink-sub)' }}>
             ラウンドが進むほどはやくなるよ！
           </p>
@@ -225,7 +234,7 @@ export function Simon() {
           'bg-amber-100 text-amber-700'
         }`}>
           {phase === 'showing' && `みてね！　${showingStep} / ${sequence.length}こ`}
-          {phase === 'input'   && `タップ！　${inputIdx + 1} / ${sequence.length}`}
+          {phase === 'input'   && (rev ? `ぎゃくから タップ！　${inputIdx + 1} / ${sequence.length}` : `タップ！　${inputIdx + 1} / ${sequence.length}`)}
           {phase === 'correct' && '○ せいかい！つぎのラウンド…'}
           {phase === 'wrong'   && '× ちがう！'}
         </div>
