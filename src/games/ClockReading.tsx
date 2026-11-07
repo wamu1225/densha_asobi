@@ -25,12 +25,25 @@ function randomTime(diff: Difficulty) {
 }
 function fmt(h: number, m: number) { return m === 0 ? `${h}じ` : `${h}じ ${m}ふん` }
 
+// まちがえの選択肢は、とけいを よむときの よくある まちがいから えらぶ
+// ・じが 1つ ずれる（ながい はりが うしろはんぶんだと つぎの じと よみやすい）・ながい はりと みじかい はりの とりちがえ・はんたいがわ
 function makeChoices(h: number, m: number, diff: Difficulty) {
   const used = new Set([fmt(h, m)]); const result = [{ h, m }]
   const allMins = DIFF_MINUTES[diff]
+  const wrap = (x: number) => ((x - 1 + 12) % 12) + 1
+  const likely = [
+    { h: wrap(m >= 30 ? h + 1 : h - 1), m },
+    { h: wrap(m >= 30 ? h - 1 : h + 1), m },
+    { h: m === 0 ? 12 : m / 5, m: (h % 12) * 5 },
+    { h: wrap(h + 6), m },
+  ].sort(() => Math.random() - 0.5)
+  for (const c of likely) {
+    const t = fmt(c.h, c.m)
+    if (result.length < 4 && allMins.includes(c.m) && !used.has(t)) { used.add(t); result.push(c) }
+  }
   while (result.length < 4) {
     const nh = Math.floor(Math.random() * 12) + 1; const nm = allMins[Math.floor(Math.random() * allMins.length)]
-    const s = fmt(nh, nm); if (!used.has(s)) { used.add(s); result.push({ h: nh, m: nm }) }
+    const t = fmt(nh, nm); if (!used.has(t)) { used.add(t); result.push({ h: nh, m: nm }) }
   }
   return result.sort(() => Math.random() - 0.5)
 }
