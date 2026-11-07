@@ -747,8 +747,7 @@ try {
   </url>
 </urlset>`)
   }
-  writeFileSync(sitemapPath, sitemap)
-  // dist 側にもコピー
+  // public/ は元の形のまま。書くのは dist だけ（ビルドのたびにソースが変わって、公開前の検査の「きれいな作業ツリー」が崩れないように）
   writeFileSync(join(distDir, 'sitemap.xml'), sitemap)
   console.log(`✓ sitemap.xml の lastmod をページごとの最終更新日に（about/privacy を含む）`)
 } catch (e) {
