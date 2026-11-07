@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { GameLayout } from '../components/GameLayout'
 import { Confetti } from '../components/Confetti'
-import { STAGES, newOrder, solve } from './shuntLogic'
+import { STAGES, newOrder, solve, solve2 } from './shuntLogic'
 
 const GRAD = 'linear-gradient(135deg, #8b5cf6, #6d28d9)'
 const TITLE = 'れっしゃ いれかえ'
 const SAVE_KEY = 'densha_shunt_cleared' // { "ステージ番号": いちばん少ない 手数 }
-const CAR_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#a855f7']
+const CAR_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#3b82f6', '#a855f7', '#ec4899']
 
 function loadCleared(): Record<string, number> {
   try {
@@ -19,13 +19,14 @@ function saveCleared(v: Record<string, number>) {
 }
 
 type Phase = 'select' | 'play' | 'won'
-interface Yard { come: number[]; wait: number[]; home: number[] } // come[0] がいちばん まえ・wait の さいごが でぐちがわ
-type Move = 'come-home' | 'come-wait' | 'wait-home'
+interface Yard { come: number[]; wait: number[][]; home: number[] } // come[0] がいちばん まえ・wait[k] の さいごが でぐちがわ（ひきこみせんは 1〜2本）
+type Move = { kind: 'come-home' } | { kind: 'come-wait'; k: number } | { kind: 'wait-home'; k: number }
+const SIDING_NAME = ['A', 'B']
 
 export function ShuntYard() {
   const [phase, setPhase] = useState<Phase>('select')
   const [stage, setStage] = useState(0)
-  const [yard, setYard] = useState<Yard>({ come: [], wait: [], home: [] })
+  const [yard, setYard] = useState<Yard>({ come: [], wait: [[]], home: [] })
   const [history, setHistory] = useState<Yard[]>([])
   const [moves, setMoves] = useState(0)
   const [goal, setGoal] = useState(0)
@@ -35,30 +36,33 @@ export function ShuntYard() {
 
   const unlocked = Math.min(STAGES.length, Object.keys(cleared).length + 1)
   const need = yard.home.length + 1
+  const two = STAGES[stage].sidings === 2
   // ひきこみせんで 大きい番号の上に 小さい番号が のっていないと、もう並べられない
-  const stuck = yard.wait.some((v, i) => i > 0 && yard.wait[i - 1] < v)
-  const full = yard.wait.length >= STAGES[stage].maxWait + 2 // 線路の長さ（入れすぎ防止）
+  const stuck = yard.wait.some((w) => w.some((v, i) => i > 0 && w[i - 1] < v))
+  const cap = two ? STAGES[stage].cars : STAGES[stage].maxWait + 2 // 線路の長さ（入れすぎ防止）
 
   function start(s: number) {
     const o = newOrder(STAGES[s])
-    setStage(s); setYard({ come: o, wait: [], home: [] }); setHistory([])
-    setMoves(0); setGoal(solve(o).moves); setMsg(''); setNewBest(false)
+    const twoS = STAGES[s].sidings === 2
+    setStage(s); setYard({ come: o, wait: twoS ? [[], []] : [[]], home: [] }); setHistory([])
+    setMoves(0); setGoal(twoS ? solve2(o) : solve(o).moves); setMsg(''); setNewBest(false)
     setPhase('play')
   }
 
   function move(m: Move) {
     if (phase !== 'play') return
-    const y: Yard = { come: yard.come.slice(), wait: yard.wait.slice(), home: yard.home.slice() }
-    if (m === 'come-home' || m === 'come-wait') {
+    const y: Yard = { come: yard.come.slice(), wait: yard.wait.map((w) => w.slice()), home: yard.home.slice() }
+    if (m.kind === 'come-home' || m.kind === 'come-wait') {
       if (!y.come.length) return
-      if (m === 'come-home' && y.come[0] !== need) { setMsg(`ホームには ${need}ばんを いれてね`); return }
-      if (m === 'come-wait' && full) { setMsg('ひきこみせんが いっぱいだよ'); return }
+      if (m.kind === 'come-home' && y.come[0] !== need) { setMsg(`ホームには ${need}ばんを いれてね`); return }
+      if (m.kind === 'come-wait' && y.wait[m.k].length >= cap) { setMsg('ひきこみせんが いっぱいだよ'); return }
       const car = y.come.shift()!
-      if (m === 'come-home') { y.home.push(car) } else { y.wait.push(car) }
+      if (m.kind === 'come-home') { y.home.push(car) } else { y.wait[m.k].push(car) }
     } else {
-      if (!y.wait.length) return
-      if (y.wait[y.wait.length - 1] !== need) { setMsg(`ホームには ${need}ばんを いれてね`); return }
-      y.home.push(y.wait.pop()!)
+      const w = y.wait[m.k]
+      if (!w.length) return
+      if (w[w.length - 1] !== need) { setMsg(`ホームには ${need}ばんを いれてね`); return }
+      y.home.push(w.pop()!)
     }
     setHistory([...history, yard]); setYard(y); setMsg('')
     const u = moves + 1
@@ -104,17 +108,18 @@ export function ShuntYard() {
                   best !== undefined ? 'bg-violet-500 border-violet-600 text-white'
                     : open ? 'bg-white border-violet-400 text-violet-700' : 'bg-gray-100 border-gray-200 text-gray-300'}`}>
                 <span className="text-2xl leading-none">{k + 1}</span>
-                <span className="text-[11px] mt-1 leading-none">{best !== undefined ? `${best}て` : `${s.cars}りょう`}</span>
+                <span className="text-[11px] mt-1 leading-none">{best !== undefined ? `${best}て` : s.sidings === 2 ? `せん2ほん` : `${s.cars}りょう`}</span>
               </button>
             )
           })}
         </div>
+        <p className="text-xs font-bold text-gray-500 text-center">9から ひきこみせんが 2ほんに なるよ。</p>
       </div>
     </GameLayout>
   )
 
   const front = yard.come[0]
-  const top = yard.wait[yard.wait.length - 1]
+  const tops = yard.wait.map((w) => w[w.length - 1])
 
   return (
     <GameLayout title={TITLE} gradient={GRAD} isPlaying={phase === 'play'} hideAd>
@@ -130,13 +135,15 @@ export function ShuntYard() {
         </div>
 
         {/* ひきこみせん（上）：右が でぐち */}
-        <section className="rounded-2xl bg-stone-100 p-3">
-          <p className="text-xs font-black text-stone-500 mb-2">ひきこみせん（いきどまり ← → でぐち）</p>
-          <div className="flex items-center gap-1 min-h-[56px] border-b-4 border-stone-400 pb-1">
-            <span className="w-3 h-10 bg-stone-500 rounded-sm" aria-hidden="true" />
-            {yard.wait.map((v, i) => <Car key={`w${v}`} n={v} dim={i < yard.wait.length - 1} />)}
-          </div>
-        </section>
+        {yard.wait.map((w, k) => (
+          <section key={k} className="rounded-2xl bg-stone-100 p-3">
+            <p className="text-xs font-black text-stone-500 mb-2">ひきこみせん{two ? ` ${SIDING_NAME[k]}` : ''}（いきどまり ← → でぐち）</p>
+            <div className="flex items-center gap-1 min-h-[56px] border-b-4 border-stone-400 pb-1">
+              <span className="w-3 h-10 bg-stone-500 rounded-sm" aria-hidden="true" />
+              {w.map((v, i) => <Car key={`w${v}`} n={v} dim={i < w.length - 1} small={two} />)}
+            </div>
+          </section>
+        ))}
 
         {/* ホーム（左）と くる せんろ（右） */}
         <section className="rounded-2xl bg-stone-100 p-3">
@@ -158,19 +165,23 @@ export function ShuntYard() {
         </p>
 
         {phase === 'play' && (
-          <div className="grid grid-cols-1 gap-2">
-            <button onClick={() => move('come-home')} disabled={front === undefined}
-              className="py-4 rounded-2xl font-black text-lg text-white shadow active:scale-95 disabled:opacity-30" style={{ background: GRAD }}>
+          <div className={`grid gap-2 ${two ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            <button onClick={() => move({ kind: 'come-home' })} disabled={front === undefined}
+              className={`py-4 rounded-2xl font-black text-lg text-white shadow active:scale-95 disabled:opacity-30 ${two ? 'col-span-2' : ''}`} style={{ background: GRAD }}>
               {front !== undefined ? `${front}ばんを ホームへ` : 'くる しゃりょうは もう ないよ'}
             </button>
-            <button onClick={() => move('come-wait')} disabled={front === undefined}
-              className="py-4 rounded-2xl font-black text-lg border-2 border-violet-400 text-violet-700 bg-white active:scale-95 disabled:opacity-30">
-              {front !== undefined ? `${front}ばんを ひきこみせんへ` : '—'}
-            </button>
-            <button onClick={() => move('wait-home')} disabled={top === undefined}
-              className="py-4 rounded-2xl font-black text-lg border-2 border-stone-400 text-stone-700 bg-white active:scale-95 disabled:opacity-30">
-              {top !== undefined ? `ひきこみせんの ${top}ばんを ホームへ` : 'ひきこみせんは からっぽ'}
-            </button>
+            {yard.wait.map((_, k) => (
+              <button key={`in${k}`} onClick={() => move({ kind: 'come-wait', k })} disabled={front === undefined}
+                className="py-4 rounded-2xl font-black text-lg border-2 border-violet-400 text-violet-700 bg-white active:scale-95 disabled:opacity-30">
+                {front !== undefined ? `${front}ばんを ${two ? SIDING_NAME[k] : 'ひきこみせん'}へ` : '—'}
+              </button>
+            ))}
+            {yard.wait.map((_, k) => (
+              <button key={`out${k}`} onClick={() => move({ kind: 'wait-home', k })} disabled={tops[k] === undefined}
+                className={`py-4 rounded-2xl font-black border-2 border-stone-400 text-stone-700 bg-white active:scale-95 disabled:opacity-30 ${two ? 'text-base' : 'text-lg'}`}>
+                {tops[k] !== undefined ? `${two ? SIDING_NAME[k] : 'ひきこみせん'}の ${tops[k]}ばんを ホームへ` : `${two ? SIDING_NAME[k] : 'ひきこみせん'}は からっぽ`}
+              </button>
+            ))}
           </div>
         )}
 
