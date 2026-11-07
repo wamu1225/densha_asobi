@@ -29,7 +29,7 @@ function chased(s: State, by: Side): Set<number> {
   return new Set(legalMoves({ ...s, turn: by, hand: [[], []] }).map((m) => m.to))
 }
 
-// れんしゅう：ルールを 1つずつ。あいては うごかない。できたら つぎへ（2026-11-07）
+// れんしゅう：ルールを 1つずつ。あいては うごかず、できたら つぎへ（2026-11-07）
 function board(put: [number, Kind, Side][], hand0: Kind[] = []): State {
   const b: (Piece | null)[] = new Array(COLS * ROWS).fill(null)
   for (const [i, kind, side] of put) b[i] = { kind, side }
