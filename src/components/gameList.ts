@@ -1,3 +1,5 @@
+import { createContext } from 'react'
+
 // 全ゲームの一覧（結果画面の「つぎは」と、ゲーム画面の下の「ほかの あそび」で使う）。色はトップの区分の色
 export const ALL_GAMES = [
   { path: '/math',     icon: 'math',     name: 'けいさんスプリント',  color: '#C8352A' },
@@ -31,3 +33,6 @@ export function nextGames(path: string, n: number) {
   const i = ALL_GAMES.findIndex(g => g.path === path)
   return Array.from({ length: n }, (_, k) => ALL_GAMES[(i + 1 + k + ALL_GAMES.length) % ALL_GAMES.length]).filter(g => g.path !== path)
 }
+
+// 結果画面が出ているあいだは、結果画面の「つぎは」と重ならないよう ゲーム画面の下の「ほかの あそび」を かくす
+export const MoreLinksContext = createContext<(hidden: boolean) => void>(() => {})

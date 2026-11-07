@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AdBanner } from './AdBanner'
 import { GameIcon, TrainSide } from './GameIcons'
-import { nextGames } from './gameList'
+import { MoreLinksContext, nextGames } from './gameList'
 
 interface GameLayoutProps {
   title: string
@@ -29,6 +29,7 @@ export function GameLayout({ title, gradient, isPlaying = false, hideAd = false,
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [showConfirm, setShowConfirm] = useState(false)
+  const [hideMore, setHideMore] = useState(false)
 
   useEffect(() => {
     const prev = document.title
@@ -112,10 +113,10 @@ export function GameLayout({ title, gradient, isPlaying = false, hideAd = false,
       <div style={{ height: 2, background: `repeating-linear-gradient(90deg, ${baseColor}55 0, ${baseColor}55 16px, transparent 16px, transparent 22px)` }} />
 
       <main className="flex-1 p-4 max-w-lg mx-auto w-full">
-        {children}
+        <MoreLinksContext.Provider value={setHideMore}>{children}</MoreLinksContext.Provider>
         {/* プレイ中はタップ動線に広告を出さない。選択・結果画面のみ・ボタン群から40px離す */}
         {!isPlaying && !hideAd && <AdBanner slot="5432198760" className="mt-10" />}
-        {!isPlaying && (
+        {!isPlaying && !hideMore && (
           <nav className="mt-10" aria-label="ほかの あそび">
             <p className="text-xs font-bold mb-2" style={{ color: 'var(--ink-sub)' }}>ほかの あそび</p>
             <div className="grid grid-cols-3 gap-2">

@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { GameIcon } from './GameIcons'
-import { ALL_GAMES, samePath } from './gameList'
+import { ALL_GAMES, MoreLinksContext, samePath } from './gameList'
 import { Confetti } from './Confetti'
 
 
@@ -36,6 +36,8 @@ function Star({ filled, size = 38, delay = 0 }: { filled: boolean; size?: number
 
 export function ResultScreen({ score, total, scoreLabel, scoreSuffix, timeStr, extra = [], best, bestStr, bestLabel = 'ベスト', onRetry, onChangeMode, isNewBest = false, accentColor = 'text-sky-500' }: ResultScreenProps) {
   const location = useLocation()
+  const setHideMore = useContext(MoreLinksContext)
+  useEffect(() => { setHideMore(true); return () => setHideMore(false) }, [setHideMore])
 
   // 現在のゲームを除外してランダムに2個選ぶ（マウント時に一度だけ抽選し再レンダリングでシャッフルしない）
   const [suggestions] = useState(() =>
