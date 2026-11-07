@@ -61,9 +61,7 @@ export function NumberGuess() {
         <p className="text-xl font-bold text-center text-gray-700">あたまの なかで、1から100までの かずを 1つ きめてね</p>
         <div className="bg-sky-50 border-2 border-sky-200 rounded-2xl p-4 w-full">
           <p className="text-sm font-bold text-sky-700 text-center leading-relaxed">
-            くちに ださなくて いいよ。きめたら「はじめる」を おしてね。<br />
-            でてくる かずが、きめた かずより おおきいか ちいさいかを こたえていくと、
-            <span className="font-black">7かい いないで</span> かならず あてるよ！
+            おおきいか ちいさいかを こたえると、<span className="font-black">7かい いないで</span> あてるよ！
           </p>
         </div>
         <button onClick={start}

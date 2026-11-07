@@ -105,9 +105,7 @@ export function TrapCart() {
           トロッコが にげだした！<br />トンネルに はいる まえに つかまえよう
         </p>
         <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 w-full text-sm font-bold text-amber-900 leading-relaxed">
-          <p>マスを タップすると さくが たつよ。</p>
-          <p>さくを 1つ たてると、トロッコは トンネルの ほうへ 1マス にげるよ。</p>
-          <p>さくで かこんで、どこにも いけなく したら かち！</p>
+          <p>さくを たてて トロッコを かこめたら かち！</p>
         </div>
         <p className="text-sm font-bold text-gray-500 self-start">ステージを えらんでね</p>
         <div className="grid grid-cols-5 gap-2 w-full">
@@ -128,9 +126,6 @@ export function TrapCart() {
             )
           })}
         </div>
-        <p className="text-xs font-bold text-gray-500 text-center">
-          クリアすると つぎの ステージが あくよ。9と10は ふちの マスが ぜんぶ トンネル。
-        </p>
       </div>
     </GameLayout>
   )
