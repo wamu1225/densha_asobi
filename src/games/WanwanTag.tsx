@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { GameLayout } from '../components/GameLayout'
 import { Confetti } from '../components/Confetti'
-import { COLS, ROWS, LEVELS, initial, legalMoves, apply, result, chooseMove, stepsOf, type State, type Kind, type Side, type Move } from './wanwanLogic'
+import { COLS, ROWS, LEVELS, initial, legalMoves, apply, result, chooseMove, stepsOf, type State, type Kind, type Side, type Move, type Piece } from './wanwanLogic'
 
 const GRAD = 'linear-gradient(135deg, #f97316, #c2410c)'
 const TITLE = 'わんわん つかまえっこ'
@@ -29,6 +29,30 @@ function chased(s: State, by: Side): Set<number> {
   return new Set(legalMoves({ ...s, turn: by, hand: [[], []] }).map((m) => m.to))
 }
 
+// れんしゅう：ルールを 1つずつ。あいては うごかない。できたら つぎへ（2026-11-07）
+function board(put: [number, Kind, Side][], hand0: Kind[] = []): State {
+  const b: (Piece | null)[] = new Array(COLS * ROWS).fill(null)
+  for (const [i, kind, side] of put) b[i] = { kind, side }
+  return { board: b, hand: [hand0, []], turn: 0, ply: 0 }
+}
+const LESSONS: { text: string; setup: () => State; done: (before: State, after: State, m: Move) => boolean; retry?: string }[] = [
+  { text: 'いぬを タップして、みどりの まるへ うごかそう',
+    setup: () => board([[7, 'hi', 0], [10, 'ou', 0], [1, 'ou', 1]]),
+    done: (_b, _a, m) => 'from' in m },
+  { text: 'あおい くびわの パグを つかまえよう',
+    setup: () => board([[7, 'kaku', 0], [10, 'ou', 0], [3, 'fu', 1], [2, 'ou', 1]]),
+    done: (b, a) => a.hand[0].length > b.hand[0].length, retry: 'プードルは ななめに すすむよ' },
+  { text: 'なかまの パグを、あいている ところに だそう',
+    setup: () => board([[10, 'ou', 0], [1, 'ou', 1]], ['fu']),
+    done: (_b, _a, m) => 'drop' in m, retry: 'したの「なかま」の パグを タップしてね' },
+  { text: 'シバを いちばん うえの れつへ。あおい いぬの となりは つかまるよ',
+    setup: () => board([[4, 'ou', 0], [0, 'ou', 1]]),
+    done: (_b, a) => {
+      const k = a.board.findIndex((p) => p && p.kind === 'ou' && p.side === 0)
+      return Math.floor(k / COLS) === 0 && !chased(a, 1).has(k)
+    }, retry: 'あおい いぬの となりは つかまるよ。ほかの ばしょを さがそう' },
+]
+
 type Phase = 'select' | 'play' | 'end'
 type Sel = { from: number } | { drop: Kind } | null
 
@@ -42,11 +66,20 @@ export function WanwanTag() {
   const [undoLeft, setUndoLeft] = useState(1)
   const [wins, setWins] = useState(loadWins)
   const [why, setWhy] = useState('')
+  const [lesson, setLesson] = useState<number | null>(null)
+  const [lessonOk, setLessonOk] = useState(false)
+  const [lessonMsg, setLessonMsg] = useState('')
 
-  const r = result(s)
-  const thinking = phase === 'play' && s.turn === 1 && r === null
+  const r = lesson === null ? result(s) : null
+  const thinking = phase === 'play' && lesson === null && s.turn === 1 && r === null
+
+  function startLesson(k: number) {
+    setLesson(k); setS(LESSONS[k].setup()); setSel(null); setLast(null); setPrev(null)
+    setLessonOk(false); setLessonMsg(''); setPhase('play')
+  }
 
   function start(lv: number) {
+    setLesson(null)
     setLevel(lv); setS(initial()); setSel(null); setLast(null); setPrev(null); setUndoLeft(1); setWhy('')
     setPhase('play')
   }
@@ -66,6 +99,13 @@ export function WanwanTag() {
   }
 
   function play(m: Move) {
+    if (lesson !== null) {
+      const ns = apply(s, m)
+      setSel(null); setLast(m)
+      if (LESSONS[lesson].done(s, ns, m)) { setS({ ...ns, turn: 0 }); setLessonOk(true); setLessonMsg('') }
+      else { setS(LESSONS[lesson].setup()); setLast(null); setLessonMsg(LESSONS[lesson].retry ?? 'もういちど やってみよう') }
+      return
+    }
     const ns = apply(s, m)
     setPrev(s); setS(ns); setSel(null); setLast(m)
     finish(ns)
@@ -86,7 +126,7 @@ export function WanwanTag() {
   }, [thinking, s, level])
 
   function tapCell(i: number) {
-    if (phase !== 'play' || s.turn !== 0) return
+    if (phase !== 'play' || s.turn !== 0 || lessonOk) return
     const p = s.board[i]
     if (sel) {
       const m = legalMoves(s).find((mv) => mv.to === i && ('drop' in sel ? 'drop' in mv && mv.drop === sel.drop : 'from' in mv && mv.from === sel.from))
@@ -118,6 +158,10 @@ export function WanwanTag() {
         <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl p-4 w-full text-sm font-bold text-orange-900 leading-relaxed">
           <p>つかまえた いぬは、きみの なかまに なるよ。</p>
         </div>
+        <button onClick={() => startLesson(0)}
+          className="w-full py-3 rounded-2xl font-black text-orange-700 bg-orange-50 border-2 border-dashed border-orange-300 active:scale-95">
+          はじめての ひとは れんしゅう（4つ）
+        </button>
         <p className="text-sm font-bold text-gray-500 self-start">あいての つよさを えらんでね</p>
         <div className="grid grid-cols-3 gap-2 w-full">
           {LEVELS.map((L, k) => (
@@ -145,7 +189,23 @@ export function WanwanTag() {
     <GameLayout title={TITLE} gradient={GRAD} isPlaying={phase === 'play'} hideAd>
       <Confetti active={phase === 'end' && r === 0} />
       <div className="flex flex-col gap-2 pt-1">
-        <div className="flex items-center gap-2">
+        {lesson !== null && (
+          <div className="rounded-2xl bg-orange-50 border-2 border-orange-200 px-3 py-2">
+            <div className="flex items-center gap-2">
+              <span className="px-3 py-1 rounded-full bg-orange-500 text-white text-sm font-black whitespace-nowrap">れんしゅう {lesson + 1}/{LESSONS.length}</span>
+              <button onClick={() => { setLesson(null); setPhase('select') }} className="ml-auto text-sm font-black text-orange-700 px-3 py-2">やめる</button>
+            </div>
+            <p className="text-base font-black text-orange-900 mt-1">{lessonOk ? 'できた！' : LESSONS[lesson].text}</p>
+            {!lessonOk && lessonMsg && <p className="text-sm font-bold text-rose-600 mt-1">{lessonMsg}</p>}
+            {lessonOk && (
+              <button onClick={() => lesson + 1 < LESSONS.length ? startLesson(lesson + 1) : (setLesson(null), setPhase('select'))}
+                className="w-full mt-2 py-3 rounded-xl font-black text-white active:scale-95" style={{ background: GRAD }}>
+                {lesson + 1 < LESSONS.length ? 'つぎの れんしゅう' : 'れんしゅう おわり！ あいてと あそぼう'}
+              </button>
+            )}
+          </div>
+        )}
+        {lesson === null && <div className="flex items-center gap-2">
           <span className="px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-sm font-black whitespace-nowrap">{LEVELS[level].name}</span>
           <span className="text-sm font-bold text-gray-600 whitespace-nowrap">
             {phase === 'end' ? 'おしまい' : thinking ? 'あいての ばん…' : sel ? 'どこへ いく？' : 'きみの ばん'}
@@ -154,7 +214,7 @@ export function WanwanTag() {
             className="ml-auto px-4 py-2 rounded-xl text-sm font-black border-2 border-orange-400 text-orange-700 bg-white disabled:opacity-30 active:scale-95 whitespace-nowrap">
             まった
           </button>
-        </div>
+        </div>}
 
         <Friends label={'あいての\nなかま'} kinds={s.hand[1]} side={1} />
 
