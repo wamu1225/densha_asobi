@@ -13,6 +13,7 @@ export interface StageDef {
   decoys: boolean   // 道に関係ないマスにも線路を置く（false は空き地）
   locked: number    // はじめから正しい向きで動かせないマスの数（手がかり）
   minLen: number    // 道の長さの下限（長いほど くねくね曲がる）
+  all?: true        // ぜんぶの マスを とおらないと クリアに ならない（ステージ9から）
 }
 
 // 横は5マスまで（390px の画面でマスが56px以上になる）。難しさは縦の長さで出す。数値は試算で決めた（scripts の試算で、どのステージも必ず解ける・はじめから解けている盤が無いことを確かめた）
@@ -25,6 +26,10 @@ export const STAGES: StageDef[] = [
   { cols: 5, rows: 6, decoys: true,  locked: 1, minLen: 16 },
   { cols: 5, rows: 7, decoys: true,  locked: 1, minLen: 19 },
   { cols: 5, rows: 7, decoys: true,  locked: 0, minLen: 23 },
+  { cols: 3, rows: 3, decoys: false, locked: 1, minLen: 9,  all: true },
+  { cols: 4, rows: 3, decoys: false, locked: 1, minLen: 12, all: true },
+  { cols: 4, rows: 4, decoys: false, locked: 2, minLen: 16, all: true },
+  { cols: 5, rows: 4, decoys: false, locked: 2, minLen: 20, all: true },
 ]
 
 export function rotate(m: number): number {
@@ -102,7 +107,7 @@ export function newBoard(def: StageDef, rand: Rand = Math.random): Board {
   })
   const b: Board = { cols, rows, tiles, answer, path, locked, startRow: Math.floor(path[0] / cols), goalRow: Math.floor(path[path.length - 1] / cols) }
   // まわす前から つながっていたら、道のマスを1つ ずらす
-  if (traceRoute(b).ok) {
+  if (cleared(b, def)) {
     const free = path.find((i) => !locked[i] && rotate(tiles[i]) !== tiles[i])
     if (free !== undefined) tiles[free] = rotate(tiles[free])
   }
@@ -125,6 +130,12 @@ export function traceRoute(b: Board): { ok: boolean; cells: number[] } {
     if (!DIRS.includes(out)) return { ok: false, cells }
     c += DC[out]; r += DR[out]; from = OPP[out]
   }
+}
+
+// クリアかどうか。all の ステージは、ぜんぶの マスを とおって はじめて クリア
+export function cleared(b: Board, def: StageDef): boolean {
+  const r = traceRoute(b)
+  return r.ok && (!def.all || r.cells.length === b.cols * b.rows)
 }
 
 // いちばん少なく まわすと何回で つながるか（記録の目安。道のマスだけ数える）

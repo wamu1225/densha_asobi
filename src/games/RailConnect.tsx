@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { GameLayout } from '../components/GameLayout'
 import { Confetti } from '../components/Confetti'
-import { N, E, S, W, STAGES, newBoard, rotate, traceRoute, type Board } from './railLogic'
+import { N, E, S, W, STAGES, newBoard, rotate, traceRoute, cleared as isCleared, type Board } from './railLogic'
 
 const GRAD = 'linear-gradient(135deg, #0ea5e9, #0369a1)'
 const TITLE = 'せんろ つなぎ'
@@ -63,7 +63,7 @@ export function RailConnect() {
     const u = taps + 1
     setBoard(b); setTurns(nt); setTaps(u)
     const r = traceRoute(b)
-    if (r.ok) {
+    if (isCleared(b, STAGES[stage])) {
       const key = String(stage + 1)
       const prev = cleared[key]
       if (prev === undefined || u < prev) {
@@ -110,7 +110,7 @@ export function RailConnect() {
                     : open ? 'bg-white border-sky-400 text-sky-700' : 'bg-gray-100 border-gray-200 text-gray-300'}`}>
                 <span className="text-2xl leading-none">{k + 1}</span>
                 <span className="text-[11px] mt-1 leading-none">
-                  {best !== undefined ? `${best}かい` : `${s.cols}×${s.rows}`}
+                  {best !== undefined ? `${best}かい` : s.all ? 'ぜんぶ' : `${s.cols}×${s.rows}`}
                 </span>
               </button>
             )
@@ -126,6 +126,14 @@ export function RailConnect() {
   const tx = (i: number) => SIDE + (i % cols) * T + T / 2
   const ty = (i: number) => Math.floor(i / cols) * T + T / 2
   const runSet = new Set(run.slice(0, Math.max(0, runStep)))
+  const all = !!STAGES[stage].all
+  // ぜんぶ とおる ステージは、ひだりの えきから たどれる マスに 色を つけて 手がかりにする
+  const route = phase === 'play' && all ? traceRoute(board) : null
+  const reach = new Set(route ? route.cells : [])
+  const hint = phase !== 'play' ? ''
+    : !all ? 'ひだりの えきから みぎの えきまで つなごう'
+    : route?.ok ? `つながったけど、まだ とおって いない マスが ${cols * rows - reach.size}こ あるよ`
+    : 'ぜんぶの マスを とおって みぎの えきまで つなごう'
   const trainAt = phase === 'won' && runStep >= 0
     ? runStep < run.length ? { x: tx(run[runStep]), y: ty(run[runStep]) } : { x: VB_W - SIDE / 2, y: board.goalRow * T + T / 2 }
     : { x: SIDE / 2, y: board.startRow * T + T / 2 }
@@ -145,7 +153,7 @@ export function RailConnect() {
           )}
         </div>
         <p className="text-sm font-bold text-gray-600 min-h-[1.25rem]">
-          {phase === 'play' ? 'ひだりの えきから みぎの えきまで つなごう' : ''}
+          {hint}
         </p>
 
         <svg viewBox={`0 0 ${VB_W} ${VB_H}`} className="w-full select-none touch-manipulation" role="img" aria-label="せんろの マスの ばん" data-cols={cols} data-start={board.startRow} data-goal={board.goalRow}>
@@ -155,7 +163,7 @@ export function RailConnect() {
             return (
               <g key={i} data-m={m} data-lock={lock ? 1 : 0} onClick={() => tap(i)} className={m && !lock && phase === 'play' ? 'cursor-pointer' : ''}>
                 <rect x={x + 1.5} y={y + 1.5} width={T - 3} height={T - 3} rx={8}
-                  fill={runSet.has(i) ? '#fef3c7' : lock ? '#d6d3d1' : m ? '#e7e5e4' : '#f5f5f4'} />
+                  fill={runSet.has(i) ? '#fef3c7' : reach.has(i) ? '#bae6fd' : lock ? '#d6d3d1' : m ? '#e7e5e4' : '#f5f5f4'} />
                 {m !== 0 && (
                   <g transform={`translate(${x + T / 2},${y + T / 2})`}>
                     <g style={{ transform: `rotate(${turns[i] * 90}deg)`, transition: 'transform .18s ease-out' }}>
