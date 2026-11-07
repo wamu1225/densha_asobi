@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { GameLayout } from '../components/GameLayout'
 import { GameIcon } from '../components/GameIcons'
 import { ResultScreen } from '../components/ResultScreen'
+import { Confetti } from '../components/Confetti'
 
 const GRAD = 'linear-gradient(135deg, #2dd4bf, #14b8a6)'
 
@@ -24,7 +25,13 @@ const BEST_KEY = 'densha_memory_best'
 function getBest(): Record<string, number> { try { return JSON.parse(localStorage.getItem(BEST_KEY) || '{}') } catch { return {} } }
 function saveBest(key: string, val: number) { const b = getBest(); if (!b[key] || val < b[key]) { b[key] = val; localStorage.setItem(BEST_KEY, JSON.stringify(b)) } }
 
-type Card = { idx: number; emoji: string; flipped: boolean; matched: boolean }
+type Card = { idx: number; emoji: string; flipped: boolean; matched: boolean; by?: number }
+
+// ふたりで あそぶときの いろ（そろえた カードの ふちにも つける）
+const PLAYERS = [
+  { name: 'あか', color: '#ef4444', soft: '#fee2e2' },
+  { name: 'あお', color: '#3b82f6', soft: '#dbeafe' },
+]
 
 function makeCards(cat: Cat, pairs: number): Card[] {
   const emojis = CATEGORIES[cat].slice(0, pairs)
@@ -40,11 +47,14 @@ export function MemoryCards() {
   const [moves, setMoves] = useState(0)
   const [locked, setLocked] = useState(false)
   const [elapsed, setElapsed] = useState(0)
+  const [two, setTwo] = useState(false)       // ふたりで（じゅんばんに めくる）
+  const [turn, setTurn] = useState(0)
+  const [isNewBest, setIsNewBest] = useState(false)
   const best = getBest()
 
   useEffect(() => { if (phase !== 'play') return; const t = setInterval(() => setElapsed(e => e + 1), 1000); return () => clearInterval(t) }, [phase])
 
-  // ⑯修正: sel のみを依存配列にして cards の変更による誤発火を防ぐ
+  // ⑯修正: sel（と ふたりでの ばん）だけを依存配列にして cards の変更による誤発火を防ぐ
   // cards は setCards の関数型更新で常に最新値を参照できる
   useEffect(() => {
     if (sel.length !== 2) return
@@ -53,22 +63,28 @@ export function MemoryCards() {
     // 最新の cards を参照するために setCards のコールバック内で比較
     setCards(prev => {
       if (prev[i].emoji === prev[j].emoji) {
-        // マッチ: matched フラグを立てる
+        // マッチ: matched フラグを立てる（ふたりでは そろえた人が もういちど）
         setTimeout(() => { setSel([]); setLocked(false) }, 0)
-        return prev.map((c, k) => k === i || k === j ? { ...c, matched: true } : c)
+        return prev.map((c, k) => k === i || k === j ? { ...c, matched: true, by: turn } : c)
       } else {
-        // 不一致: 900ms後にフリップを戻す
+        // 不一致: 900ms後にフリップを戻す（ふたりでは あいての ばんに かわる）
         setTimeout(() => {
           setCards(p => p.map((c, k) => k === i || k === j ? { ...c, flipped: false } : c))
           setSel([]); setLocked(false)
+          if (two) setTurn(t => 1 - t)
         }, 900)
         return prev
       }
     })
     setMoves(m => m + 1)
-  }, [sel])
+  }, [sel, turn, two])
 
-  useEffect(() => { if (phase === 'play' && cards.length > 0 && cards.every(c => c.matched)) setPhase('over') }, [cards, phase])
+  useEffect(() => {
+    if (phase !== 'play' || cards.length === 0 || !cards.every(c => c.matched)) return
+    // ベストは ひとりの ときだけ のこす（ふたりの てかずは くらべられない）
+    if (!two) { const prev = getBest()[`${cat}_${sizeIdx}`]; setIsNewBest(prev == null || moves < prev); saveBest(`${cat}_${sizeIdx}`, moves) }
+    setPhase('over')
+  }, [cards, phase, two, cat, sizeIdx, moves])
 
   function flip(i: number) {
     if (locked || cards[i].flipped || cards[i].matched || sel.length >= 2) return
@@ -78,7 +94,7 @@ export function MemoryCards() {
 
   function start() {
     const size = SIZES[sizeIdx]
-    setCards(makeCards(cat, size.pairs)); setSel([]); setMoves(0); setElapsed(0); setLocked(false); setPhase('play')
+    setCards(makeCards(cat, size.pairs)); setSel([]); setMoves(0); setElapsed(0); setLocked(false); setTurn(0); setPhase('play')
   }
 
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
@@ -100,6 +116,14 @@ export function MemoryCards() {
             <p className="text-xs text-teal-600 mt-0.5">すくない てかずで クリアしよう</p>
           </div>
         </div>
+        <div className="grid grid-cols-2 gap-2">
+          {[false, true].map(t => (
+            <button key={String(t)} onClick={() => setTwo(t)} className={`py-3 text-lg font-black rounded-2xl border-2 active:scale-95 transition-all ${two === t ? 'text-white border-transparent' : 'bg-white text-gray-700 border-gray-200'}`} style={two === t ? { background: GRAD } : {}}>
+              {t ? '👥 ふたりで' : '👤 ひとりで'}
+            </button>
+          ))}
+        </div>
+        {two && <p className="text-sm font-bold text-teal-700 text-center -mt-2">そろえたら もういちど。おおい ほうの かち！</p>}
         <p className="text-center text-xl font-bold text-gray-700">カテゴリをえらんでね</p>
         <div className="grid grid-cols-2 gap-2">
           {(Object.keys(CATEGORIES) as Cat[]).map(c => (
@@ -111,7 +135,7 @@ export function MemoryCards() {
         <p className="text-center text-lg font-bold text-gray-700">サイズをえらんでね</p>
         {SIZES.map((s, i) => (
           <button key={i} onClick={() => setSizeIdx(i)} className={`py-3 text-base font-bold rounded-2xl border-2 active:scale-95 transition-all ${sizeIdx === i ? 'text-white border-transparent' : 'bg-white text-gray-700 border-gray-200'}`} style={sizeIdx === i ? { background: GRAD } : {}}>
-            {s.label}{best[`${cat}_${i}`] != null ? ` ベスト${best[`${cat}_${i}`]}て` : ''}
+            {s.label}{!two && best[`${cat}_${i}`] != null ? ` ベスト${best[`${cat}_${i}`]}て` : ''}
           </button>
         ))}
         <button onClick={start} className="py-5 text-xl font-black text-white rounded-2xl shadow-lg active:scale-95 mt-2" style={{ background: GRAD }}>はじめる！</button>
@@ -119,8 +143,35 @@ export function MemoryCards() {
     </GameLayout>
   )
 
+  const score = [0, 1].map(p => cards.filter(c => c.matched && c.by === p).length / 2)
+
+  if (phase === 'over' && two) {
+    const win = score[0] === score[1] ? -1 : score[0] > score[1] ? 0 : 1
+    return (
+      <GameLayout title="しんけいすいじゃく" gradient={GRAD}>
+        <Confetti active />
+        <div className="flex flex-col items-center gap-4 pt-6">
+          <p className="text-3xl font-black bounce-in" style={{ color: win < 0 ? '#0f766e' : PLAYERS[win].color }}>
+            {win < 0 ? 'ひきわけ！' : `${PLAYERS[win].name}の かち！`}
+          </p>
+          <div className="grid grid-cols-2 gap-3 w-full">
+            {PLAYERS.map((pl, p) => (
+              <div key={p} className="rounded-2xl py-4 text-center border-4" style={{ borderColor: pl.color, background: pl.soft }}>
+                <p className="text-lg font-black" style={{ color: pl.color }}>{pl.name}</p>
+                <p className="text-4xl font-black text-gray-800">{score[p]}<span className="text-lg">ペア</span></p>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2 w-full">
+            <button onClick={() => setPhase('select')} className="flex-1 py-4 text-lg font-black rounded-2xl border-2 border-teal-400 text-teal-700 bg-white active:scale-95">えらびなおす</button>
+            <button onClick={start} className="flex-1 py-4 text-lg font-black text-white rounded-2xl shadow-lg active:scale-95" style={{ background: GRAD }}>もういちど</button>
+          </div>
+        </div>
+      </GameLayout>
+    )
+  }
+
   if (phase === 'over') {
-    const isNewBest = getBest()[bestKey] == null || moves < getBest()[bestKey]; saveBest(bestKey, moves)
     return (
       <GameLayout title="しんけいすいじゃく" gradient={GRAD}>
         <ResultScreen timeStr={fmt(elapsed)} extra={[{ label: 'てかず', value: `${moves}て` }]} bestStr={getBest()[bestKey] != null ? `${getBest()[bestKey]}て` : undefined} bestLabel="ベストてかず" onRetry={start} onChangeMode={() => setPhase('select')} isNewBest={isNewBest} accentColor="text-teal-500" />
@@ -131,11 +182,23 @@ export function MemoryCards() {
   return (
     <GameLayout title="しんけいすいじゃく" gradient={GRAD} isPlaying={phase === 'play'}>
       <div className="flex flex-col items-center gap-3">
-        <div className="flex justify-between w-full">
-          <span className="text-lg font-bold text-gray-700">{moves}て</span>
-          <span className="text-lg font-bold text-gray-700">タイム {fmt(elapsed)}</span>
-          <span className="text-lg font-bold text-gray-700">{cards.filter(c => c.matched).length / 2}/{size.pairs}ペア</span>
-        </div>
+        {two ? (
+          <div className="grid grid-cols-2 gap-2 w-full" aria-live="polite">
+            {PLAYERS.map((pl, p) => (
+              <div key={p} data-turn={turn === p ? 1 : 0} className={`rounded-2xl py-2 text-center border-4 transition-all ${turn === p ? 'scale-105 shadow-lg' : 'opacity-50'}`}
+                style={{ borderColor: pl.color, background: pl.soft }}>
+                <p className="text-base font-black" style={{ color: pl.color }}>{turn === p ? `${pl.name}の ばん` : pl.name}</p>
+                <p className="text-2xl font-black text-gray-800">{score[p]}<span className="text-sm">ペア</span></p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex justify-between w-full">
+            <span className="text-lg font-bold text-gray-700">{moves}て</span>
+            <span className="text-lg font-bold text-gray-700">タイム {fmt(elapsed)}</span>
+            <span className="text-lg font-bold text-gray-700">{cards.filter(c => c.matched).length / 2}/{size.pairs}ペア</span>
+          </div>
+        )}
         <div className={`grid gap-2 w-full`} style={{ gridTemplateColumns: `repeat(${size.cols}, 1fr)` }}>
           {cards.map((card, i) => (
             <div key={i} onClick={() => flip(i)} className="flip-card aspect-square cursor-pointer">
@@ -143,7 +206,8 @@ export function MemoryCards() {
                 <div className="flip-card-front rounded-xl flex items-center justify-center shadow" style={{ background: GRAD }}>
                   <span className="text-white"><GameIcon id="bingo" size={26} /></span>
                 </div>
-                <div className={`flip-card-back rounded-xl flex items-center justify-center shadow ${card.matched ? 'border-2 border-teal-400' : 'border-2 border-teal-200'}`} style={{ background: card.matched ? '#ccfbf1' : 'white' }}>
+                <div className={`flip-card-back rounded-xl flex items-center justify-center shadow ${card.matched ? 'border-2 border-teal-400' : 'border-2 border-teal-200'}`}
+                  style={card.matched && two && card.by != null ? { background: PLAYERS[card.by].soft, borderColor: PLAYERS[card.by].color, borderWidth: 3 } : { background: card.matched ? '#ccfbf1' : 'white' }}>
                   <span className="text-3xl font-black text-teal-700">{card.emoji}</span>
                 </div>
               </div>
