@@ -385,7 +385,7 @@ ${FALLBACK_STYLE}
 
     <h2 class="section">🎮 ほかの ゲームも あそぼう</h2>
     <div class="game-grid">
-${GAMES.filter(o => o.path !== game.path).slice(0, 6).map(o => `      <a class="game-card" href="${BASE_URL}/${o.path}/">
+${[1, 2, 3, 4, 5, 6].map(k => GAMES[(GAMES.indexOf(game) + k) % GAMES.length]).map(o => `      <a class="game-card" href="${BASE_URL}/${o.path}/">
         <span class="emoji" aria-hidden="true">${o.emoji}</span>
         <span class="gname">${o.name}</span>
         <span class="gage">${o.age}</span>

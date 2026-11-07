@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { AdBanner } from './AdBanner'
-import { TrainSide } from './GameIcons'
+import { GameIcon, TrainSide } from './GameIcons'
+import { nextGames } from './gameList'
 
 interface GameLayoutProps {
   title: string
@@ -26,6 +27,7 @@ function darken(hex: string, amount = 30): string {
 
 export function GameLayout({ title, gradient, isPlaying = false, hideAd = false, children }: GameLayoutProps) {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const [showConfirm, setShowConfirm] = useState(false)
 
   useEffect(() => {
@@ -45,8 +47,9 @@ export function GameLayout({ title, gradient, isPlaying = false, hideAd = false,
     return () => { wl?.release().catch(() => {}) }
   }, [isPlaying])
 
-  function handleBack() {
-    if (isPlaying) { setShowConfirm(true) } else { navigate('/') }
+  // あそんでいる とちゅうは すぐ もどらず、やめるか きく
+  function handleBack(e: React.MouseEvent) {
+    if (isPlaying) { e.preventDefault(); setShowConfirm(true) }
   }
 
   const baseColor = extractColor(gradient)
@@ -86,14 +89,15 @@ export function GameLayout({ title, gradient, isPlaying = false, hideAd = false,
         className="text-white px-4 flex items-center gap-3 shrink-0"
         style={{ background: headerBg, height: 52 }}
       >
-        <button
+        <Link
+          to="/"
           onClick={handleBack}
           className="w-11 h-11 flex items-center justify-center rounded-xl text-lg font-bold shrink-0 active:opacity-70"
           style={{ background: 'rgba(255,255,255,0.15)' }}
           aria-label="もどる"
         >
           ←
-        </button>
+        </Link>
         <h1 className="text-lg font-black tracking-tight truncate">{title}</h1>
         {/* ゲーム個別の電車要素（O-3-6「電車らしさが見出しだけ」への対応の続き・2026-08-07）
             全13ゲーム共通のGameLayoutにさりげなく電車シルエットを常設し、
@@ -111,6 +115,21 @@ export function GameLayout({ title, gradient, isPlaying = false, hideAd = false,
         {children}
         {/* プレイ中はタップ動線に広告を出さない。選択・結果画面のみ・ボタン群から40px離す */}
         {!isPlaying && !hideAd && <AdBanner slot="5432198760" className="mt-10" />}
+        {!isPlaying && (
+          <nav className="mt-10" aria-label="ほかの あそび">
+            <p className="text-xs font-bold mb-2" style={{ color: 'var(--ink-sub)' }}>ほかの あそび</p>
+            <div className="grid grid-cols-3 gap-2">
+              {nextGames(pathname, 6).map(g => (
+                <Link key={g.path} to={g.path} className="flex flex-col items-center gap-1 py-2 bg-white rounded-xl border-2 border-gray-200 active:scale-95">
+                  <span className="flex items-center justify-center rounded-lg" style={{ width: 30, height: 30, background: g.color, color: 'white' }}>
+                    <GameIcon id={g.icon} size={18} />
+                  </span>
+                  <span className="text-[11px] font-bold leading-tight text-center px-1" style={{ color: 'var(--ink)' }}>{g.name}</span>
+                </Link>
+              ))}
+            </div>
+          </nav>
+        )}
       </main>
     </div>
   )

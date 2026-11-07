@@ -1,23 +1,9 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { GameIcon } from './GameIcons'
+import { ALL_GAMES } from './gameList'
 import { Confetti } from './Confetti'
 
-const NEXT_GAMES = [
-  { path: '/math',     icon: 'math',     name: 'けいさんスプリント',  color: '#C8352A' },
-  { path: '/bigger',   icon: 'bigger',   name: 'どっちがおおきい？',  color: '#C8352A' },
-  { path: '/clock',    icon: 'clock',    name: 'とけいをよもう',      color: '#C8352A' },
-  { path: '/bingo',    icon: 'bingo',    name: 'でんしゃビンゴ',      color: '#217A4B' },
-  { path: '/color',    icon: 'color',    name: 'いろさがし',          color: '#217A4B' },
-  { path: '/memory',   icon: 'memory',   name: 'しんけいすいじゃく',  color: '#6B3FC0' },
-  { path: '/next',     icon: 'next',     name: 'つぎはどれ？',        color: '#6B3FC0' },
-  { path: '/simon',    icon: 'simon',    name: 'いろきおく',          color: '#6B3FC0' },
-  { path: '/maze',     icon: 'maze',     name: 'すうじめいろ',        color: '#C8352A' },
-  { path: '/scramble', icon: 'scramble', name: 'もじならべ',          color: '#2558C4' },
-  { path: '/search',   icon: 'search',   name: 'ひらがなさがし',      color: '#2558C4' },
-  { path: '/riddles',  icon: 'riddles',  name: 'なぞなぞ',            color: '#2558C4' },
-  { path: '/dots',     icon: 'dots',     name: 'ドットつなぎ',        color: '#6B3FC0' },
-]
 
 interface Stat { label: string; value: string | number }
 
@@ -49,12 +35,11 @@ function Star({ filled, size = 38, delay = 0 }: { filled: boolean; size?: number
 }
 
 export function ResultScreen({ score, total, scoreLabel, scoreSuffix, timeStr, extra = [], best, bestStr, bestLabel = 'ベスト', onRetry, onChangeMode, isNewBest = false, accentColor = 'text-sky-500' }: ResultScreenProps) {
-  const navigate = useNavigate()
   const location = useLocation()
 
   // 現在のゲームを除外してランダムに2個選ぶ（マウント時に一度だけ抽選し再レンダリングでシャッフルしない）
   const [suggestions] = useState(() =>
-    NEXT_GAMES
+    ALL_GAMES
       .filter(g => g.path !== location.pathname)
       .sort(() => Math.random() - 0.5)
       .slice(0, 2)
@@ -168,13 +153,13 @@ export function ResultScreen({ score, total, scoreLabel, scoreSuffix, timeStr, e
             せっていをかえる
           </button>
         )}
-        <button
-          onClick={() => navigate('/')}
-          className="flex-1 py-3 text-sm font-bold rounded-xl active:scale-95 border-2"
+        <Link
+          to="/"
+          className="flex-1 py-3 text-sm font-bold rounded-xl active:scale-95 border-2 text-center"
           style={{ background: 'white', color: 'var(--ink-sub)', borderColor: '#e5e7eb', boxShadow: '2px 3px 0 rgba(0,0,0,0.06)' }}
         >
           ホームへ
-        </button>
+        </Link>
       </div>
 
       {/* 次のゲーム提案 */}
@@ -184,9 +169,9 @@ export function ResultScreen({ score, total, scoreLabel, scoreSuffix, timeStr, e
         </p>
         <div className="flex gap-2">
           {suggestions.map(g => (
-            <button
+            <Link
               key={g.path}
-              onClick={() => navigate(g.path)}
+              to={g.path}
               className="flex-1 py-3 bg-white rounded-xl border-2 border-gray-200 active:scale-95 text-center"
               style={{ boxShadow: '2px 3px 0 rgba(0,0,0,0.06)' }}
             >
@@ -197,7 +182,7 @@ export function ResultScreen({ score, total, scoreLabel, scoreSuffix, timeStr, e
               <span className="text-xs font-bold leading-tight block mt-1.5" style={{ color: 'var(--ink)' }}>
                 {g.name}
               </span>
-            </button>
+            </Link>
           ))}
         </div>
       </div>

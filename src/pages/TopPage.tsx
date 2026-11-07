@@ -1,4 +1,4 @@
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { GameIcon, TrainSide } from '../components/GameIcons'
 
@@ -204,7 +204,6 @@ const SECTIONS: { label: string; tagline?: string; cat: keyof typeof CAT; featur
 ]
 
 export function TopPage() {
-  const navigate = useNavigate()
   const [played, setPlayed] = useState<Set<string>>(new Set())
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [bingoProgress, setBingoProgress] = useState<{ marked: number; total: number } | null>(null)
@@ -316,7 +315,7 @@ export function TopPage() {
                             <TrainSide height={16} />
                           </div>
                         )}
-                        <button onClick={() => navigate(g.path)}
+                        <Link to={g.path}
                           aria-label={earned ? `${g.title}（このえきにとうちゃくずみ）` : `${g.title}（まだ）`}
                           className="rounded-full flex items-center justify-center active:scale-90 transition-transform relative z-10"
                           style={{
@@ -327,7 +326,7 @@ export function TopPage() {
                             border: earned ? `2px solid ${CAT[g.cat].border}` : `1.5px dashed ${CAT[g.cat].border}`,
                           }}>
                           <GameIcon id={g.icon} size={20} />
-                        </button>
+                        </Link>
                       </div>
                     )
                   })}
@@ -361,9 +360,9 @@ export function TopPage() {
                 /* まどのそと: 横長カードで大きく */
                 <div className="flex flex-col gap-3">
                   {section.games.map(game => (
-                    <button
+                    <Link
                       key={game.path}
-                      onClick={() => navigate(game.path)}
+                      to={game.path}
                       className="w-full flex items-stretch overflow-hidden text-left active:scale-[0.97] transition-transform duration-100"
                       style={{ borderRadius: 18, boxShadow: '3px 4px 0 rgba(0,0,0,0.13)', background: c.bg }}
                     >
@@ -386,16 +385,16 @@ export function TopPage() {
                           </span>
                         )}
                       </div>
-                    </button>
+                    </Link>
                   ))}
                 </div>
               ) : (
                 /* 通常: 2列グリッド */
                 <div className="grid grid-cols-2 gap-3">
                   {section.games.map(game => (
-                    <button
+                    <Link
                       key={game.path}
-                      onClick={() => navigate(game.path)}
+                      to={game.path}
                       className="flex flex-col active:scale-90 transition-transform duration-100 overflow-hidden"
                       style={{ borderRadius: 18, boxShadow: '3px 4px 0 rgba(0,0,0,0.13)' }}
                     >
@@ -421,7 +420,7 @@ export function TopPage() {
                           </span>
                         )}
                       </div>
-                    </button>
+                    </Link>
                   ))}
                 </div>
               )}
