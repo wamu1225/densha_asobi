@@ -131,7 +131,7 @@ function RideTimer({ played }: { played: Set<string> }) {
         <div className="h-2.5 rounded-full transition-all" style={{ width: `${pct}%`, background: '#1C2B40' }} />
       </div>
       <button onClick={close}
-        className="mt-2 text-[10px] font-bold underline" style={{ color: 'var(--ink-sub)' }}>
+        className="mt-2 text-[11px] font-bold underline" style={{ color: 'var(--ink-sub)' }}>
         おわる
       </button>
     </div>
@@ -183,7 +183,7 @@ const SECTIONS: { label: string; tagline?: string; cat: keyof typeof CAT; featur
   {
     label: 'ことば', cat: 'blue',
     games: [
-      { path: '/scramble', icon: 'scramble', title: 'もじならべ',     sub: 'ことばを つくろう・テーマいろいろ', age: '5さい〜' },
+      { path: '/scramble', icon: 'scramble', title: 'もじならべ',     sub: 'ことばを つくろう', age: '5さい〜' },
       { path: '/search',   icon: 'search',   title: 'ひらがなさがし', sub: 'かくれたことばは？', age: '6さい〜' },
       { path: '/riddles',  icon: 'riddles',  title: 'なぞなぞ',       sub: 'おやこで かんがえよう', age: '4さい〜' },
     ],
@@ -255,7 +255,7 @@ export function TopPage() {
             <span style={{ color: '#9bb8e6' }}><GameIcon id="bingo" size={28} /></span>
             <div className="flex-1">
               <p className="text-xs font-black text-white leading-tight">ホーム画面に追加しよう！</p>
-              <p className="text-[10px] text-blue-300 mt-0.5">オフラインでもあそべるよ</p>
+              <p className="text-[11px] text-blue-300 mt-0.5">オフラインでもあそべるよ</p>
             </div>
             <button
               onClick={async () => { await installPrompt.prompt(); setInstallPrompt(null) }}
@@ -335,9 +335,9 @@ export function TopPage() {
               {stamped === allGames.length ? (
                 <p className="text-xs font-black mt-1" style={{ color: '#b45309' }}>ぜんぶの えきに とうちゃく！すごい！</p>
               ) : stamped > 0 ? (
-                <p className="text-[10px] font-bold mt-1" style={{ color: 'var(--ink-sub)' }}>でんしゃが とまった えきが いろつきに なるよ</p>
+                <p className="text-[11px] font-bold mt-1" style={{ color: 'var(--ink-sub)' }}>でんしゃが とまった えきが いろつきに なるよ</p>
               ) : (
-                <p className="text-[10px] font-bold mt-1" style={{ color: 'var(--ink-sub)' }}>ゲームで あそぶと そのえきに でんしゃが とまるよ</p>
+                <p className="text-[11px] font-bold mt-1" style={{ color: 'var(--ink-sub)' }}>ゲームで あそぶと そのえきに でんしゃが とまるよ</p>
               )}
             </div>
           )
@@ -352,7 +352,7 @@ export function TopPage() {
                 <span style={{ width: 18, height: 4, borderRadius: 2, background: c.border, flexShrink: 0 }} />
                 <h2 className="text-sm font-black" style={{ color: 'var(--ink)' }}>{section.label}</h2>
                 {section.tagline && (
-                  <span className="text-[10px] font-bold" style={{ color: 'var(--ink-sub)' }}>{section.tagline}</span>
+                  <span className="text-[11px] font-bold" style={{ color: 'var(--ink-sub)' }}>{section.tagline}</span>
                 )}
               </div>
 
@@ -373,14 +373,14 @@ export function TopPage() {
                         <div className="flex items-center gap-1.5">
                           <span className="font-black leading-tight" style={{ fontSize: 15, color: c.text }}>{game.title}</span>
                         </div>
-                        <p className="leading-tight mt-1" style={{ fontSize: 10.5, color: c.text + 'aa' }}>{game.sub}</p>
+                        <p className="leading-tight mt-1" style={{ fontSize: 11.5, color: c.text + 'aa' }}>{game.sub}</p>
                         <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full font-bold"
-                          style={{ fontSize: 9, background: 'white', color: c.text, border: `1px solid ${c.border}33` }}>
+                          style={{ fontSize: 11, background: 'white', color: c.text, border: `1px solid ${c.border}33` }}>
                           {game.age}
                         </span>
                         {game.path === '/bingo' && bingoProgress && (
                           <span className="inline-block mt-1.5 ml-1 px-2 py-0.5 rounded-full font-bold"
-                            style={{ fontSize: 9, background: '#fef3c7', color: '#92400e' }}>
+                            style={{ fontSize: 11, background: '#fef3c7', color: '#92400e' }}>
                             {bingoProgress.marked}/{bingoProgress.total} とちゅう
                           </span>
                         )}
@@ -406,16 +406,16 @@ export function TopPage() {
                         <span className="font-black leading-tight" style={{ fontSize: 12.5, color: c.text, letterSpacing: '-0.01em' }}>
                           {game.title}
                         </span>
-                        <span className="mt-0.5 leading-tight" style={{ fontSize: 9.5, color: c.text + '99' }}>
+                        <span className="mt-0.5 leading-tight" style={{ fontSize: 11, color: c.text + 'cc' }}>
                           {game.sub}
                         </span>
                         <span className="inline-block mt-1 px-1.5 py-0.5 rounded-full font-bold"
-                          style={{ fontSize: 8, background: 'white', color: c.text, border: `1px solid ${c.border}33` }}>
+                          style={{ fontSize: 11, background: 'white', color: c.text, border: `1px solid ${c.border}33` }}>
                           {game.age}
                         </span>
                         {game.path === '/riddles' && riddlesInProgress && (
                           <span className="inline-block mt-1 px-1.5 py-0.5 rounded-full font-bold"
-                            style={{ fontSize: 8, background: '#fef3c7', color: '#92400e' }}>
+                            style={{ fontSize: 11, background: '#fef3c7', color: '#92400e' }}>
                             つづきから
                           </span>
                         )}
