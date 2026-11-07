@@ -11,6 +11,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { execSync } from 'node:child_process'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const distDir = join(__dirname, '../dist')
@@ -693,7 +694,24 @@ console.log(`✓ ${count}個のゲームページを生成しました（平均 
 const sitemapPath = join(__dirname, '../public/sitemap.xml')
 try {
   let sitemap = readFileSync(sitemapPath, 'utf8')
-  sitemap = sitemap.replace(/<lastmod>[^<]+<\/lastmod>/g, `<lastmod>${TODAY}</lastmod>`)
+  // lastmod はページごとに、そのゲームのソースが最後に変わった日（2026-11-07）。全 URL を今日にすると、どれが変わったか伝わらない
+  const lastDay = (files) => {
+    try { return execSync(`git log -1 --format=%cs -- ${files.join(' ')}`, { cwd: join(__dirname, '..'), stdio: ['ignore', 'pipe', 'ignore'] }).toString().trim() || TODAY } catch { return TODAY }
+  }
+  const appSrc = readFileSync(join(__dirname, '../src/App.tsx'), 'utf8')
+  const fileOf = (comp) => (appSrc.match(new RegExp(`import \\{ ${comp} \\} from '\\./games/([A-Za-z]+)'`)) || [])[1]
+  const dayOf = {}
+  for (const g of GAMES) {
+    const comp = (appSrc.match(new RegExp(`path="/${g.path}" element=\\{<([A-Za-z]+) />`)) || [])[1]
+    const file = comp && fileOf(comp)
+    dayOf[g.path] = file ? lastDay([`src/games/${file}.tsx`, `src/games/${g.path}Logic.ts`]) : TODAY
+  }
+  dayOf[''] = Object.values(dayOf).concat(lastDay(['src/pages/TopPage.tsx'])).sort().pop()
+  dayOf.about = dayOf.privacy = lastDay(['scripts/generate-game-pages.js'])
+  sitemap = sitemap.replace(/<loc>([^<]+)<\/loc>(\s*)<lastmod>[^<]+<\/lastmod>/g, (m, loc, sp) => {
+    const slug = loc.replace(`${BASE_URL}/`, '').replace(/\/$/, '')
+    return `<loc>${loc}</loc>${sp}<lastmod>${dayOf[slug] ?? TODAY}</lastmod>`
+  })
   // ゲームを足したのに sitemap に書き忘れると検索に出ないので、GAMES に在って sitemap に無いものを足す（2026-11-06）
   for (const g of GAMES) {
     if (sitemap.includes(`${BASE_URL}/${g.path}/`)) continue
@@ -732,7 +750,7 @@ try {
   writeFileSync(sitemapPath, sitemap)
   // dist 側にもコピー
   writeFileSync(join(distDir, 'sitemap.xml'), sitemap)
-  console.log(`✓ sitemap.xml lastmod を ${TODAY} に更新しました (about/privacy を含む)`)
+  console.log(`✓ sitemap.xml の lastmod をページごとの最終更新日に（about/privacy を含む）`)
 } catch (e) {
   console.warn('sitemap.xml の更新に失敗:', e.message)
 }
