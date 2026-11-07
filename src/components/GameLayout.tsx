@@ -125,7 +125,7 @@ export function GameLayout({ title, gradient, isPlaying = false, hideAd = false,
                   <span className="flex items-center justify-center rounded-lg" style={{ width: 30, height: 30, background: g.color, color: 'white' }}>
                     <GameIcon id={g.icon} size={18} />
                   </span>
-                  <span className="text-[11px] font-bold leading-tight text-center px-1" style={{ color: 'var(--ink)' }}>{g.name}</span>
+                  <span className="text-[11px] font-bold leading-tight text-center px-1" style={{ color: 'var(--ink)', wordBreak: 'keep-all' }}>{g.name}</span>
                 </Link>
               ))}
             </div>
