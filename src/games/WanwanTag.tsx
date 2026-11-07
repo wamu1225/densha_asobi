@@ -67,19 +67,22 @@ export function WanwanTag() {
   const [wins, setWins] = useState(loadWins)
   const [why, setWhy] = useState('')
   const [lesson, setLesson] = useState<number | null>(null)
+  const [two, setTwo] = useState(false) // ふたりで（1台を こうたいで つかう）
   const [lessonOk, setLessonOk] = useState(false)
   const [lessonMsg, setLessonMsg] = useState('')
 
   const r = lesson === null ? result(s) : null
-  const thinking = phase === 'play' && lesson === null && s.turn === 1 && r === null
+  const thinking = phase === 'play' && lesson === null && !two && s.turn === 1 && r === null
+  // いま さわれる がわ（ふたりでは ばんの がわ、ひとりでは あか）
+  const me: Side = two ? s.turn : 0
 
   function startLesson(k: number) {
     setLesson(k); setS(LESSONS[k].setup()); setSel(null); setLast(null); setPrev(null)
     setLessonOk(false); setLessonMsg(''); setPhase('play')
   }
 
-  function start(lv: number) {
-    setLesson(null)
+  function start(lv: number, withTwo = false) {
+    setLesson(null); setTwo(withTwo)
     setLevel(lv); setS(initial()); setSel(null); setLast(null); setPrev(null); setUndoLeft(1); setWhy('')
     setPhase('play')
   }
@@ -88,6 +91,12 @@ export function WanwanTag() {
     const rr = result(ns)
     if (rr === null) return
     const caught = !ns.board.some((p) => p && p.kind === 'ou' && p.side === (rr === 0 ? 1 : 0))
+    if (two) {
+      const w = rr === 'draw' ? '' : TEAM[rr].name, l = rr === 'draw' ? '' : TEAM[1 - rr].name
+      setWhy(rr === 'draw' ? 'ながく つづいたので ひきわけ' : caught ? `${l}の シバを つかまえた` : `${w}の シバが いぬごやに ついた`)
+      setPhase('end')
+      return
+    }
     setWhy(rr === 'draw' ? 'ながく つづいたので ひきわけ'
       : caught ? (rr === 0 ? 'あいての リーダーの シバを つかまえた' : 'リーダーの シバが つかまっちゃった')
       : (rr === 0 ? 'シバが あいての いぬごやに ついた' : 'あいての シバが いぬごやに ついた'))
@@ -126,13 +135,13 @@ export function WanwanTag() {
   }, [thinking, s, level])
 
   function tapCell(i: number) {
-    if (phase !== 'play' || s.turn !== 0 || lessonOk) return
+    if (phase !== 'play' || s.turn !== me || lessonOk) return
     const p = s.board[i]
     if (sel) {
       const m = legalMoves(s).find((mv) => mv.to === i && ('drop' in sel ? 'drop' in mv && mv.drop === sel.drop : 'from' in mv && mv.from === sel.from))
       if (m) { play(m); return }
     }
-    if (p && p.side === 0) setSel({ from: i })
+    if (p && p.side === me) setSel({ from: i })
     else setSel(null)
   }
 
@@ -173,13 +182,17 @@ export function WanwanTag() {
             </button>
           ))}
         </div>
+        <button onClick={() => start(0, true)}
+          className="w-full py-3 rounded-2xl font-black text-white active:scale-95 shadow" style={{ background: GRAD }}>
+          👥 ふたりで あそぶ（こうたいで タップ）
+        </button>
       </div>
     </GameLayout>
   )
 
-  const moves = phase === 'play' && s.turn === 0 ? legalMoves(s) : []
+  const moves = phase === 'play' && s.turn === me ? legalMoves(s) : []
   const targets = new Set(sel ? moves.filter((m) => ('drop' in sel ? 'drop' in m && m.drop === sel.drop : 'from' in m && m.from === sel.from)).map((m) => m.to) : [])
-  const danger = phase === 'play' ? chased(s, 1) : new Set<number>()
+  const danger = phase === 'play' ? chased(s, (1 - me) as Side) : new Set<number>()
   const C = 100
   const TOP = 26 // いぬごやの ぶん
   const lastFrom = last && 'from' in last ? last.from : -1
@@ -187,7 +200,7 @@ export function WanwanTag() {
 
   return (
     <GameLayout title={TITLE} gradient={GRAD} isPlaying={phase === 'play'} hideAd>
-      <Confetti active={phase === 'end' && r === 0} />
+      <Confetti active={phase === 'end' && (r === 0 || (two && r === 1))} />
       <div className="flex flex-col gap-2 pt-1">
         {lesson !== null && (
           <div className="rounded-2xl bg-orange-50 border-2 border-orange-200 px-3 py-2">
@@ -206,17 +219,25 @@ export function WanwanTag() {
           </div>
         )}
         {lesson === null && <div className="flex items-center gap-2">
-          <span className="px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-sm font-black whitespace-nowrap">{LEVELS[level].name}</span>
+          <span className="px-3 py-1 rounded-full bg-orange-100 text-orange-800 text-sm font-black whitespace-nowrap">{two ? 'ふたりで' : LEVELS[level].name}</span>
+          {two && phase === 'play' ? (
+            <span className="px-3 py-1 rounded-full text-white text-sm font-black whitespace-nowrap" style={{ background: TEAM[s.turn].collar }}>
+              {TEAM[s.turn].name}の ばん{sel ? '・どこへ？' : ''}
+            </span>
+          ) : (
           <span className="text-sm font-bold text-gray-600 whitespace-nowrap">
             {phase === 'end' ? 'おしまい' : thinking ? 'あいての ばん…' : sel ? 'どこへ いく？' : 'きみの ばん'}
           </span>
+          )}
           <button onClick={undo} disabled={!prev || undoLeft <= 0 || thinking}
             className="ml-auto px-4 py-2 rounded-xl text-sm font-black border-2 border-orange-400 text-orange-700 bg-white disabled:opacity-30 active:scale-95 whitespace-nowrap">
             まった
           </button>
         </div>}
 
-        <Friends label={'あいての\nなかま'} kinds={s.hand[1]} side={1} />
+        <Friends label={two ? 'あおの\nなかま' : 'あいての\nなかま'} kinds={s.hand[1]} side={1}
+          selected={two && s.turn === 1 && sel && 'drop' in sel ? sel.drop : null}
+          onPick={two && phase === 'play' && s.turn === 1 ? (k) => setSel(sel && 'drop' in sel && sel.drop === k ? null : { drop: k }) : undefined} />
 
         <svg viewBox={`0 0 ${COLS * C} ${ROWS * C + TOP * 2}`} className="w-full max-w-[340px] mx-auto select-none touch-manipulation" role="img" aria-label="いぬの こうえん">
           <DogHouse x={COLS * C / 2} y={TOP - 4} color={TEAM[1].collar} />
@@ -225,7 +246,7 @@ export function WanwanTag() {
             const x = (i % COLS) * C, y = Math.floor(i / COLS) * C + TOP
             const mark = targets.has(i)
             const selected = sel && 'from' in sel && sel.from === i
-            const hot = p && p.side === 0 && danger.has(i)
+            const hot = p && p.side === me && danger.has(i)
             const row = Math.floor(i / COLS)
             return (
               <g key={i} data-i={i} data-p={p ? `${p.kind}${p.side}` : ''} data-t={mark ? 1 : 0} onClick={() => tapCell(i)} className="cursor-pointer">
@@ -239,26 +260,27 @@ export function WanwanTag() {
           })}
         </svg>
 
-        <Friends label={'きみの\nなかま'} kinds={s.hand[0]} side={0}
-          selected={sel && 'drop' in sel ? sel.drop : null}
+        <Friends label={two ? 'あかの\nなかま' : 'きみの\nなかま'} kinds={s.hand[0]} side={0}
+          selected={s.turn === 0 && sel && 'drop' in sel ? sel.drop : null}
           onPick={phase === 'play' && s.turn === 0 ? (k) => setSel(sel && 'drop' in sel && sel.drop === k ? null : { drop: k }) : undefined} />
 
         {phase === 'end' && (
           <>
-            <div className={`rounded-2xl px-5 py-4 text-center bounce-in shadow-lg ${r === 0 ? '' : 'bg-slate-600'}`} style={r === 0 ? { background: GRAD } : undefined}>
-              <p className="text-2xl font-black text-white">{r === 0 ? 'きみの かち！' : r === 1 ? 'まけちゃった…' : 'ひきわけ'}</p>
+            <div className={`rounded-2xl px-5 py-4 text-center bounce-in shadow-lg ${r === 0 || (two && r !== 'draw') ? '' : 'bg-slate-600'}`}
+              style={two && r !== 'draw' && r !== null ? { background: TEAM[r].collar } : r === 0 ? { background: GRAD } : undefined}>
+              <p className="text-2xl font-black text-white">{two ? (r === 'draw' ? 'ひきわけ' : `${TEAM[r as Side].name}の かち！`) : r === 0 ? 'きみの かち！' : r === 1 ? 'まけちゃった…' : 'ひきわけ'}</p>
               <p className="text-sm font-bold text-white/90 mt-1">
-                {why}{r === 1 && undoLeft > 0 ? '。「まった」で 1かい もどれるよ' : ''}
+                {why}{!two && r === 1 && undoLeft > 0 ? '。「まった」で 1かい もどれるよ' : ''}
               </p>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => start(level)}
+              <button onClick={() => start(level, two)}
                 className="flex-1 py-4 text-lg font-black rounded-2xl border-2 border-orange-400 text-orange-700 bg-white active:scale-95">
                 もういちど
               </button>
               <button onClick={() => setPhase('select')}
                 className="flex-1 py-4 text-lg font-black text-white rounded-2xl shadow-lg active:scale-95" style={{ background: GRAD }}>
-                つよさを えらぶ
+                {two ? 'えらびなおす' : 'つよさを えらぶ'}
               </button>
             </div>
           </>
