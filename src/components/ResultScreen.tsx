@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { GameIcon } from './GameIcons'
-import { ALL_GAMES } from './gameList'
+import { ALL_GAMES, samePath } from './gameList'
 import { Confetti } from './Confetti'
 
 
@@ -40,7 +40,7 @@ export function ResultScreen({ score, total, scoreLabel, scoreSuffix, timeStr, e
   // 現在のゲームを除外してランダムに2個選ぶ（マウント時に一度だけ抽選し再レンダリングでシャッフルしない）
   const [suggestions] = useState(() =>
     ALL_GAMES
-      .filter(g => g.path !== location.pathname)
+      .filter(g => !samePath(g.path, location.pathname))
       .sort(() => Math.random() - 0.5)
       .slice(0, 2)
   )

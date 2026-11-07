@@ -20,8 +20,14 @@ export const ALL_GAMES = [
   { path: '/shunt',    icon: 'shunt',    name: 'れっしゃ いれかえ',   color: '#6B3FC0' },
 ]
 
+// 本番は /memory/ のように末尾に / が つくので、そろえてから くらべる
+export function samePath(a: string, b: string) {
+  return a.replace(/\/+$/, '') === b.replace(/\/+$/, '')
+}
+
 // いまの ゲームの つぎから じゅんに n本（新しいゲームにも 下の ページから リンクが とどくように）
 export function nextGames(path: string, n: number) {
+  path = path.replace(/\/+$/, '')
   const i = ALL_GAMES.findIndex(g => g.path === path)
   return Array.from({ length: n }, (_, k) => ALL_GAMES[(i + 1 + k + ALL_GAMES.length) % ALL_GAMES.length]).filter(g => g.path !== path)
 }
