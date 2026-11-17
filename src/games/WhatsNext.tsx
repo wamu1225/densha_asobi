@@ -146,9 +146,11 @@ export function WhatsNext() {
   const [lastExp, setLastExp] = useState('')
   // ⑮修正: ダブルタップ防止
   const [locked, setLocked] = useState(false)
+  // まちがえた ときは 正解を見せて 止める（11-17 監督：1.4秒で次へ進み 正解が分からなかった・説明が次の問題に残っていた）
+  const [wrongPick, setWrongPick] = useState<string | null>(null)
 
   function start(d: Difficulty) {
-    setDiff(d); setScore(0); setQNum(1); setLocked(false)
+    setDiff(d); setScore(0); setQNum(1); setLocked(false); setWrongPick(null); setShowExp(false)
     setPattern(makePattern(d)); setPhase('play')
   }
 
@@ -157,15 +159,19 @@ export function WhatsNext() {
     setLocked(true)
 
     const isCorrect = c === pattern.answer
-    if (isCorrect) { setFlash('ok'); setScore(s => s + 1); setShowExp(false) }
-    else { setFlash('ng'); setLastExp(pattern.explanation); setShowExp(true) }
+    if (!isCorrect) {
+      // 正解を「？」の ところに入れ、ボタンにも色を付けて「つぎへ」まで待つ
+      setFlash('ng'); setLastExp(pattern.explanation); setShowExp(true); setWrongPick(c)
+      setTimeout(() => setFlash(null), 900)
+      return
+    }
+    setFlash('ok'); setScore(s => s + 1); setShowExp(false)
+    setTimeout(() => { setFlash(null); goNext() }, 900)
+  }
 
-    // ⑬修正: stale closure を排除し、正誤で遅延を直接決定
-    const delay = isCorrect ? 900 : 1400
-    setTimeout(() => {
-      setFlash(null); setLocked(false)
-      if (qNum >= TOTAL) { setPhase('over') } else { setQNum(n => n + 1); setPattern(makePattern(diff)) }
-    }, delay)
+  function goNext() {
+    setLocked(false); setWrongPick(null); setShowExp(false)
+    if (qNum >= TOTAL) { setPhase('over') } else { setQNum(n => n + 1); setPattern(makePattern(diff)) }
   }
 
   if (phase === 'select') return (
@@ -215,7 +221,9 @@ export function WhatsNext() {
               <span key={i} className="flex items-center justify-center px-0.5"><Chip id={s} size={38} /></span>
             ))}
             <span className="text-2xl font-bold text-indigo-400 px-1">→</span>
-            <span className="text-3xl font-bold text-indigo-300 bg-indigo-100 rounded-xl px-3 py-1">？</span>
+            {wrongPick || flash === 'ok'
+              ? <span className="flex items-center justify-center rounded-xl px-1 py-0.5 bg-green-100 border-2 border-green-500" aria-label="こたえ"><Chip id={pattern.answer} size={38} /></span>
+              : <span className="text-3xl font-bold text-indigo-300 bg-indigo-100 rounded-xl px-3 py-1">？</span>}
           </div>
         </div>
         {showExp && (
@@ -229,13 +237,24 @@ export function WhatsNext() {
               key={i}
               onClick={() => tap(c)}
               disabled={locked}
-              className="rounded-2xl border-2 active:scale-95 transition-transform font-bold text-gray-800 disabled:opacity-60 flex items-center justify-center"
-              style={{ height: 80, background: '#eef2ff', borderColor: '#a5b4fc', boxShadow: '3px 4px 0 rgba(0,0,0,0.07)' }}
+              className="rounded-2xl border-2 active:scale-95 transition-transform font-bold text-gray-800 flex items-center justify-center"
+              style={{
+                height: 80, boxShadow: '3px 4px 0 rgba(0,0,0,0.07)',
+                background: wrongPick && c === pattern.answer ? '#dcfce7' : wrongPick === c ? '#fee2e2' : '#eef2ff',
+                borderColor: wrongPick && c === pattern.answer ? '#22c55e' : wrongPick === c ? '#ef4444' : '#a5b4fc',
+                opacity: wrongPick && c !== pattern.answer && c !== wrongPick ? 0.45 : 1,
+              }}
+              aria-label={wrongPick && c === pattern.answer ? 'こたえ' : undefined}
             >
               <Chip id={c} size={44} />
             </button>
           ))}
         </div>
+        {wrongPick && (
+          <button onClick={goNext} className="w-full py-3 text-lg font-black text-white rounded-2xl shadow active:scale-95" style={{ background: GRAD }}>
+            {qNum >= TOTAL ? 'けっかを みる' : 'つぎへ'}
+          </button>
+        )}
       </div>
     </GameLayout>
   )
